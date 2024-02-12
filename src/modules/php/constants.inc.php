@@ -1,10 +1,54 @@
 <?php
-
-
-
 /*
  * Game Constants
  */
+const REPTILES = "reptiles";
+const FELINES = "felines";
+const RAPTORS = "raptors";
+const URSIDS = "ursids";
+const MARINES = "marines";
+
+const NORMAL_BANNERS = [REPTILES, FELINES, RAPTORS, URSIDS, MARINES];
+const RELIGIOUS = "religious";
+const IMPERIAL = "imperial";
+const ORDERS = [RELIGIOUS, IMPERIAL];
+
+const ALL_BANNERS = [REPTILES, FELINES, RAPTORS, URSIDS, MARINES, RELIGIOUS, IMPERIAL];
+
+//card type
+const THRONE = 'throne';
+
+const KING = 'king';
+const QUEEN = 'queen';
+const WITCH = 'witch';
+const WARRIOR = 'warrior';
+const TITAN = 'titan';
+const NORMAL_CHARACTERS = [KING, QUEEN, WITCH, WARRIOR, TITAN];
+
+const POPESS = 'popess';
+const WARRIOR_MONK = 'warrior_monk';
+const GAIA = 'gaia';
+const OURANOS = 'ouranos';
+
+const RELIGIOUS_CHARACTERS = [POPESS, WARRIOR_MONK, GAIA, OURANOS];
+
+const COLONEL = 'colonel';
+const GENERAL = 'general';
+const CAPTAIN = 'captain';
+const MARSHAL = 'marshal';
+
+const IMPERIAL_CHARACTERS = [COLONEL, GENERAL, CAPTAIN, MARSHAL];
+
+
+
+//Locations
+const DISCARD = 'discard';
+const DECK = 'deck';
+const INFLUENCE = 'influence';
+const CONCIL = 'concil';
+const ALKANE = 'alkane';
+const TITANS = 'titans';
+
 
 
 
@@ -25,9 +69,9 @@ const ST_END_GAME = 99;
  * Cheat Module
  */
 
- const OPTION_DEBUG = 103;
- const OPTION_DEBUG_OFF = 0;
- const OPTION_DEBUG_ON = 1;
+const OPTION_DEBUG = 103;
+const OPTION_DEBUG_OFF = 0;
+const OPTION_DEBUG_ON = 1;
 
 /******************
  ****** STATS ******
@@ -67,3 +111,7 @@ const MULTI = "multipleactiveplayer";
 const PRIVATESTATE = "private";
 const END_TURN = 'endTurn';
 const ACTIVE_PLAYER = "activeplayer";
+
+const FLIPPED = 1;
+const NOT_FLIPPED = 0;
+const VISIBLE = 0;

@@ -16,29 +16,29 @@ $gameinfos = array(
     'game_name' => "FiveRealms",
 
     // Game designer (or game designers, separated by commas)
-    'designer' => 'Joachim Thôme',
+    'designer' => ' ',
 
     // Game artist (or game artists, separated by commas)
-    'artist' => 'Emir Durmišević',
+    'artist' => ' ',
 
     // Year of FIRST publication of this game. Can be negative.
-    'year' => 2023,
+    'year' => 2024,
 
     // Game publisher (use empty string if there is no publisher)
-    'publisher' => 'Sylex',
+    'publisher' => 'GRRRE Games',
 
     // Url of game publisher website
-    'publisher_website' => 'https://sylex-edition.fr/',
+    'publisher_website' => 'https://www.grrre-games.com/',
 
     // Board Game Geek ID of the publisher
-    'publisher_bgg_id' => 36803,
+    'publisher_bgg_id' => 40652,
 
     // Board game geek ID of the game
-    'bgg_id' => 366397,
+    'bgg_id' => 0,
 
 
     // Players configuration that can be played (ex: 2 to 4 players)
-    'players' => array(2, 3, 4),
+    'players' => array(2),
 
     // Suggest players to play with this number of players. Must be null if there is no such advice, or if there is only one possible player configuration.
     // NB: the automatic lobby will try first the lowest number of players if this is not specified. So you _have to_ specify this parameter if the lowest player number is not compatible with the default options.
@@ -67,7 +67,7 @@ $gameinfos = array(
     // Note: if you are NOT using any tie breaker, leave the empty string.
     //
     // Example: 'tie_breaker_description' => totranslate( "Number of remaining cards in hand" ),
-    'tie_breaker_description' => totranslate("Number of sheriff stars then number of gold nuggets"),
+    'tie_breaker_description' => '',
 
     // If in the game, all losers are equal (no score to rank them or explicit in the rules that losers are not ranked between them), set this to true 
     // The game end result will display "Winner" for the 1st player and "Loser" for all other players

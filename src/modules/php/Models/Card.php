@@ -17,27 +17,20 @@ class Card extends \FRMS\Helpers\DB_Model
         'location' => 'card_location',
         'state' => ['card_state', 'int'],
         'extraDatas' => ['extra_datas', 'obj'],
-        // 'playerId' => ['player_id', 'int'],
-        'color' => 'color',
-        'value' => ['value', 'int'],
+        'flipped' => ['flipped', 'int'],
+        'x' => ['x', 'int'],
+        'y' => ['y', 'int'],
+        'type' => 'type',
+        'realm' => 'realm',
     ];
 
     protected $staticAttributes = [
-        // 'color',
-        // ['value', 'int'],
-        'action',
+        'type', 'realm'
     ];
 
-    public function __construct($row, $datas)
+    public function setCoord($coord)
     {
-        parent::__construct($row);
-        foreach ($datas as $attribute => $value) {
-            $this->$attribute = $value;
-        }
-    }
-
-    public function isSupported($players, $options)
-    {
-        return true; // Useful for expansion/ban list/ etc...
+        $this->setX($coord[0]);
+        $this->setY($coord[1]);
     }
 }

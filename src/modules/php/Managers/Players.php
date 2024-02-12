@@ -32,8 +32,7 @@ class Players extends \FRMS\Helpers\DB_Manager
       'player_color',
       'player_canal',
       'player_name',
-      'player_avatar',
-      'player_rewards'
+      'player_avatar'
     ]);
 
     $values = [];
@@ -45,8 +44,7 @@ class Players extends \FRMS\Helpers\DB_Manager
         $color,
         $player['player_canal'],
         $player['player_name'],
-        $player['player_avatar'],
-        '[]'
+        $player['player_avatar']
       ];
     }
 

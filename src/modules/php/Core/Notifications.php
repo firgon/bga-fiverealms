@@ -10,16 +10,13 @@ use FRMS\Core\Globals;
 class Notifications
 {
 
-  public static function playCard($player, $card, $cost)
+  public static function newAlkane()
   {
     $data = [
-      'player' => $player,
-      'card' => $card,
-      'cost' => $cost
+      'alkane' => Cards::getInLocation(ALKANE)->ui()
     ];
-    $msg = ($cost) ? clienttranslate('By paying ${cost} nuggets, ${player_name} play a ${value} ${color} card')
-      :    clienttranslate('${player_name} play a ${value} ${color} card');
-    static::notifyAll(PLAY_CARD, $msg, $data);
+
+    static::notifyAll('newAlkane', clienttranslate('The Alkane square is completed'), $data);
   }
 
   public static function payCards($player, $card1, $card2)
@@ -360,7 +357,7 @@ class Notifications
       }
     }
   }
-  
+
   //          █████                          █████     ███                     
   //         ░░███                          ░░███     ░░░                      
   //  ██████  ░███████    ██████   ██████   ███████   ████  ████████    ███████

@@ -13,11 +13,6 @@ class Globals extends \FRMS\Helpers\DB_Manager
   protected static $variables = [
     'turn' => 'int',
     'firstPlayer' => 'int',
-    'cheatMode' => 'bool'
-    // 'pendingAction' => 'obj',
-    // 'calledValue' => 'int',
-    // 'calledColor' => 'str',
-    // 'calledPlayer' => 'int'
   ];
 
   protected static $table = 'global_variables';
@@ -32,7 +27,6 @@ class Globals extends \FRMS\Helpers\DB_Manager
   {
     static::setTurn(0);
     static::setFirstPlayer($activePlayerId);
-    static::setCheatMode($options[OPTION_DEBUG] == 1);
   }
 
   /*

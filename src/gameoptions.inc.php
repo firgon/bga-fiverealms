@@ -27,23 +27,23 @@ require_once 'modules/php/constants.inc.php';
 
 $game_options = [
 
-    OPTION_DEBUG => [
-        'name' => totranslate('Cheat Module'),
-        'values' => [
-            OPTION_DEBUG_ON => [
-                'name' => totranslate('With'),
-                'description' => totranslate('Only for testing purpose'),
-                'tmdisplay' => totranslate('With cheat module'),
-                'alpha' => true
-            ],
-            OPTION_DEBUG_OFF => [
-                'name' => totranslate('Without'),
-                'description' => totranslate('Without cheat module'),
-                'tmdisplay' => totranslate('Without cheat module'),
-            ],
-        ],
-        'default' => OPTION_DEBUG_OFF,
-    ],
+    // OPTION_DEBUG => [
+    //     'name' => totranslate('Cheat Module'),
+    //     'values' => [
+    //         OPTION_DEBUG_ON => [
+    //             'name' => totranslate('With'),
+    //             'description' => totranslate('Only for testing purpose'),
+    //             'tmdisplay' => totranslate('With cheat module'),
+    //             'alpha' => true
+    //         ],
+    //         OPTION_DEBUG_OFF => [
+    //             'name' => totranslate('Without'),
+    //             'description' => totranslate('Without cheat module'),
+    //             'tmdisplay' => totranslate('Without cheat module'),
+    //         ],
+    //     ],
+    //     'default' => OPTION_DEBUG_OFF,
+    // ],
 ];
 
 

@@ -15,7 +15,7 @@ class Cards extends \FRMS\Helpers\Pieces
     protected static $prefix = 'card_';
     protected static $autoIncrement = true;
     protected static $autoremovePrefix = false;
-    protected static $customFields = ['extra_datas', 'value', 'color'];
+    protected static $customFields = ['extra_datas', 'type', 'realm', 'x', 'y', 'flipped'];
 
     protected static $autoreshuffle = true; // If true, a new deck is automatically formed with a reshuffled discard as soon at is needed
     // If defined, tell the name of the deck and what is the corresponding discard (ex : "mydeck" => "mydiscard")
@@ -23,58 +23,82 @@ class Cards extends \FRMS\Helpers\Pieces
 
     protected static function cast($row)
     {
-        $data = self::getCards()[$row[static::$prefix . 'id']];
-        return new \FRMS\Models\Card($row, $data);
+        // $type = '\FRMS\Models\Characters\\' . $row['type'];
+        $type = '\FRMS\Models\Card';
+        return new $type($row);
     }
 
     public static function getUiData()
     {
         return [
-            'deck_count' => static::countInLocation('deck'),
-            'discard_count' => static::countInLocation('discard'),
-            'discard' => static::getTopOf('discard')
+            'alkane' => [],
+            'deckN' => static::countInLocation(DECK),
+            'discard' => static::getTopOf(DISCARD),
+
         ];
     }
 
     /* Creation of the Cards */
     public static function setupNewGame($players, $options)
     {
-        // $cards = [];
-        // // Create the deck
-        // foreach (self::getCards() as $id => $card) {
+        $cards = [];
 
-        //     $cards[] = [
-        //         'id' => $id,
-        //         'location' => 'deck',
-        //         'value' => $card['value'],
-        //         'color' => $card['color']
-        //     ];
-        // }
+        //create throne cards
+        foreach (NORMAL_BANNERS as $banner) {
+            $cards[] = [
+                'location' => DECK . THRONE,
+                'type' => THRONE,
+                'realm' => $banner
+            ];
+        }
 
-        // static::create($cards);
+        //create normal banner cards
+        foreach (ALL_BANNERS as $banner) {
+            $characters = (in_array($banner, NORMAL_BANNERS))
+                ? NORMAL_CHARACTERS
+                : (($banner == IMPERIAL)
+                    ? IMPERIAL_CHARACTERS
+                    : RELIGIOUS_CHARACTERS);
+            foreach ($characters as $character) {
+                $cards[] = [
+                    'location' => DECK,
+                    'type' => $character,
+                    'realm' => $banner
+                ];
+            }
+        }
 
-        // static::shuffle('deck');
+        static::create($cards);
 
-        // $nbCards = 4;
-        // foreach ($players as $pId => $player) {
-        //     static::pickForLocation($nbCards, 'deck', 'hand', $pId);
-        //     static::pickOneForLocation('deck', 'table', $pId);
-        //     $nbCards++;
-        // }
+        static::shuffle(DECK);
+        static::shuffle(DECK . THRONE);
+
+        foreach ($players as $pId => $player) {
+            static::pickForLocation(1, DECK . THRONE, CONCIL, $pId);
+        }
+
+        static::generateAlkane(false);
     }
 
-    public function getCards()
+    public static function generateAlkane($notifNeeded = true)
     {
-        $f = function ($data) {
-            return [
-                'color' => $data[0],
-                'value' => $data[1],
-                'action' => $data[2],
-            ];
-        };
-
-        return [
-            // 1 => $f([GREEN, 1, NUGGETS]),
+        $possiblePlaces = [
+            [2, 1],
+            [3, 1],
+            [1, 2],
+            [3, 2],
+            [1, 3],
+            [2, 3]
         ];
+        $index = 0;
+        $card = static::getInLocation(ALKANE)->first();
+        if ($card) {
+            $card->setCoord($possiblePlaces[$index++]);
+        }
+        for ($i = $index; $i < count($possiblePlaces); $i++) {
+            $newCard = static::getTopOf(DECK);
+            $newCard->setCoord($possiblePlaces[$index++]);
+        }
+        if ($notifNeeded) Notifications::newAlkane();
     }
 }

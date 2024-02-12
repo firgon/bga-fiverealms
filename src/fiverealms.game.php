@@ -36,7 +36,6 @@ require_once 'modules/php/constants.inc.php';
 
 use FRMS\Managers\Players;
 use FRMS\Managers\Cards;
-use FRMS\Managers\Cells;
 use FRMS\Core\Globals;
 use FRMS\Core\Preferences;
 use FRMS\Core\Stats;
@@ -113,7 +112,6 @@ class FiveRealms extends Table
         return [
             'prefs' => Preferences::getUiData($pId),
             'players' => Players::getUiData($pId),
-            'cheatModule' => Globals::isCheatMode() ? CheatModule::getUiData() : null
         ];
     }
 

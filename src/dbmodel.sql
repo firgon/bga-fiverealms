@@ -30,29 +30,21 @@ CREATE TABLE IF NOT EXISTS `cards` (
 	`card_state` int(10) DEFAULT 0,
 	`card_location` varchar(32) NOT NULL,
 	`extra_datas` JSON NULL,
-	-- `player_id` int(10) NULL,
-  `value` int(1) NULL,
-  `color` varchar(16) NULL,
+	`type` varchar(16) NOT NULL,
+	`realm` varchar(16) NOT NULL,
+	`player_id` int(10) NULL,
+  `x` int(1) NULL,
+  `y` int(1) NULL,
+  `flipped` int(1) NULL,
 	PRIMARY KEY (`card_id`)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
-    CREATE TABLE IF NOT EXISTS `cells` (
-  `cell_id` int(5) NOT NULL AUTO_INCREMENT,
-  `turn` int(3) DEFAULT 0,
-	`sheet` INT(1) NOT NULL,
-  `cell` INT(3) DEFAULT -1,
-	`zone` varchar(32) NULL,
-	`extra_datas` JSON NULL,
-	`player_id` int(10) NULL,
-	PRIMARY KEY (`cell_id`)
-    ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
-
 	-- ALTER player TABLE --
-ALTER TABLE `player`
-ADD `player_rewards` JSON NULL,
-ADD `player_nuggets` INT(3) DEFAULT 3,
-ADD `player_can_undo` INT(3) DEFAULT 0,
-ADD `player_pending_action` varchar(32) NULL;
+-- ALTER TABLE `player`
+-- ADD `player_rewards` JSON NULL,
+-- ADD `player_nuggets` INT(3) DEFAULT 3,
+-- ADD `player_can_undo` INT(3) DEFAULT 0,
+-- ADD `player_pending_action` varchar(32) NULL;
 
 	-- CORE TABLES --
 CREATE TABLE IF NOT EXISTS `global_variables` (
