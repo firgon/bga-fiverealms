@@ -1,0 +1,12 @@
+@use "sass:math";
+@mixin getBackgroundPosition($x, $maxx, $maxy) {
+  $x: $x - 1;
+  background-position-x: math.div($x % $maxx * 100%, ($maxx - 1));
+  @if ($maxy > 1) {
+    background-position-y: math.div(
+      math.floor(math.div($x, $maxx)) * 100%,
+      ($maxy - 1)
+    );
+  }
+  background-size: $maxx * 100%;
+}

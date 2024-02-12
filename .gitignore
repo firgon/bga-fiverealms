@@ -1,0 +1,10 @@
+vendor
+package-lock.json
+vendor/composer/autoload_classmap.php
+vendor/composer/autoload_static.php
+vendor/composer/installed.php
+.vscode
+composer.json
+composer.lock
+phpunit.xml
+.phpunit.result.cache
