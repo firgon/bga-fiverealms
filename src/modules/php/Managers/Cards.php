@@ -31,9 +31,11 @@ class Cards extends \FRMS\Helpers\Pieces
     public static function getUiData()
     {
         return [
-            'alkane' => [],
+            'alkane' => static::getInLocation(ALKANE),
             'deckN' => static::countInLocation(DECK),
+            'deck' => static::getTopOf(DECK)->getUiData(),
             'discard' => static::getTopOf(DISCARD),
+            'discardN' => static::countInLocation(DISCARD),
 
         ];
     }
