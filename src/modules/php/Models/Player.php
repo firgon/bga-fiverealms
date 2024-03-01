@@ -27,9 +27,7 @@ class Player extends \FRMS\Helpers\DB_Model
     'scoreAux' => ['player_score_aux', 'int'],
     'canUndo' => ['player_can_undo', 'int'],
     'pendingActions' => ['player_pending_actions', 'obj'],
-    'nuggets' => ['player_nuggets', 'int'],
-    'zombie' => 'player_zombie',
-    'rewards' => ['player_rewards', 'obj']
+    'thronePlayed' => 'bool'
   ];
 
   public function getUiData($currentPlayerId = null)
@@ -54,6 +52,16 @@ class Player extends \FRMS\Helpers\DB_Model
   public function getCardsOnTable()
   {
     return Cards::getInLocation('table', $this->id);
+  }
+
+  public function canUseThrone()
+  {
+    return $this->getThronePlayed() == 1;
+  }
+
+  public function useThrone()
+  {
+    return $this->setThronePlayed(1);
   }
 
   public function getPlayableCardsIds($costMax = 3)
@@ -95,7 +103,7 @@ class Player extends \FRMS\Helpers\DB_Model
                                                                              
                                                                              
   */
-  
+
   public function addActionToPendingAction($action, $bFirst = false)
   {
     // $player = is_numeric($player) ? Players::get($player) : $player;

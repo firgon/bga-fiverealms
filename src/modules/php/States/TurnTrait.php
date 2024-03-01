@@ -17,9 +17,11 @@ trait TurnTrait
 	public function argPlay()
 	{
 		$activePlayer = Players::getActive();
+		$nextCard = Cards::getTopOf(DECK);
 
 		return [
-			'player_name' => $activePlayer->getName()
+			'possibleSpaceIds' => Cards::getPlayablePlaces($nextCard->getRealm()),
+			'nextCard' => $nextCard->getUiData(false)
 		];
 	}
 

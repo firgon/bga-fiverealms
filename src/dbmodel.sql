@@ -40,11 +40,8 @@ CREATE TABLE IF NOT EXISTS `cards` (
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8;
 
 	-- ALTER player TABLE --
--- ALTER TABLE `player`
--- ADD `player_rewards` JSON NULL,
--- ADD `player_nuggets` INT(3) DEFAULT 3,
--- ADD `player_can_undo` INT(3) DEFAULT 0,
--- ADD `player_pending_action` varchar(32) NULL;
+ALTER TABLE `player`
+ADD `thronePlayed` int(1) NULL;
 
 	-- CORE TABLES --
 CREATE TABLE IF NOT EXISTS `global_variables` (

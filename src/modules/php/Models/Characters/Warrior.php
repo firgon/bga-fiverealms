@@ -8,10 +8,10 @@ use FRMS\Managers\Players;
  * Throne
  */
 
-class Throne extends \FRMS\Models\Card
+class Warrior extends \FRMS\Models\Card
 {
 	public function anytimeEffect($playedRealm, $nthOfCards){
-		return $this->getRewards($playedRealm, $nthOfCards, [2],2);
+		return $this->getRewards($playedRealm, $nthOfCards, [4], 'steal');
 	}
 
 	//
@@ -28,6 +28,6 @@ class Throne extends \FRMS\Models\Card
 	}
 
 	public function isWarrior(){
-		return false;
+		return true;
 	}
 }

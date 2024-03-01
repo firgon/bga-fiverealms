@@ -24,9 +24,10 @@ abstract class DB_Model extends \APP_DbObject implements \JsonSerializable
    * as attribute => bindedValue
    */
   public $bindedAttributes = [
-    'id' => ''
+    'id' => '',
+    'type' => ''
   ];
-  
+
   /**
    * Fill in class attributes based on DB entry
    */

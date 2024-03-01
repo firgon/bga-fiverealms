@@ -8,26 +8,26 @@ use FRMS\Managers\Players;
  * Throne
  */
 
-class Throne extends \FRMS\Models\Card
+class {FILENAME_PC} extends \FRMS\Models\Card
 {
 	public function anytimeEffect($playedRealm, $nthOfCards){
-		return $this->getRewards($playedRealm, $nthOfCards, [2],2);
+		return $this->getRewards($playedRealm, $nthOfCards, {ANYTIME});
 	}
 
-	//
+	//{RECRUIT}
 	public function recruitEffect(){
 		return 0;
 	}
 
 	public function endEffect(){
-		return $this->();
+		return $this->{END}();
 	}
 
 	public function isTitan(){
-		return false;
+		return {ISTITAN};
 	}
 
 	public function isWarrior(){
-		return false;
+		return {ISWARRIORS};
 	}
 }

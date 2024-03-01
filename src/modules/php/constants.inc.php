@@ -16,26 +16,26 @@ const ORDERS = [RELIGIOUS, IMPERIAL];
 const ALL_BANNERS = [REPTILES, FELINES, RAPTORS, URSIDS, MARINES, RELIGIOUS, IMPERIAL];
 
 //card type
-const THRONE = 'throne';
+const THRONE = 'Throne';
 
-const KING = 'king';
-const QUEEN = 'queen';
-const WITCH = 'witch';
-const WARRIOR = 'warrior';
-const TITAN = 'titan';
-const NORMAL_CHARACTERS = [KING, QUEEN, WITCH, WARRIOR, TITAN];
+const KING = 'King';
+const REINE = 'Reine';
+const WITCH = 'Witch';
+const WARRIOR = 'Warrior';
+const TITAN = 'Titan';
+const NORMAL_CHARACTERS = [KING, REINE, WITCH, WARRIOR, TITAN];
 
-const POPESS = 'popess';
-const WARRIOR_MONK = 'warrior_monk';
-const GAIA = 'gaia';
-const OURANOS = 'ouranos';
+const POPESS = 'Popess';
+const WARRIOR_MONK = 'Warrior Monk';
+const GAIA = 'Gaia';
+const OURANOS = 'Ouranos';
 
 const RELIGIOUS_CHARACTERS = [POPESS, WARRIOR_MONK, GAIA, OURANOS];
 
-const COLONEL = 'colonel';
-const GENERAL = 'general';
-const CAPTAIN = 'captain';
-const MARSHAL = 'marshal';
+const COLONEL = 'Colonel';
+const GENERAL = 'General';
+const CAPTAIN = 'Captain';
+const MARSHAL = 'Marshal';
 
 const IMPERIAL_CHARACTERS = [COLONEL, GENERAL, CAPTAIN, MARSHAL];
 
@@ -50,6 +50,7 @@ const ALKANE = 'alkane';
 const TITANS = 'titans';
 
 
+const DIRECTIONS = [[-1, 0], [0, -1], [1, 0], [0, 1]];
 
 
 /*
