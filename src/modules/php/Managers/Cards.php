@@ -50,7 +50,8 @@ class Cards extends \FRMS\Helpers\Pieces
             $cards[] = [
                 'location' => DECK . THRONE,
                 'type' => THRONE,
-                'realm' => $banner
+                'realm' => $banner,
+                'flipped' => NOT_FLIPPED
             ];
         }
 
@@ -65,7 +66,8 @@ class Cards extends \FRMS\Helpers\Pieces
                 $cards[] = [
                     'location' => DECK,
                     'type' => $character,
-                    'realm' => $banner
+                    'realm' => $banner,
+                    'flipped' => FLIPPED
                 ];
             }
         }
@@ -76,7 +78,7 @@ class Cards extends \FRMS\Helpers\Pieces
         static::shuffle(DECK . THRONE);
 
         foreach ($players as $pId => $player) {
-            static::pickForLocation(1, DECK . THRONE, CONCIL, $pId);
+            static::pickForLocation(1, DECK . THRONE, COUNCIL, $pId);
         }
 
         static::generateAlkane(false);
@@ -148,7 +150,7 @@ class Cards extends \FRMS\Helpers\Pieces
                             if (isset($adjacentColors[$adjacentCard->getRealm()])) {
                                 $adjacentColors[$adjacentCard->getRealm()] = array_merge($adjacentColors[$adjacentCard->getRealm()], $zoneRealmsBySpaceId[$adjacentCard->getSpaceId()]);
                             } else {
-                                $adjacentColors[$adjacentCard->getRealm()] = $zoneRealmsBySpaceId[$adjacentCard->getSpaceId()];
+                                $adjacentColors[$adjacentCard->getRealm()] = $spaceIdByRealms[$adjacentCard->getRealm()];
                             }
                         }
                     }
@@ -157,10 +159,9 @@ class Cards extends \FRMS\Helpers\Pieces
                         //if it's one of the adjacent colors
                         if (array_key_exists($realm, $adjacentColors)) {
                             //add current space id and all adjacent zones
-                            $possiblePlaces[static::getSpaceId($x, $y)]['adjacent'] = array_values(array_unique(array_merge([static::getSpaceId($x, $y)], $adjacentColors[$realm])));
+                            $possiblePlaces[static::getSpaceId($x, $y)][$realm] = array_values(array_unique(array_merge([static::getSpaceId($x, $y)], $adjacentColors[$realm])));
                         } else {
-                            //else only add existing cards with that real
-                            $possiblePlaces[static::getSpaceId($x, $y)]['different'] = $spaceIdByRealms[$realm] ?? [];
+                            $possiblePlaces[static::getSpaceId($x, $y)] = $adjacentColors;
                         }
                     }
                 }
@@ -186,7 +187,7 @@ class Cards extends \FRMS\Helpers\Pieces
                         // var_dump($currentCard);
                         $currentZone[] = $currentCard;
 
-                        $spaceIdByRealms[$card->getRealm()][] = $card->getSpaceId();
+                        $spaceIdByRealms[$currentCard->getRealm()][] = $currentCard->getSpaceId();
                         foreach (static::getNeighbours($currentCard->getX(), $currentCard->getY()) as $coord) {
                             if (isset($grid[$coord[0]][$coord[1]])) {
                                 $candidate = $grid[$coord[0]][$coord[1]];
@@ -205,6 +206,12 @@ class Cards extends \FRMS\Helpers\Pieces
             }
         }
         return [$adjacentRealms, $spaceIdByRealms];
+    }
+
+    public static function getCardFromSpaceId($spaceId)
+    {
+        $coord = static::getCoord($spaceId);
+        return static::getInLocationQ(ALKANE)->where('x', $coord[0])->where('y', $coord[1])->getSingle();
     }
 
     protected static function getNeighbours($x, $y)
@@ -283,6 +290,6 @@ class Cards extends \FRMS\Helpers\Pieces
 
     public static function getCoord($spaceId)
     {
-        return explode($spaceId, '_');
+        return explode('_', $spaceId);
     }
 }

@@ -54,7 +54,7 @@ class Players extends \FRMS\Helpers\DB_Manager
     Game::get()->reloadPlayersBasicInfos();
   }
 
-  public function getActiveId()
+  public static function getActiveId()
   {
     return Game::get()->getActivePlayerId();
   }
@@ -64,7 +64,7 @@ class Players extends \FRMS\Helpers\DB_Manager
     return (int) Game::get()->getCurrentPId();
   }
 
-  public function getAll()
+  public static function getAll()
   {
     return self::DB()->get(false);
   }
@@ -90,9 +90,9 @@ class Players extends \FRMS\Helpers\DB_Manager
     return self::get(self::getCurrentId());
   }
 
-  public function getNextId($player = null)
+  public static function getNextId($player = null)
   {
-    $player = $player ?? Players::getCurrent();
+    $player = $player ?? static::getActiveId();
     $pId = is_int($player) ? $player : $player->getId();
     $table = Game::get()->getNextPlayerTable();
     return $table[$pId];

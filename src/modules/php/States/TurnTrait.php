@@ -14,6 +14,12 @@ use FRMS\Models\Player;
 
 trait TurnTrait
 {
+	public function stNextPlayer()
+	{
+		$this->activeNextPlayer();
+		Game::transition();
+	}
+
 	public function argPlay()
 	{
 		$activePlayer = Players::getActive();
@@ -29,34 +35,37 @@ trait TurnTrait
 	{
 	}
 
-	public function actPlay($pId2, $color, $value, $pId = null)
+	public function actInfluence($spaceId, $realm)
 	{
 		// get infos
-		if (!$pId) {
-			$pId = Game::get()->getCurrentPlayerId();
-			self::checkAction('actPlay');
-		}
+
+		$pId = Game::get()->getCurrentPlayerId();
+		self::checkAction('actInfluence');
 
 		$currentPlayer = Players::get($pId);
-		$calledPlayer = Players::get($pId2);
 
 		$args = $this->getArgs();
 
-		if (!in_array($calledPlayer, $args['callablePlayers'])) {
-			throw new \BgaVisibleSystemException("You can't call this player.");
+		if (!in_array($spaceId, $args['possibleSpaceIds'])) {
+			throw new \BgaVisibleSystemException("You can't play your card here.");
 		}
 
-		foreach ($args['uncallableCards'] as $id => $card) {
-			if ($card->getColor() == $color && $card->getValue() == $value)
-				throw new \BgaVisibleSystemException("You can't ask this card.");
+		if (!in_array($realm, $args['possibleSpaceIds'][$realm])) {
+			throw new \BgaVisibleSystemException("You can't influence this realm $realm.");
 		}
 
-		Notifications::call($currentPlayer, $calledPlayer, $color, $value);
+		$spaceIds = $args['possibleSpaceIds'][$realm];
 
-		Globals::setCalledPlayer($pId2);
-		Globals::setCalledValue($value);
-		Globals::setCalledColor($color);
+		foreach ($spaceIds as $spaceId) {
+			$card = Cards::getCardFromSpaceId($spaceId);
+			$currentPlayer->takeCardInInfluence($card);
+		}
 
+		Notifications::influence($currentPlayer, $spaceIds, $realm);
+
+		$influenceInRealm = $currentPlayer->countSpecificBanner($realm);
+
+		$currentPlayer->activateCouncil($realm, range($influenceInRealm - count($spaceIds) + 1, $influenceInRealm));
 
 		$this->gamestate->nextState('');
 	}

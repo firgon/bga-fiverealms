@@ -40,6 +40,8 @@ use FRMS\Core\Globals;
 use FRMS\Core\Preferences;
 use FRMS\Core\Stats;
 use FRMS\Core\CheatModule;
+use FRMS\Core\Game;
+
 // use FRMS\Helpers\Log;
 
 class FiveRealms extends Table
@@ -92,6 +94,7 @@ class FiveRealms extends Table
 
         $this->setGameStateInitialValue('logging', false);
         $this->activeNextPlayer();
+        $this->giveExtraTime(Players::getActiveId());
 
         Globals::setupNewGame($players, $options, Players::getActiveId());
         // Log::enable();

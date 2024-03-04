@@ -45,7 +45,7 @@ const IMPERIAL_CHARACTERS = [COLONEL, GENERAL, CAPTAIN, MARSHAL];
 const DISCARD = 'discard';
 const DECK = 'deck';
 const INFLUENCE = 'influence';
-const CONCIL = 'concil';
+const COUNCIL = 'council';
 const ALKANE = 'alkane';
 const TITANS = 'titans';
 
@@ -58,7 +58,8 @@ const DIRECTIONS = [[-1, 0], [0, -1], [1, 0], [0, 1]];
  */
 const ST_GAME_SETUP = 1;
 
-// const ST_PLAY = 2;
+const ST_PLAY = 2;
+const ST_NEXT_PLAYER = 3;
 
 
 
@@ -111,6 +112,7 @@ const GAME = "game";
 const MULTI = "multipleactiveplayer";
 const PRIVATESTATE = "private";
 const END_TURN = 'endTurn';
+const END_GAME = 'endGame';
 const ACTIVE_PLAYER = "activeplayer";
 
 const FLIPPED = 1;

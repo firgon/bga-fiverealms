@@ -59,21 +59,29 @@ $machinestates = [
         "type" => "manager",
         "action" => "stGameSetup",
         "transitions" => [
-            "" => 2,
+            "" => ST_PLAY,
         ]
     ],
 
-    2 => [
+    ST_PLAY => [
         "name" => "play",
-        "description" => clienttranslate('${actplayer} must play'),
-        "descriptionmyturn" => clienttranslate('${you} must play'), //won't be displayed
+        "description" => clienttranslate('${actplayer} must place the first card from Banner deck in the Alkane square'),
+        "descriptionmyturn" => clienttranslate('${you} must place the first card from Banner deck in the Alkane square'),
         "type" => ACTIVE_PLAYER,
         "args" => "argPlay",
-        "action" => "stPlay",
-        "possibleactions" => ['actPlay'], //this action is possible if player is not in any private state which usually happens when they are inactive
+        // "action" => "stPlay",
+        "possibleactions" => ['actRecruit', 'actInfluence'],
         "transitions" => [
-            END_TURN => ST_PRE_END_OF_GAME
+            END_TURN => ST_NEXT_PLAYER,
+            END_GAME => ST_PRE_END_OF_GAME
         ]
+    ],
+
+    ST_NEXT_PLAYER => [
+        'name' => 'nextPlayer',
+        'type' => GAME,
+        'action' => 'stNextPlayer',
+        'transitions' => ['' => ST_PLAY],
     ],
 
     ST_PRE_END_OF_GAME => [

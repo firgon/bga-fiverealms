@@ -3,6 +3,7 @@
 namespace FRMS\Core;
 
 use FiveRealms;
+use FRMS\Managers\Players;
 
 /*
  * Game: a wrapper over table object to allow more generic modules
@@ -14,14 +15,13 @@ class Game
   {
     return FiveRealms::get();
   }
-  
+
   public static function isStateId($stateId)
   {
     return static::get()->gamestate->state_id() == $stateId;
   }
 
-  
-  public static function transition($transition)
+  public static function transition($transition = '')
   {
     static::get()->gamestate->nextState($transition);
   }

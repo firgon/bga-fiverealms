@@ -7,12 +7,13 @@ use FRMS\Core\Game;
 use FRMS\Core\Notifications;
 use FRMS\Managers\Players;
 use FRMS\Helpers\Log;
+use FRMS\Managers\Cards;
 
 trait DebugTrait
 {
   function test()
   {
-    Log::revertAll();
+    Cards::get(8)->setX('NULL');
   }
 
   // ████                         █████ ██████████            █████                        

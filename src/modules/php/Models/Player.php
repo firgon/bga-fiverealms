@@ -2,6 +2,7 @@
 
 namespace FRMS\Models;
 
+use FRMS\Core\Notifications;
 use FRMS\Core\Stats;
 use FRMS\Core\Preferences;
 use FRMS\Managers\Players;
@@ -33,13 +34,10 @@ class Player extends \FRMS\Helpers\DB_Model
   public function getUiData($currentPlayerId = null)
   {
     $data = parent::getUiData();
+    foreach (NORMAL_BANNERS as $banner) {
+      $data[INFLUENCE][$banner] = $this->countSpecificBanners($banner);
+    }
     // $isCurrent = $this->id == $currentPlayerId;
-    // $data['hand'] = $this->getCardsInHand($isCurrent);
-    // $data['table'] = $this->getCardsOnTable();
-    // $data['score1'] = Cells::getScore1($this->id);
-    // $data['rewards'] = $this->getRewards();
-    // $data['score2'] = array_sum($data['rewards']);
-    // $data['score3'] = $this->getScore();
 
     return $data;
   }
@@ -47,11 +45,6 @@ class Player extends \FRMS\Helpers\DB_Model
   public function getCardsInHand($isCurrent = true)
   {
     return ($isCurrent) ? Cards::getInLocation('hand', $this->id) : Cards::countInLocation('hand', $this->id);
-  }
-
-  public function getCardsOnTable()
-  {
-    return Cards::getInLocation('table', $this->id);
   }
 
   public function canUseThrone()
@@ -64,30 +57,79 @@ class Player extends \FRMS\Helpers\DB_Model
     return $this->setThronePlayed(1);
   }
 
-  public function getPlayableCardsIds($costMax = 3)
+  public function addCardInInfluence($card)
   {
-    $result = [];
-    $cards = $this->getCardsInHand();
-    $unplayableCards = $this->getCardsOnTable();
+    $card->setPlayerId($this->getId());
+    $card->setLocation(INFLUENCE);
+    $card->setX(-10);
+    $card->setY(-10);
+  }
 
-    foreach ($cards as $id => $card) {
-      if ($card->getValue() > $costMax) continue;
-      $playable = true;
-      foreach ($unplayableCards as $id => $unplayableCard) {
-        if (
-          $card->getValue() == $unplayableCard->getValue() &&
-          $card->getColor() == $unplayableCard->getColor()
-        ) {
-          $playable = false;
-          break;
-        }
+
+  public function countSpecificBanner($banner)
+  {
+    return Cards::getInLocationQ(INFLUENCE)
+      ->where('player_id', $this->getId())
+      ->where('realm', $banner)
+      ->get()->count();
+  }
+
+
+  public function countWarrior()
+  {
+    return Cards::getInLocationQ(COUNCIL)
+      ->where('player_id', $this->getId())
+      ->get()->filter(fn ($card) => $card->isWarrior())->count();
+  }
+
+
+  public function countTitans()
+  {
+    return Cards::getInLocationQ(TITANS)
+      ->where('player_id', $this->getId())
+      ->get()->count();
+  }
+
+  public function countLines()
+  {
+    return max(array_map(fn ($realm) => $this->countSpecificBanner($realm), NORMAL_BANNERS));
+  }
+
+  public function activateCouncil($playerRealm, $nthOfCards, $bEndOfGame = false)
+  {
+    $cards = Cards::getInLocationPId(COUNCIL, $this->getId());
+    $witch = null;
+
+    foreach ($cards as $cardId => $card) {
+      //play witch at the end
+      if ($card->isWitch()) {
+        $witch = $card;
+        continue;
       }
-      if ($playable) {
-        $result[] = $card->getId();
+      if ($bEndOfGame) {
+        $card->endEffect();
+      } else {
+        $card->anytimeEffect($playerRealm, $nthOfCards);
       }
     }
+    if (!is_null($witch)) {
+      $witch->anytimeEffect($playerRealm, $nthOfCards);
+    }
+  }
 
-    return $result;
+  public function increaseScore($score, $card)
+  {
+    $this->incScore($score);
+    Notifications::getNewCastleCards($score, $card, $this);
+  }
+
+  public function getOpponent()
+  {
+    foreach (Players::getAll() as $pId => $player) {
+      if ($pId != $this->getId()) {
+        return $player;
+      }
+    }
   }
 
   /*
@@ -106,7 +148,6 @@ class Player extends \FRMS\Helpers\DB_Model
 
   public function addActionToPendingAction($action, $bFirst = false)
   {
-    // $player = is_numeric($player) ? Players::get($player) : $player;
     $pendingActions = $this->getPendingActions();
 
     if ($bFirst) {
@@ -120,7 +161,6 @@ class Player extends \FRMS\Helpers\DB_Model
 
   public function getNextPendingAction($bFirst = true, $bDestructive = true)
   {
-
     $pendingActions = $this->getPendingActions();
 
     if ($bFirst) {

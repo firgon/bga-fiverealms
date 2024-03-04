@@ -12,7 +12,7 @@ class Colonel extends \FRMS\Models\Card
 {
 	public function anytimeEffect($playedRealm, $nthOfCards)
 	{
-		return $this->getRewards($playedRealm, $nthOfCards, 'line', 1);
+		return $this->getRewards($playedRealm, $nthOfCards, 'countNewLines', 1);
 	}
 
 	//

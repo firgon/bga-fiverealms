@@ -23,7 +23,7 @@ class Captain extends \FRMS\Models\Card
 
 	public function endEffect()
 	{
-		return $this->majorityInEachRealm();
+		return $this->countMajorities();
 	}
 
 	public function isTitan()

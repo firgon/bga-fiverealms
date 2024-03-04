@@ -44,41 +44,95 @@ class Card extends \FRMS\Helpers\DB_Model
         return 0;
     }
 
-    //TODO
+    protected function getPlayer()
+    {
+        return Players::get($this->getPlayerId());
+    }
+
+    protected function countNewLines($nthOfCards)
+    {
+        $linesNb = $this->getPlayer()->countLines();
+
+        //determine how many new lines have been created
+        return count(array_filter($nthOfCards, fn ($nth) => $nth <= $linesNb));
+    }
 
     protected function getRewards($playedRealm, $nthOfCards, $thresold, $reward)
     {
-        //test if $tresold is an array if not it's a function
+        //test if $thresold is an array if not it's a function
         //test if $reward is a number if not it's a function
+        if ($this->getRealm() !=  $playedRealm) return;
+        if (is_array($thresold)) {
+            $intersect = array_intersect($nthOfCards, $thresold);
+            $count = count($intersect);
+        } else {
+            $count = $this->$thresold($nthOfCards);
+        }
+
+        if (is_string($reward)) {
+            for ($i = 0; $i < $count; $i++) {
+                $this->$reward();
+            }
+        } else {
+            $this->getPlayer()->increaseScore($count * $reward, $this);
+        }
     }
     protected function majorityOfThisRealm()
     {
+        $player = $this->getPlayer();
+        $opponent = $player->getOpponent();
+        if ($player->countSpecificBanner($this->getRealm()) > $opponent->countSpecificBanner($this->getRealm())) {
+            $player->increaseScore(3, $this);
+        }
     }
-    protected function majorityInEachRealm()
-    {
-    }
+
     protected function majorityOfWarriors()
     {
+        $player = $this->getPlayer();
+        $opponent = $player->getOpponent();
+        if ($player->countWarriors() > $opponent->countWarriors()) {
+            $player->increaseScore(2, $this);
+            $opponent->increaseScore(-2, $this);
+        }
     }
     protected function majorityOfTitans()
     {
+        $player = $this->getPlayer();
+        $opponent = $player->getOpponent();
+        if ($player->countTitans() > $opponent->countTitans()) {
+            $player->increaseScore(1, $this);
+        }
     }
     protected function majorityOfLines()
     {
+        $player = $this->getPlayer();
+        if ($player->countLines() > $player->getOpponent()->countLines()) {
+            $player->increaseScore(3, $this);
+        };
     }
+
     protected function countMajorities()
     {
+        $player = $this->getPlayer();
+        $opponent = $player->getOpponent();
+        $majorities = 0;
+
+        foreach (NORMAL_BANNERS as $realm) {
+            if ($player->countSpecificBanner($realm) > $opponent->countSpecificBanner($realm)) {
+                $majorities++;
+            }
+        }
+
+        $player->increaseScore($majorities, $this);
     }
 
     //
     public function recruitEffect()
     {
-        return 0;
     }
 
     public function endEffect()
     {
-        return 0;
     }
 
     public function isWitch()
