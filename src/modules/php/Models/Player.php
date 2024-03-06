@@ -35,7 +35,7 @@ class Player extends \FRMS\Helpers\DB_Model
   {
     $data = parent::getUiData();
     foreach (NORMAL_BANNERS as $banner) {
-      $data[INFLUENCE][$banner] = $this->countSpecificBanners($banner);
+      $data[INFLUENCE][$banner] = $this->countSpecificBanner($banner);
     }
     // $isCurrent = $this->id == $currentPlayerId;
 

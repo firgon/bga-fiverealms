@@ -12,7 +12,8 @@ class Popess extends \FRMS\Models\Card
 {
 	public function anytimeEffect($playedRealm, $nthOfCards)
 	{
-		return $this->getRewards($playedRealm, $nthOfCards, [4], 2);
+		//hack to always make playedRealm match the realm of this card
+		return $this->getRewards($this->getRealm(), $nthOfCards, [4], 2);
 	}
 
 	public function isTitan()
