@@ -10,24 +10,18 @@ use FRMS\Managers\Players;
 
 class Throne extends \FRMS\Models\Card
 {
-	public function anytimeEffect($playedRealm, $nthOfCards){
-		return $this->getRewards($playedRealm, $nthOfCards, [2],2);
+	public function anytimeEffect($influence)
+	{
+		return $this->getRewards($influence, [2], 2);
 	}
 
-	//
-	public function recruitEffect(){
-		return 0;
-	}
-
-	public function endEffect(){
-		return $this->();
-	}
-
-	public function isTitan(){
+	public function isTitan()
+	{
 		return false;
 	}
 
-	public function isWarrior(){
+	public function isWarrior()
+	{
 		return false;
 	}
 }

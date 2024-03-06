@@ -28,6 +28,13 @@ class Card extends \FRMS\Helpers\DB_Model
 
     protected $staticAttributes = [];
 
+    public function placeOnAlkane($coordOrSpaceId)
+    {
+        $coord = (is_array($coordOrSpaceId)) ? $coordOrSpaceId : Cards::getCoord($coordOrSpaceId);
+        $this->setLocation(ALKANE);
+        $this->setCoord($coord);
+    }
+
     public function setCoord($coord)
     {
         $this->setX($coord[0]);
@@ -39,7 +46,7 @@ class Card extends \FRMS\Helpers\DB_Model
         return Cards::getSpaceId($this->getX(), $this->getY());
     }
 
-    public function anytimeEffect($playedRealm, $nthOfCards)
+    public function anytimeEffect($influence)
     {
         return 0;
     }
@@ -57,11 +64,22 @@ class Card extends \FRMS\Helpers\DB_Model
         return count(array_filter($nthOfCards, fn ($nth) => $nth <= $linesNb));
     }
 
-    protected function getRewards($playedRealm, $nthOfCards, $thresold, $reward)
+    protected function getRangePlayedCards($nbPlayedCards, $realm = null)
+    {
+        $influenceInRealm = Players::get($this->getPlayerId())->countSpecificBanner($realm ?? $this->getRealm());
+
+        //determine which card have been added in the matching realm
+        return range($influenceInRealm - $nbPlayedCards + 1, $influenceInRealm);
+    }
+
+    protected function getRewards($influence, $thresold, $reward)
     {
         //test if $thresold is an array if not it's a function
         //test if $reward is a number if not it's a function
-        if ($this->getRealm() !=  $playedRealm) return;
+        if (!array_key_exists($this->getRealm(), $influence)) return;
+
+        $nthOfCards = $this->getRangePlayedCards(count($influence[$this->getRealm()]));
+
         if (is_array($thresold)) {
             $intersect = array_intersect($nthOfCards, $thresold);
             $count = count($intersect);
@@ -77,6 +95,7 @@ class Card extends \FRMS\Helpers\DB_Model
             $this->getPlayer()->increaseScore($count * $reward, $this);
         }
     }
+
     protected function majorityOfThisRealm()
     {
         $player = $this->getPlayer();

@@ -72,7 +72,7 @@ class Players extends \FRMS\Helpers\DB_Manager
   /*
    * get : returns the Player object for the given player ID
    */
-  public function get($pId = null)
+  public static function get($pId = null)
   {
     $pId = $pId ?: self::getActiveId();
     return self::DB()

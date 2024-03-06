@@ -10,8 +10,8 @@ use FRMS\Managers\Players;
 
 class {FILENAME_PC} extends \FRMS\Models\Card
 {
-	public function anytimeEffect($playedRealm, $nthOfCards){
-		return $this->getRewards($playedRealm, $nthOfCards, {ANYTIME});
+	public function anytimeEffect($influence){
+		return $this->getRewards($influence, {ANYTIME});
 	}
 
 	//{RECRUIT}

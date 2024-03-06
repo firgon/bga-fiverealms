@@ -10,9 +10,9 @@ use FRMS\Managers\Players;
 
 class General extends \FRMS\Models\Card
 {
-	public function anytimeEffect($playedRealm, $nthOfCards)
+	public function anytimeEffect($influence)
 	{
-		return $this->getRewards($playedRealm, $nthOfCards, 'line', 'replay');
+		return $this->getRewards($influence, 'line', 'replay');
 	}
 
 	protected function line()

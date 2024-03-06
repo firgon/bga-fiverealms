@@ -57,10 +57,10 @@ class Player extends \FRMS\Helpers\DB_Model
     return $this->setThronePlayed(1);
   }
 
-  public function addCardInInfluence($card)
+  public function addCardInInfluence($card, $realm)
   {
     $card->setPlayerId($this->getId());
-    $card->setLocation(INFLUENCE);
+    $card->setLocation($realm);
     $card->setX(-10);
     $card->setY(-10);
   }
@@ -68,10 +68,7 @@ class Player extends \FRMS\Helpers\DB_Model
 
   public function countSpecificBanner($banner)
   {
-    return Cards::getInLocationQ(INFLUENCE)
-      ->where('player_id', $this->getId())
-      ->where('realm', $banner)
-      ->get()->count();
+    return Cards::getInLocationPId($banner, $this->getId())->count();
   }
 
 
@@ -95,7 +92,7 @@ class Player extends \FRMS\Helpers\DB_Model
     return max(array_map(fn ($realm) => $this->countSpecificBanner($realm), NORMAL_BANNERS));
   }
 
-  public function activateCouncil($playerRealm, $nthOfCards, $bEndOfGame = false)
+  public function activateCouncil($influence, $bEndOfGame = false)
   {
     $cards = Cards::getInLocationPId(COUNCIL, $this->getId());
     $witch = null;
@@ -109,12 +106,15 @@ class Player extends \FRMS\Helpers\DB_Model
       if ($bEndOfGame) {
         $card->endEffect();
       } else {
-        $card->anytimeEffect($playerRealm, $nthOfCards);
+        $card->anytimeEffect($influence);
       }
     }
     if (!is_null($witch)) {
-      $witch->anytimeEffect($playerRealm, $nthOfCards);
+      $witch->anytimeEffect($influence);
     }
+
+    $throne = Cards::getInLocationPId(THRONE, $this->getId())->first();
+    $throne->anytimeEffect($influence);
   }
 
   public function increaseScore($score, $card)
@@ -173,6 +173,11 @@ class Player extends \FRMS\Helpers\DB_Model
       $this->setPendingActions($pendingActions);
     }
     return $action;
+  }
+
+  public function removeNextPendingAction()
+  {
+    $this->getNextPendingAction(true, true);
   }
 
   public function getPref($prefId)

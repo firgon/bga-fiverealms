@@ -10,9 +10,9 @@ use FRMS\Managers\Players;
 
 class Colonel extends \FRMS\Models\Card
 {
-	public function anytimeEffect($playedRealm, $nthOfCards)
+	public function anytimeEffect($influence)
 	{
-		return $this->getRewards($playedRealm, $nthOfCards, 'countNewLines', 1);
+		return $this->getRewards($influence, 'countNewLines', 1);
 	}
 
 	//

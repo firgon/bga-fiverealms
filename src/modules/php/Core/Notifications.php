@@ -19,7 +19,20 @@ class Notifications
     static::notifyAll('newAlkane', clienttranslate('The Alkane square is completed'), $data);
   }
 
-  public static function influence($currentPlayer, $spaceIds, $realm)
+  public static function influence($currentPlayer, $spaceIds, $realm, $influence)
+  {
+    $data = [
+      'player' => $currentPlayer,
+      'spaceIds' => $spaceIds,
+      'realm' => $realm,
+      'influence' => $influence,
+      'nb' => count($spaceIds)
+    ];
+    $msg = clienttranslate('${player_name} add ${nb} ${realm} cards to his influence');
+    static::notifyAll('influence', $msg, $data);
+  }
+
+  public static function recruit($currentPlayer, $spaceIds, $realm)
   {
     $data = [
       'player' => $currentPlayer,
@@ -27,7 +40,7 @@ class Notifications
       'realm' => $realm,
       'nb' => count($spaceIds)
     ];
-    $msg = clienttranslate('${player_name} add ${nb} ${realm} cards to his influence');
+    $msg = clienttranslate('${player_name} collects ${nb} ${realm} cards and choose to recruit');
     static::notifyAll('influence', $msg, $data);
   }
 

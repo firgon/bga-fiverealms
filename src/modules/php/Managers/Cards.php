@@ -78,7 +78,7 @@ class Cards extends \FRMS\Helpers\Pieces
         static::shuffle(DECK . THRONE);
 
         foreach ($players as $pId => $player) {
-            static::pickForLocation(1, DECK . THRONE, COUNCIL, $pId);
+            static::pickForLocation(1, DECK . THRONE, THRONE, $pId);
         }
 
         static::generateAlkane(false);

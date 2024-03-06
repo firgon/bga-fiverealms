@@ -44,6 +44,7 @@ const IMPERIAL_CHARACTERS = [COLONEL, GENERAL, CAPTAIN, MARSHAL];
 //Locations
 const DISCARD = 'discard';
 const DECK = 'deck';
+const HAND = 'hand';
 const INFLUENCE = 'influence';
 const COUNCIL = 'council';
 const ALKANE = 'alkane';
@@ -60,6 +61,8 @@ const ST_GAME_SETUP = 1;
 
 const ST_PLAY = 2;
 const ST_NEXT_PLAYER = 3;
+
+const ST_RECRUIT = 4;
 
 
 

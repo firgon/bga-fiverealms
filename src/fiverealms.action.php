@@ -39,6 +39,28 @@ class action_fiverealms extends APP_GameAction
     }
   }
 
+  public function actInfluence()
+  {
+    self::setAjaxMode();
+    $spaceId = self::getArg("spaceId", AT_alphanum, true);
+    $realm = self::getArg("realm", AT_alphanum, true);
+    $influence = self::getArg('influence', AT_json, true);
+    $this->validateJSonAlphaNum($influence, 'influence');
+
+    $this->actInfluence($spaceId, $realm, $influence);
+    self::ajaxResponse();
+  }
+
+  public function actRecruit()
+  {
+    self::setAjaxMode();
+    $spaceId = self::getArg("spaceId", AT_alphanum, true);
+    $realm = self::getArg("realm", AT_alphanum, true);
+
+    $this->actRecruit($spaceId, $realm);
+    self::ajaxResponse();
+  }
+
   // public function tick()
   // {
   //   self::setAjaxMode();
@@ -53,7 +75,7 @@ class action_fiverealms extends APP_GameAction
   //   self::ajaxResponse();
   // }
 
-  
+
   //   █████████  █████   █████ ██████████   █████████   ███████████
   //  ███░░░░░███░░███   ░░███ ░░███░░░░░█  ███░░░░░███ ░█░░░███░░░█
   // ███     ░░░  ░███    ░███  ░███  █ ░  ░███    ░███ ░   ░███  ░ 

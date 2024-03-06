@@ -10,10 +10,15 @@ use FRMS\Managers\Players;
 
 class Popess extends \FRMS\Models\Card
 {
-	public function anytimeEffect($playedRealm, $nthOfCards)
+	public function anytimeEffect($influence)
 	{
-		//hack to always make playedRealm match the realm of this card
-		return $this->getRewards($this->getRealm(), $nthOfCards, [4], 2);
+		foreach ($influence as $realm => $spaceIds) {
+
+			//determine if a forth card have been played 
+			if (in_array(4, $this->getRangePlayedCards(count($spaceIds), $realm))) {
+				Players::get($this->getPlayerId())->increaseScore(2, $this);
+			}
+		}
 	}
 
 	public function isTitan()

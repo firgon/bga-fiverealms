@@ -10,9 +10,9 @@ use FRMS\Managers\Players;
 
 class Reine extends \FRMS\Models\Card
 {
-	public function anytimeEffect($playedRealm, $nthOfCards)
+	public function anytimeEffect($influence)
 	{
-		return $this->getRewards($playedRealm, $nthOfCards, [3, 4, 5], 1);
+		return $this->getRewards($influence, [3, 4, 5], 1);
 	}
 
 	//

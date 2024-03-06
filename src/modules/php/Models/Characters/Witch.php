@@ -10,9 +10,9 @@ use FRMS\Managers\Players;
 
 class Witch extends \FRMS\Models\Card
 {
-	public function anytimeEffect($playedRealm, $nthOfCards)
+	public function anytimeEffect($influence)
 	{
-		return $this->getRewards($playedRealm, $nthOfCards, [3, 5], 'witch');
+		return $this->getRewards($influence, [3, 5], 'witch');
 	}
 
 	protected function witch()
