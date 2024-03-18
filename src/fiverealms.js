@@ -26,431 +26,580 @@ define([
   "dojo/_base/declare",
   "ebg/core/gamegui",
   "ebg/counter",
-  "ebg/stock",
   g_gamethemeurl + "modules/js/Core/game.js",
   g_gamethemeurl + "modules/js/Core/modal.js",
-  g_gamethemeurl + "modules/js/zoomUI.js",
 ], function (dojo, declare) {
-  return declare("bgagame.fiverealms", [customgame.game, fiverealms.zoomUI], {
+  return declare("bgagame.fiverealms", [customgame.game], {
     constructor() {
-      debug("fiverealms constructor");
-
-      this._activeStates = ["giveCard"];
+      this._inactiveStates = [];
       this._notifications = [
-        // ['completeHand', 1000],
-        // ['completeOtherHand', 1000, (notif) => notif.args.player_id == this.player_id],
+        ["clearTurn", 200],
+        ["refreshUI", 200],
       ];
 
       // Fix mobile viewport (remove CSS zoom)
       this.default_viewport = "width=800";
-
-      // this._settingsSections = [];
-      this._settingsConfig = {};
-
-      this._counters = {};
     },
 
-    /*
-  █████████  ██████████ ███████████ █████  █████ ███████████ 
- ███░░░░░███░░███░░░░░█░█░░░███░░░█░░███  ░░███ ░░███░░░░░███
-░███    ░░░  ░███  █ ░ ░   ░███  ░  ░███   ░███  ░███    ░███
-░░█████████  ░██████       ░███     ░███   ░███  ░██████████ 
- ░░░░░░░░███ ░███░░█       ░███     ░███   ░███  ░███░░░░░░  
- ███    ░███ ░███ ░   █    ░███     ░███   ░███  ░███        
-░░█████████  ██████████    █████    ░░████████   █████       
- ░░░░░░░░░  ░░░░░░░░░░    ░░░░░      ░░░░░░░░   ░░░░░        
-                                                             
-                                                             
-                                                             
-        */
-
-    setup(gamedatas) {
-      debug("setup", gamedatas);
-
-      // this.counters['deck'] = this.addCounterOnDeck('deck', gamedatas.cards.deck_count);
-
-      // // Setting up player boards
-      // this.setupPlayers();
-
-      // //create zoom panel and define Utils
-      // this.setupZoomUI();
-
-      //   this.updatePlayerOrdering();
-
-      //add general tooltips
-
-      // add shortcut and navigation
-
-      this.adaptWidth();
-      this.inherited(arguments);
-      debug("Ending game setup");
+    getSettingsConfig() {
+      return {
+        // confirmMode: { type: "pref", prefId: 103 },
+      };
     },
 
     /**
-  █████████  ███████████   █████████   ███████████ ██████████  █████████ 
- ███░░░░░███░█░░░███░░░█  ███░░░░░███ ░█░░░███░░░█░░███░░░░░█ ███░░░░░███
-░███    ░░░ ░   ░███  ░  ░███    ░███ ░   ░███  ░  ░███  █ ░ ░███    ░░░ 
-░░█████████     ░███     ░███████████     ░███     ░██████   ░░█████████ 
- ░░░░░░░░███    ░███     ░███░░░░░███     ░███     ░███░░█    ░░░░░░░░███
- ███    ░███    ░███     ░███    ░███     ░███     ░███ ░   █ ███    ░███
-░░█████████     █████    █████   █████    █████    ██████████░░█████████ 
- ░░░░░░░░░     ░░░░░    ░░░░░   ░░░░░    ░░░░░    ░░░░░░░░░░  ░░░░░░░░░  
-                                                              
- */
+     * Setup:
+     *	This method set up the game user interface according to current game situation specified in parameters
+     *	The method is called each time the game interface is displayed to a player, ie: when the game starts and when a player refreshes the game page (F5)
+     *
+     * Params :
+     *	- mixed gamedatas : contains all datas retrieved by the getAllDatas PHP method.
+     */
+    setup(gamedatas) {
+      debug("SETUP", gamedatas);
+      this.setupPlayers();
+      this.setupInfoPanel();
+      this.setupCards();
 
-    onEnteringStateCall(args) {
-      this.moveCaller(args.caller.id);
-      if (this.player_id != this.getActivePlayerId()) return;
-
-      args.callablePlayers.forEach((player) => {
-        this.addPrimaryActionButton("btn_" + player.id, player.name, () =>
-          this.openCardsChoices(player)
-        );
-        // $('btn_'+player.id).style.color = "#" + player.color; illisible
-      });
-      Object.entries(args.uncallableCards).forEach(([id, card]) => {
-        dojo
-          .query(
-            '#card_choice > [data-card-color="' +
-              card.color +
-              '"][data-card-value=' +
-              card.value +
-              "]"
-          )
-          .addClass("hidden");
-      });
+      this.inherited(arguments);
     },
 
-    /*
-     █████  █████ ███████████ █████ █████        █████████ 
-    ░░███  ░░███ ░█░░░███░░░█░░███ ░░███        ███░░░░░███
-     ░███   ░███ ░   ░███  ░  ░███  ░███       ░███    ░░░ 
-     ░███   ░███     ░███     ░███  ░███       ░░█████████ 
-     ░███   ░███     ░███     ░███  ░███        ░░░░░░░░███
-     ░███   ░███     ░███     ░███  ░███      █ ███    ░███
-     ░░████████      █████    █████ ███████████░░█████████ 
-      ░░░░░░░░      ░░░░░    ░░░░░ ░░░░░░░░░░░  ░░░░░░░░░  
-  */
+    onEnteringState(stateName, args) {
+      debug("Entering state: " + stateName, args);
+      if (this.isFastMode() && ![].includes(stateName)) return;
 
-    displayTickedCells(cells) {
-      cells.forEach((cell) => {
-        this.displayTickedCell(cell);
-      });
-    },
+      if (args.args && args.args.descSuffix) {
+        this.changePageTitle(args.args.descSuffix);
+      }
 
-    // onLeavingState: this method is called each time we are leaving a game state.
-    //                 You can use this method to perform some user interface changes at this moment.
-    //
+      if (args.args && args.args.optionalAction) {
+        let base = args.args.descSuffix ? args.args.descSuffix : "";
+        this.changePageTitle(base + "skippable");
+      }
 
-    // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
-    //                        action status bar (ie: the HTML links in the status bar).
-    //
+      if (
+        !this._inactiveStates.includes(stateName) &&
+        !this.isCurrentPlayerActive()
+      )
+        return;
 
-    /*
-   █████████             █████     ███                             
-  ███░░░░░███           ░░███     ░░░                              
- ░███    ░███   ██████  ███████   ████   ██████  ████████    █████ 
- ░███████████  ███░░███░░░███░   ░░███  ███░░███░░███░░███  ███░░  
- ░███░░░░░███ ░███ ░░░   ░███     ░███ ░███ ░███ ░███ ░███ ░░█████ 
- ░███    ░███ ░███  ███  ░███ ███ ░███ ░███ ░███ ░███ ░███  ░░░░███
- █████   █████░░██████   ░░█████  █████░░██████  ████ █████ ██████ 
-░░░░░   ░░░░░  ░░░░░░     ░░░░░  ░░░░░  ░░░░░░  ░░░░ ░░░░░ ░░░░░░  
-                                                                   
-                                                                   
-                                                                   
-*/
+      // Undo last steps
+      if (args.args && args.args.previousSteps) {
+        args.args.previousSteps.forEach((stepId) => {
+          let logEntry = $("logs").querySelector(
+            `.log.notif_newUndoableStep[data-step="${stepId}"]`,
+          );
+          if (logEntry) this.onClick(logEntry, () => this.undoToStep(stepId));
 
-    // onTickCell(e){
-    //   debug("onTickCell", e)
-    //   const divId = e.currentTarget.id;
-    //   if (!$(divId).classList.contains('clickable')) return false;
-    //   this.takeAction('tick', {
-    //     'cell' : divId
-    //   });
-
-    // },
-
-    /*
- ██████   █████    ███████    ███████████ █████ ███████████  █████████ 
-░░██████ ░░███   ███░░░░░███ ░█░░░███░░░█░░███ ░░███░░░░░░█ ███░░░░░███
- ░███░███ ░███  ███     ░░███░   ░███  ░  ░███  ░███   █ ░ ░███    ░░░ 
- ░███░░███░███ ░███      ░███    ░███     ░███  ░███████   ░░█████████ 
- ░███ ░░██████ ░███      ░███    ░███     ░███  ░███░░░█    ░░░░░░░░███
- ░███  ░░█████ ░░███     ███     ░███     ░███  ░███  ░     ███    ░███
- █████  ░░█████ ░░░███████░      █████    █████ █████      ░░█████████ 
-░░░░░    ░░░░░    ░░░░░░░       ░░░░░    ░░░░░ ░░░░░        ░░░░░░░░░  
-                                                                                                               
-*/
-
-    // notif_completeHand(n){
-    //   debug('notif_completeHand', n);
-    //   n.args.cardIds.forEach(cardId => {
-    //     this.addCardToHand(cardId, this.player_id, true);
-    //   });
-
-    //   this.counters['deck'].toValue(n.args.deck);
-    //   this.counters['discard'].toValue(n.args.discard);
-    // },
-
-    /*
- ██████   ██████    ███████    █████   █████ ██████████  █████████ 
-░░██████ ██████   ███░░░░░███ ░░███   ░░███ ░░███░░░░░█ ███░░░░░███
- ░███░█████░███  ███     ░░███ ░███    ░███  ░███  █ ░ ░███    ░░░ 
- ░███░░███ ░███ ░███      ░███ ░███    ░███  ░██████   ░░█████████ 
- ░███ ░░░  ░███ ░███      ░███ ░░███   ███   ░███░░█    ░░░░░░░░███
- ░███      ░███ ░░███     ███   ░░░█████░    ░███ ░   █ ███    ░███
- █████     █████ ░░░███████░      ░░███      ██████████░░█████████ 
-░░░░░     ░░░░░    ░░░░░░░         ░░░      ░░░░░░░░░░  ░░░░░░░░░  
-*/
-
-    moveCard(cardId, fromPlayerId, toPlayerId = null, fromHand = true) {
-      const toDiv = toPlayerId
-        ? this.getDestinationDiv(cardId, toPlayerId)
-        : "discard";
-
-      if (fromHand) this.cardsCounters[fromPlayerId].incValue(-1);
-
-      //move from visible hand to visible table
-      if (this.player_id != fromPlayerId && fromHand) {
-        debug(
-          "flipandreplace launched with ",
-          dojo.query("#hand_" + fromPlayerId + " > .card")[0]
-        );
-        this.flipAndReplace(
-          dojo.query("#hand_" + fromPlayerId + " > .card")[0],
-          this.card_tpl(cardId),
-          500
-        ).then(() => {
-          const elemId = "card_" + cardId;
-          //the card will leave a hand, no need of margin right
-          $(elemId).style.marginRight = 0;
-
-          if (toDiv == "discard") this.moveToDiscard(elemId);
-          else this.genericMove(elemId, toDiv);
+          logEntry = document.querySelector(
+            `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`,
+          );
+          if (logEntry) this.onClick(logEntry, () => this.undoToStep(stepId));
         });
-      } else {
-        const elemId = "card_" + cardId;
-        //the card will leave a hand, no need of margin right
-        $(elemId).style.marginRight = 0;
+      }
 
-        if (toDiv == "discard") this.moveToDiscard(elemId);
-        else this.genericMove(elemId, toDiv);
+      // Restart turn button
+      if (
+        args.args &&
+        args.args.previousChoices &&
+        args.args.previousChoices >= 1 &&
+        !args.args.automaticAction
+      ) {
+        if (args.args && args.args.previousSteps) {
+          let lastStep = Math.max(...args.args.previousSteps);
+          if (lastStep > 0)
+            this.addDangerActionButton(
+              "btnUndoLastStep",
+              _("Undo last step"),
+              () => this.undoToStep(lastStep),
+              "restartAction",
+            );
+        }
+
+        // Restart whole turn
+        this.addDangerActionButton(
+          "btnRestartTurn",
+          _("Restart turn"),
+          () => {
+            this.stopActionTimer();
+            this.takeAction("actRestart");
+          },
+          "restartAction",
+        );
+      }
+
+      // Call appropriate method
+      var methodName =
+        "onEnteringState" +
+        stateName.charAt(0).toUpperCase() +
+        stateName.slice(1);
+      if (this[methodName] !== undefined) this[methodName](args.args);
+    },
+
+    onAddingNewUndoableStepToLog(notif) {
+      if (!$(`log_${notif.logId}`)) return;
+      let stepId = notif.msg.args.stepId;
+      $(`log_${notif.logId}`).dataset.step = stepId;
+      if ($(`dockedlog_${notif.mobileLogId}`))
+        $(`dockedlog_${notif.mobileLogId}`).dataset.step = stepId;
+
+      if (
+        this.gamedatas &&
+        this.gamedatas.gamestate &&
+        this.gamedatas.gamestate.args &&
+        this.gamedatas.gamestate.args.previousSteps &&
+        this.gamedatas.gamestate.args.previousSteps.includes(parseInt(stepId))
+      ) {
+        this.onClick($(`log_${notif.logId}`), () => this.undoToStep(stepId));
+
+        if ($(`dockedlog_${notif.mobileLogId}`))
+          this.onClick($(`dockedlog_${notif.mobileLogId}`), () =>
+            this.undoToStep(stepId),
+          );
       }
     },
 
-    /*
- ███████████ ██████████ ██████   ██████ ███████████  █████         █████████   ███████████ ██████████  █████████ 
-░█░░░███░░░█░░███░░░░░█░░██████ ██████ ░░███░░░░░███░░███         ███░░░░░███ ░█░░░███░░░█░░███░░░░░█ ███░░░░░███
-░   ░███  ░  ░███  █ ░  ░███░█████░███  ░███    ░███ ░███        ░███    ░███ ░   ░███  ░  ░███  █ ░ ░███    ░░░ 
-    ░███     ░██████    ░███░░███ ░███  ░██████████  ░███        ░███████████     ░███     ░██████   ░░█████████ 
-    ░███     ░███░░█    ░███ ░░░  ░███  ░███░░░░░░   ░███        ░███░░░░░███     ░███     ░███░░█    ░░░░░░░░███
-    ░███     ░███ ░   █ ░███      ░███  ░███         ░███      █ ░███    ░███     ░███     ░███ ░   █ ███    ░███
-    █████    ██████████ █████     █████ █████        ███████████ █████   █████    █████    ██████████░░█████████ 
-   ░░░░░    ░░░░░░░░░░ ░░░░░     ░░░░░ ░░░░░        ░░░░░░░░░░░ ░░░░░   ░░░░░    ░░░░░    ░░░░░░░░░░  ░░░░░░░░░  
-                                                                                                                 
-                                                                                                                 
-                                                                                                                 
-        */
+    onEnteringStateConfirmTurn(args) {
+      this.addPrimaryActionButton("btnConfirmTurn", _("Confirm"), () => {
+        this.stopActionTimer();
+        this.takeAction("actConfirmTurn");
+      });
 
-    // semi generic
-    tplPlayerPanel(player) {
-      return `<div id='fiverealms-player-infos_${player.id}' class='player-infos'>
-        <div class='icons' data-player_no="${player.no}" data-player_id="${player.id}"></div>
-        <div class='cards-counter counter' id='card-counter-${player.id}'>0</div>
-        <div class='nuggets-counter counter' id='nuggets-counter-${player.id}'>0</div>
+      const OPTION_CONFIRM = 103;
+      let n = args.previousChoices;
+      let timer = Math.min(10 + 2 * n, 20);
+      this.startActionTimer(
+        "btnConfirmTurn",
+        timer,
+        this.prefs[OPTION_CONFIRM].value,
+      );
+    },
+
+    undoToStep(stepId) {
+      this.stopActionTimer();
+      this.checkAction("actRestart");
+      this.takeAction("actUndoToStep", { stepId }, false);
+    },
+
+    notif_clearTurn(n) {
+      debug("Notif: restarting turn", n);
+      this.cancelLogs(n.args.notifIds);
+    },
+
+    notif_refreshUI(n) {
+      debug("Notif: refreshing UI", n);
+      ["players", "cards"].forEach((value) => {
+        this.gamedatas[value] = n.args.datas[value];
+      });
+
+      this.setupCards();
+    },
+
+    ////////////////////////////////////////
+    //  ____  _
+    // |  _ \| | __ _ _   _  ___ _ __ ___
+    // | |_) | |/ _` | | | |/ _ \ '__/ __|
+    // |  __/| | (_| | |_| |  __/ |  \__ \
+    // |_|   |_|\__,_|\__, |\___|_|  |___/
+    //                |___/
+    ////////////////////////////////////////
+
+    setupPlayers() {
+      let currentPlayerNo = 1;
+      let nPlayers = 0;
+      this._counters = {};
+      this.forEachPlayer((player) => {
+        let isCurrent = player.id == this.player_id;
+        this.place(
+          "tplPlayerPanel",
+          player,
+          `player_panel_content_${player.color}`,
+          "after",
+        );
+        this.place("tplPlayerBoard", player, "fiverealms-main-container");
+
+        let pId = player.id;
+        // this._counters[pId] = {
+        //   worker: this.createCounter(`counter-${pId}-worker`, player.workers),
+        //   money: this.createCounter(`counter-${pId}-money`, player.money),
+        // };
+
+        // Useful to order boards
+        nPlayers++;
+        if (isCurrent) currentPlayerNo = player.no;
+      });
+
+      // Order them
+      this.forEachPlayer((player) => {
+        let order = ((player.no - currentPlayerNo + nPlayers) % nPlayers) + 1;
+        $(`board-${player.id}`).style.order = order;
+      });
+    },
+
+    getPlayerColor(pId) {
+      return this.gamedatas.players[pId].color;
+    },
+
+    tplPlayerBoard(player) {
+      return `<div class='fiverealms-board' id='board-${player.id}' data-color='${player.color}'>
+        <div class='player-board-fixed-size'>
+        </div>
       </div>`;
     },
 
-    getTickHelpText(action) {
-      switch (action) {
-        case FLAG:
-          return _("Claim a new region by ticking this flag");
-        case FREE_CARD:
-          return _("Ticking this leg allows you to play a free card");
-        case SALOON:
-          return _("Ticking this leg allows you to check a new saloon box");
-        case WANTED:
-          return _("Ticking this leg allows you to check a new wanted box");
-        case TIPI:
-          return _("Ticking this leg allows you to check a new tipi box");
-        case DISCOVERY:
-          return _("Ticking this leg allows you to claim a new region");
-        case NUGGETS:
-          return _("Ticking this leg allows you to play a nugget action");
-        case CARDS:
-          return _("Ticking this leg allows you to play a card action");
-        case CHECKS:
-          return _("Ticking this leg allows you to play a check action");
-        case POINTS:
-          return _("Ticking this leg gives you points as indicated");
-        case NOTHING:
-          return _("Ticking this leg has no direct effect");
-        case REWARD:
-          return _("Complete this region and you will get this reward");
-
-        default:
-          return _("ERROR");
-      }
-    },
-
-    /*
-   █████████  ██████████ ██████   █████ ██████████ ███████████   █████   █████████   █████████ 
-  ███░░░░░███░░███░░░░░█░░██████ ░░███ ░░███░░░░░█░░███░░░░░███ ░░███   ███░░░░░███ ███░░░░░███
- ███     ░░░  ░███  █ ░  ░███░███ ░███  ░███  █ ░  ░███    ░███  ░███  ███     ░░░ ░███    ░░░ 
-░███          ░██████    ░███░░███░███  ░██████    ░██████████   ░███ ░███         ░░█████████ 
-░███    █████ ░███░░█    ░███ ░░██████  ░███░░█    ░███░░░░░███  ░███ ░███          ░░░░░░░░███
-░░███  ░░███  ░███ ░   █ ░███  ░░█████  ░███ ░   █ ░███    ░███  ░███ ░░███     ███ ███    ░███
- ░░█████████  ██████████ █████  ░░█████ ██████████ █████   █████ █████ ░░█████████ ░░█████████ 
-  ░░░░░░░░░  ░░░░░░░░░░ ░░░░░    ░░░░░ ░░░░░░░░░░ ░░░░░   ░░░░░ ░░░░░   ░░░░░░░░░   ░░░░░░░░░  
-                                                                                               
-                                                                                               
-                                                                                               
-*/
-    //place each player board in good order.
-    // myUpdatePlayerOrdering(elementName, container) {
-    //     let index = 0;
-    //     for (let i in this.gamedatas.playerorder) {
-    //       const playerId = this.gamedatas.playerorder[i];
-    //       dojo.place(elementName + '_' + playerId, container, index);
-    //       index++;
-    //     }
-    //   },
-
-    displayLastTurn() {
-      let text = _("Caution: this is the last turn !");
-      dojo.place(
-        '<div id="FRMS_message">' + text + "</div>",
-        "FRMS_caution",
-        "first"
-      );
-      dojo.connect($("FRMS_caution"), "onclick", this, () => {
-        dojo.destroy("FRMS_message");
-      });
-    },
-
-    /*
-     *   Create and place a counter in a div container
+    /**
+     * Player panel
      */
-    addCounterOnDeck(containerId, initialValue) {
-      const counterId = containerId + "_deckinfo";
-      const div = `<div id="${counterId}" class="deckinfo">0</div>`;
-      dojo.place(div, containerId);
-      const counter = this.createCounter(counterId, initialValue);
-      if (initialValue) $(containerId).classList.remove("empty");
-      return counter;
+
+    tplPlayerPanel(player) {
+      return `<div class='fiverealms-panel'>
+        <div class='fiverealms-player-infos'>
+        </div>
+      </div>`;
     },
 
     /**
-     * This method can be used instead of addActionButton, to add a button which is an image (i.e. resource). Can be useful when player
-     * need to make a choice of resources or tokens.
+     * Use this tpl for any counters that represent qty of meeples in "reserve", eg xtokens
      */
-    addImageActionButton(
-      id,
-      handler,
-      tooltip,
-      classes = null,
-      bcolor = "blue"
-    ) {
-      if (classes) classes.push("shadow bgaimagebutton");
-      else classes = ["shadow bgaimagebutton"];
+    tplResourceCounter(player, res, prefix = "") {
+      return this.formatString(`
+        <div class='player-resource resource-${res}'>
+          <span id='${prefix}counter-${player.id}-${res}' 
+            class='${prefix}resource-${res}'></span>${this.formatIcon(res)}
+          <div class='reserve' id='${prefix}reserve-${player.id}-${res}'></div>
+        </div>
+      `);
+    },
 
-      // this will actually make a transparent button id color = blue
-      this.addActionButton(id, "", handler, "customActions", false, bcolor);
-      // remove border, for images it better without
-      dojo.style(id, "border", "none");
-      // but add shadow style (box-shadow, see css)
-      dojo.addClass(id, classes.join(" "));
-      dojo.removeClass(id, "bgabutton_blue");
-      // you can also add additional styles, such as background
-      if (tooltip) {
-        dojo.attr(id, "title", tooltip);
+    gainPayMoney(pId, n, targetSource = null) {
+      if (this.isFastMode()) {
+        this._crystalCounters[pId].incValue(n);
+        return Promise.resolve();
       }
-      return $(id);
-    },
 
-    /*
-     * briefly display a card in the center of the screen
-     */
-    showCard(card, autoClose = false, nextContainer) {
-      if (!card) return;
+      let elem = `<div id='money-animation'>
+        ${Math.abs(n)}
+        <div class="icon-container icon-container-money">
+          <div class="fiverealms-icon icon-money"></div>
+        </div>
+      </div>`;
+      $("page-content").insertAdjacentHTML("beforeend", elem);
 
-      dojo.place("<div id='card-overlay'></div>", "ebd-body");
-      // let duplicate = card.cloneNode(true);
-      // duplicate.id = duplicate.id + ' duplicate';
-      this.genericMove(card, "card-overlay", false);
-      // $('card-overlay').appendChild(card);
-      $("card-overlay").offsetHeight;
-      $("card-overlay").classList.add("active");
-
-      let close = () => {
-        this.genericMove(card, nextContainer, false);
-        $("card-overlay").classList.remove("active");
-        this.wait(500).then(() => {
-          $("card-overlay").remove();
-        });
-      };
-
-      if (autoClose) this.wait(2000).then(close);
-      else $("card-overlay").addEventListener("click", close);
-    },
-
-    /*
-     *
-     * To add div in logs
-     *
-     */
-
-    getTokenDiv(key, args) {
-      // debug('getTokenDiv', key, args);
-      // ... implement whatever html you want here, example from sharedcode.js
-      var token_id = args[key];
-      switch (key) {
-        case "value":
-        case "value2":
-          var valueDiv = "<div class='value value-" + token_id + "'></div>";
-          return valueDiv;
-
-        case "color":
-          var valueDiv = "<div class='color color-" + token_id + "'></div>";
-          return valueDiv;
-
-        default:
-          return token_id;
+      if (n > 0) {
+        return this.slide("money-animation", `counter-${pId}-money`, {
+          from: targetSource || this.getVisibleTitleContainer(),
+          destroy: true,
+          phantom: false,
+          duration: 1200,
+        }).then(() => this._counters[pId]["money"].incValue(n));
+      } else {
+        this._counters[pId]["money"].incValue(n);
+        return this.slide(
+          "money-animation",
+          targetSource || this.getVisibleTitleContainer(),
+          {
+            from: `counter-${pId}-money`,
+            destroy: true,
+            phantom: false,
+            duration: 1200,
+          },
+        );
       }
     },
 
-    genericMove(elemId, newContainerId, fastMode = false, position = null) {
-      const el = $(elemId);
-
-      if (this.isFastMode() || (fastMode && this.isCurrentPlayerActive())) {
-        if (position == "first") $(newContainerId).prepend(el);
-        else $(newContainerId).appendChild(el);
-        return;
+    gainLoseScore(pId, n, targetSource = null) {
+      if (this.isFastMode()) {
+        this.scoreCtrl[pId].incValue(n);
+        return Promise.resolve();
       }
 
-      const first = el.getBoundingClientRect();
+      let elem = `<div id='score-animation'>
+        ${Math.abs(n)}
+        <i class="fa fa-star"></i>
+      </div>`;
+      $("page-content").insertAdjacentHTML("beforeend", elem);
 
-      // Now set the element to the last position.
-      if (position == "first") $(newContainerId).prepend(el);
-      else $(newContainerId).appendChild(el);
+      // Score animation
+      if (n > 0) {
+        return this.slide("score-animation", `player_score_${pId}`, {
+          from: targetSource || this.getVisibleTitleContainer(),
+          destroy: true,
+          phantom: false,
+          duration: 1100,
+        }).then(() => this.scoreCtrl[pId].incValue(n));
+      } else {
+        this.scoreCtrl[pId].incValue(n);
+        return this.slide(
+          "score-animation",
+          targetSource || this.getVisibleTitleContainer(),
+          {
+            from: `player_score_${pId}`,
+            destroy: true,
+            phantom: false,
+            duration: 1100,
+          },
+        );
+      }
+    },
 
-      const last = el.getBoundingClientRect();
+    notif_spendMoney(n) {
+      debug("Notif: spending money", n);
+      this.gainPayMoney(n.args.player_id, -n.args.n);
+    },
 
-      const invertY = first.top - last.top;
-      const invertX = first.left - last.left;
+    notif_giveMoney(n) {
+      debug("Notif: gaining money", n);
+      this.gainPayMoney(n.args.player_id, n.args.n);
+    },
 
-      el.style.transform = `translate(${invertX}px, ${invertY}px)`;
+    ////////////////////////////////////////////////////////
+    //    ____              _
+    //   / ___|__ _ _ __ __| |___
+    //  | |   / _` | '__/ _` / __|
+    //  | |__| (_| | | | (_| \__ \
+    //   \____\__,_|_|  \__,_|___/
+    //////////////////////////////////////////////////////////
 
-      setTimeout(function () {
-        el.classList.add("animate-on-transforms");
-        el.style.transform = "";
-      }, 50);
+    setupCards() {
+      // This function is refreshUI compatible
+      let cardIds = this.gamedatas.cards.alkane.map((card) => {
+        if (!$(`card-${card.id}`)) {
+          this.addCard(card);
+        }
 
-      // setTimeout(function() {
-      el.addEventListener("transitionend", () => {
-        el.classList.remove("animate-on-transforms");
+        let o = $(`card-${card.id}`);
+        if (!o) return null;
+
+        let container = this.getCardContainer(card);
+        if (o.parentNode != $(container)) {
+          dojo.place(o, container);
+        }
+        o.dataset.state = card.state;
+
+        return card.id;
       });
-      // }, 20);
+      document
+        .querySelectorAll('.fiverealms-card[id^="card-"]')
+        .forEach((oCard) => {
+          if (!cardIds.includes(parseInt(oCard.getAttribute("data-id")))) {
+            this.destroy(oCard);
+          }
+        });
+    },
+
+    addCard(card, location = null) {
+      if ($("card-" + card.id)) return;
+
+      let o = this.place(
+        "tplCard",
+        card,
+        location == null ? this.getCardContainer(card) : location,
+      );
+      let tooltipDesc = this.getCardTooltip(card);
+      if (tooltipDesc != null) {
+        this.addCustomTooltip(
+          o.id,
+          tooltipDesc.map((t) => this.formatString(t)).join("<br/>"),
+        );
+      }
+
+      return o;
+    },
+
+    getCardTooltip(card) {
+      return null;
+    },
+
+    tplCard(card) {
+      return `<div class="fiverealms-card" id="card-${card.id}" data-id="${card.id}" data-type="${card.type}" data-realm="${card.realm}"></div>`;
+    },
+
+    getCardContainer(card) {
+      let t = card.location.split("_");
+      if (card.location == "alkane") {
+        return $(`alkane-${card.x}-${card.y}`);
+      }
+      // if (t[0] == "order") {
+      //   return $(card.location).querySelector(".space-order-container");
+      // }
+
+      console.error("Trying to get container of a card", card);
+      return "game_play_area";
+    },
+
+    ////////////////////////////////////////////////////////////
+    // _____                          _   _   _
+    // |  ___|__  _ __ _ __ ___   __ _| |_| |_(_)_ __   __ _
+    // | |_ / _ \| '__| '_ ` _ \ / _` | __| __| | '_ \ / _` |
+    // |  _| (_) | |  | | | | | | (_| | |_| |_| | | | | (_| |
+    // |_|  \___/|_|  |_| |_| |_|\__,_|\__|\__|_|_| |_|\__, |
+    //                                                 |___/
+    ////////////////////////////////////////////////////////////
+
+    /**
+     * Replace some expressions by corresponding html formating
+     */
+    formatIcon(name, n = null, lowerCase = true) {
+      let type = lowerCase ? name.toLowerCase() : name;
+      const NO_TEXT_ICONS = [];
+      let noText = NO_TEXT_ICONS.includes(name);
+      let text = n == null ? "" : `<span>${n}</span>`;
+      return `${noText ? text : ""}<div class="icon-container icon-container-${type}">
+            <div class="fiverealms-icon icon-${type}">${noText ? "" : text}</div>
+          </div>`;
+    },
+
+    formatString(str) {
+      const ICONS = ["WORKER"];
+
+      ICONS.forEach((name) => {
+        // WITHOUT BONUS / WITH TEXT
+        const regex = new RegExp("<" + name + ":([^>]+)>", "g");
+        str = str.replaceAll(regex, this.formatIcon(name, "$1"));
+        // WITHOUT TEXT
+        str = str.replaceAll(
+          new RegExp("<" + name + ">", "g"),
+          this.formatIcon(name),
+        );
+      });
+      str = str.replace(
+        /__([^_]+)__/g,
+        '<span class="action-card-name-reference">$1</span>',
+      );
+      str = str.replace(/\*\*([^\*]+)\*\*/g, "<b>$1</b>");
+
+      return str;
+    },
+
+    /**
+     * Format log strings
+     *  @Override
+     */
+    format_string_recursive(log, args) {
+      try {
+        if (log && args && !args.processed) {
+          args.processed = true;
+
+          log = this.formatString(_(log));
+
+          // if (args.amount_money !== undefined) {
+          //   args.amount_money = this.formatIcon('money', args.amount_money);
+          // }
+        }
+      } catch (e) {
+        console.error(log, args, "Exception thrown", e.stack);
+      }
+
+      return this.inherited(arguments);
+    },
+
+    ////////////////////////////////////////////////////////
+    //  ___        __         ____                  _
+    // |_ _|_ __  / _| ___   |  _ \ __ _ _ __   ___| |
+    //  | || '_ \| |_ / _ \  | |_) / _` | '_ \ / _ \ |
+    //  | || | | |  _| (_) | |  __/ (_| | | | |  __/ |
+    // |___|_| |_|_|  \___/  |_|   \__,_|_| |_|\___|_|
+    ////////////////////////////////////////////////////////
+
+    setupInfoPanel() {
+      dojo.place(this.tplConfigPlayerBoard(), "player_boards", "first");
+
+      let chk = $("help-mode-chk");
+      dojo.connect(chk, "onchange", () => this.toggleHelpMode(chk.checked));
+      this.addTooltip("help-mode-switch", "", _("Toggle help/safe mode."));
+
+      this._settingsModal = new customgame.modal("showSettings", {
+        class: "fiverealms_popin",
+        closeIcon: "fa-times",
+        title: _("Settings"),
+        closeAction: "hide",
+        verticalAlign: "flex-start",
+        contentsTpl: `<div id='fiverealms-settings'>
+           <div id='fiverealms-settings-header'></div>
+           <div id="settings-controls-container"></div>
+         </div>`,
+      });
+    },
+
+    tplConfigPlayerBoard() {
+      return `
+ <div class='player-board' id="player_board_config">
+   <div id="player_config" class="player_board_content">
+     <div class="player_config_row">
+      <div id="show-scoresheet">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512">
+          <g class="fa-group">
+            <path class="fa-secondary" fill="currentColor" d="M0 192v272a48 48 0 0 0 48 48h352a48 48 0 0 0 48-48V192zm324.13 141.91a11.92 11.92 0 0 1-3.53 6.89L281 379.4l9.4 54.6a12 12 0 0 1-17.4 12.6l-49-25.8-48.9 25.8a12 12 0 0 1-17.4-12.6l9.4-54.6-39.6-38.6a12 12 0 0 1 6.6-20.5l54.7-8 24.5-49.6a12 12 0 0 1 21.5 0l24.5 49.6 54.7 8a12 12 0 0 1 10.13 13.61zM304 128h32a16 16 0 0 0 16-16V16a16 16 0 0 0-16-16h-32a16 16 0 0 0-16 16v96a16 16 0 0 0 16 16zm-192 0h32a16 16 0 0 0 16-16V16a16 16 0 0 0-16-16h-32a16 16 0 0 0-16 16v96a16 16 0 0 0 16 16z" opacity="0.4"></path>
+            <path class="fa-primary" fill="currentColor" d="M314 320.3l-54.7-8-24.5-49.6a12 12 0 0 0-21.5 0l-24.5 49.6-54.7 8a12 12 0 0 0-6.6 20.5l39.6 38.6-9.4 54.6a12 12 0 0 0 17.4 12.6l48.9-25.8 49 25.8a12 12 0 0 0 17.4-12.6l-9.4-54.6 39.6-38.6a12 12 0 0 0-6.6-20.5zM400 64h-48v48a16 16 0 0 1-16 16h-32a16 16 0 0 1-16-16V64H160v48a16 16 0 0 1-16 16h-32a16 16 0 0 1-16-16V64H48a48 48 0 0 0-48 48v80h448v-80a48 48 0 0 0-48-48z"></path>
+          </g>
+        </svg>
+      </div>
+      
+       <div id="help-mode-switch">
+         <input type="checkbox" class="checkbox" id="help-mode-chk" />
+         <label class="label" for="help-mode-chk">
+           <div class="ball"></div>
+         </label>
+
+         <svg aria-hidden="true" focusable="false" data-prefix="fad" data-icon="question-circle" class="svg-inline--fa fa-question-circle fa-w-16" role="img" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><g class="fa-group"><path class="fa-secondary" fill="currentColor" d="M256 8C119 8 8 119.08 8 256s111 248 248 248 248-111 248-248S393 8 256 8zm0 422a46 46 0 1 1 46-46 46.05 46.05 0 0 1-46 46zm40-131.33V300a12 12 0 0 1-12 12h-56a12 12 0 0 1-12-12v-4c0-41.06 31.13-57.47 54.65-70.66 20.17-11.31 32.54-19 32.54-34 0-19.82-25.27-33-45.7-33-27.19 0-39.44 13.14-57.3 35.79a12 12 0 0 1-16.67 2.13L148.82 170a12 12 0 0 1-2.71-16.26C173.4 113 208.16 90 262.66 90c56.34 0 116.53 44 116.53 102 0 77-83.19 78.21-83.19 106.67z" opacity="0.4"></path><path class="fa-primary" fill="currentColor" d="M256 338a46 46 0 1 0 46 46 46 46 0 0 0-46-46zm6.66-248c-54.5 0-89.26 23-116.55 63.76a12 12 0 0 0 2.71 16.24l34.7 26.31a12 12 0 0 0 16.67-2.13c17.86-22.65 30.11-35.79 57.3-35.79 20.43 0 45.7 13.14 45.7 33 0 15-12.37 22.66-32.54 34C247.13 238.53 216 254.94 216 296v4a12 12 0 0 0 12 12h56a12 12 0 0 0 12-12v-1.33c0-28.46 83.19-29.67 83.19-106.67 0-58-60.19-102-116.53-102z"></path></g></svg>
+       </div>
+
+       <div id="show-settings">
+         <svg  xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 512">
+           <g>
+             <path class="fa-secondary" fill="currentColor" d="M638.41 387a12.34 12.34 0 0 0-12.2-10.3h-16.5a86.33 86.33 0 0 0-15.9-27.4L602 335a12.42 12.42 0 0 0-2.8-15.7 110.5 110.5 0 0 0-32.1-18.6 12.36 12.36 0 0 0-15.1 5.4l-8.2 14.3a88.86 88.86 0 0 0-31.7 0l-8.2-14.3a12.36 12.36 0 0 0-15.1-5.4 111.83 111.83 0 0 0-32.1 18.6 12.3 12.3 0 0 0-2.8 15.7l8.2 14.3a86.33 86.33 0 0 0-15.9 27.4h-16.5a12.43 12.43 0 0 0-12.2 10.4 112.66 112.66 0 0 0 0 37.1 12.34 12.34 0 0 0 12.2 10.3h16.5a86.33 86.33 0 0 0 15.9 27.4l-8.2 14.3a12.42 12.42 0 0 0 2.8 15.7 110.5 110.5 0 0 0 32.1 18.6 12.36 12.36 0 0 0 15.1-5.4l8.2-14.3a88.86 88.86 0 0 0 31.7 0l8.2 14.3a12.36 12.36 0 0 0 15.1 5.4 111.83 111.83 0 0 0 32.1-18.6 12.3 12.3 0 0 0 2.8-15.7l-8.2-14.3a86.33 86.33 0 0 0 15.9-27.4h16.5a12.43 12.43 0 0 0 12.2-10.4 112.66 112.66 0 0 0 .01-37.1zm-136.8 44.9c-29.6-38.5 14.3-82.4 52.8-52.8 29.59 38.49-14.3 82.39-52.8 52.79zm136.8-343.8a12.34 12.34 0 0 0-12.2-10.3h-16.5a86.33 86.33 0 0 0-15.9-27.4l8.2-14.3a12.42 12.42 0 0 0-2.8-15.7 110.5 110.5 0 0 0-32.1-18.6A12.36 12.36 0 0 0 552 7.19l-8.2 14.3a88.86 88.86 0 0 0-31.7 0l-8.2-14.3a12.36 12.36 0 0 0-15.1-5.4 111.83 111.83 0 0 0-32.1 18.6 12.3 12.3 0 0 0-2.8 15.7l8.2 14.3a86.33 86.33 0 0 0-15.9 27.4h-16.5a12.43 12.43 0 0 0-12.2 10.4 112.66 112.66 0 0 0 0 37.1 12.34 12.34 0 0 0 12.2 10.3h16.5a86.33 86.33 0 0 0 15.9 27.4l-8.2 14.3a12.42 12.42 0 0 0 2.8 15.7 110.5 110.5 0 0 0 32.1 18.6 12.36 12.36 0 0 0 15.1-5.4l8.2-14.3a88.86 88.86 0 0 0 31.7 0l8.2 14.3a12.36 12.36 0 0 0 15.1 5.4 111.83 111.83 0 0 0 32.1-18.6 12.3 12.3 0 0 0 2.8-15.7l-8.2-14.3a86.33 86.33 0 0 0 15.9-27.4h16.5a12.43 12.43 0 0 0 12.2-10.4 112.66 112.66 0 0 0 .01-37.1zm-136.8 45c-29.6-38.5 14.3-82.5 52.8-52.8 29.59 38.49-14.3 82.39-52.8 52.79z" opacity="0.4"></path>
+             <path class="fa-primary" fill="currentColor" d="M420 303.79L386.31 287a173.78 173.78 0 0 0 0-63.5l33.7-16.8c10.1-5.9 14-18.2 10-29.1-8.9-24.2-25.9-46.4-42.1-65.8a23.93 23.93 0 0 0-30.3-5.3l-29.1 16.8a173.66 173.66 0 0 0-54.9-31.7V58a24 24 0 0 0-20-23.6 228.06 228.06 0 0 0-76 .1A23.82 23.82 0 0 0 158 58v33.7a171.78 171.78 0 0 0-54.9 31.7L74 106.59a23.91 23.91 0 0 0-30.3 5.3c-16.2 19.4-33.3 41.6-42.2 65.8a23.84 23.84 0 0 0 10.5 29l33.3 16.9a173.24 173.24 0 0 0 0 63.4L12 303.79a24.13 24.13 0 0 0-10.5 29.1c8.9 24.1 26 46.3 42.2 65.7a23.93 23.93 0 0 0 30.3 5.3l29.1-16.7a173.66 173.66 0 0 0 54.9 31.7v33.6a24 24 0 0 0 20 23.6 224.88 224.88 0 0 0 75.9 0 23.93 23.93 0 0 0 19.7-23.6v-33.6a171.78 171.78 0 0 0 54.9-31.7l29.1 16.8a23.91 23.91 0 0 0 30.3-5.3c16.2-19.4 33.7-41.6 42.6-65.8a24 24 0 0 0-10.5-29.1zm-151.3 4.3c-77 59.2-164.9-28.7-105.7-105.7 77-59.2 164.91 28.7 105.71 105.7z"></path>
+           </g>
+         </svg>
+       </div>
+     </div>
+   </div>
+ </div>
+ `;
+    },
+
+    updatePlayerOrdering() {
+      this.inherited(arguments);
+      dojo.place("player_board_config", "player_boards", "first");
+    },
+
+    onLoadingComplete() {
+      this.updateLayout();
+      this.inherited(arguments);
+    },
+
+    onScreenWidthChange() {
+      if (this.settings) this.updateLayout();
+    },
+
+    updateLayout() {
+      return; // TODO
+
+      if (!this.settings) return;
+      const ROOT = document.documentElement;
+
+      const WIDTH = $("fiverealms-main-container").getBoundingClientRect()[
+        "width"
+      ];
+      const HEIGHT =
+        (window.innerHeight ||
+          document.documentElement.clientHeight ||
+          document.body.clientHeight) - 62;
+      const BOARD_WIDTH = 1650;
+      const BOARD_HEIGHT = 750;
+
+      let widthScale = ((this.settings.boardWidth / 100) * WIDTH) / BOARD_WIDTH,
+        heightScale = HEIGHT / BOARD_HEIGHT,
+        scale = Math.min(widthScale, heightScale);
+      ROOT.style.setProperty("--boardScale", scale);
+
+      const PLAYER_BOARD_WIDTH = 1650;
+      const PLAYER_BOARD_HEIGHT = 840;
+      widthScale =
+        ((this.settings.playerBoardWidth / 100) * WIDTH) / PLAYER_BOARD_WIDTH;
+      heightScale = HEIGHT / PLAYER_BOARD_HEIGHT;
+      scale = Math.min(widthScale, heightScale);
+      ROOT.style.setProperty("--playerBoardScale", scale);
     },
   });
 });

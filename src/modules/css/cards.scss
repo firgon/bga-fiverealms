@@ -1,0 +1,103 @@
+.fiverealms-card {
+    width: 143px;
+    height: 200px;
+    background-image: url("img/cards.jpg");
+    background-size: 700% 700%;
+    border: 1px solid black;
+    box-shadow: 1px 1px 5px black;
+    border-radius: 5px;
+
+    // @for $i from 1 through 46 {
+    //     &[data-type="#{$i}"] {
+    //         background-position-x: ($i % 9) * 100% / 8;
+    //         background-position-y: (($i - ($i % 9)) / 9) * 100% / 4;
+    //     }
+    // }
+
+    &[data-realm="reptiles"] {
+        background-position-x: 0%;
+    }
+    &[data-realm="ursids"] {
+        background-position-x: 1 * 100% / 6;
+    }
+    &[data-realm="marines"] {
+        background-position-x: 2 * 100% / 6;
+    }
+    &[data-realm="raptors"] {
+        background-position-x: 3 * 100% / 6;
+    }
+    &[data-realm="felines"] {
+        background-position-x: 4 * 100% / 6;
+    }
+
+    &[data-realm="imperial"] {
+        background-position-x: 5 * 100% / 6;
+    }
+    &[data-realm="religious"] {
+        background-position-x: 6 * 100% / 6;
+    }
+
+    &[data-type="back"] {
+        background-position-y: 0 * 100% / 6;
+    }
+    &[data-type="King"] {
+        background-position-y: 1 * 100% / 6;
+    }
+    &[data-type="Reine"] {
+        background-position-y: 2 * 100% / 6;
+    }
+    &[data-type="Witch"] {
+        background-position-y: 3 * 100% / 6;
+    }
+    &[data-type="Warrior"] {
+        background-position-y: 4 * 100% / 6;
+    }
+    &[data-type="Titan"] {
+        background-position-y: 5 * 100% / 6;
+    }
+    &[data-type="Throne"] {
+        background-position-y: 6 * 100% / 6;
+    }
+
+    &[data-type="Gaia"] {
+        background-position-y: 1 * 100% / 6;
+    }
+    &[data-type="Ouranos"] {
+        background-position-y: 2 * 100% / 6;
+    }
+    &[data-type="Popess"] {
+        background-position-y: 3 * 100% / 6;
+    }
+    &[data-type="Warrior Monk"] {
+        background-position-y: 4 * 100% / 6;
+    }
+
+    &[data-type="Marshal"] {
+        background-position-y: 1 * 100% / 6;
+    }
+    &[data-type="Colonel"] {
+        background-position-y: 2 * 100% / 6;
+    }
+    &[data-type="Captain"] {
+        background-position-y: 3 * 100% / 6;
+    }
+    &[data-type="General"] {
+        background-position-y: 4 * 100% / 6;
+    }
+
+    position: relative;
+
+    &.selectable {
+        box-shadow: 0px 0px 7px 2px red;
+        cursor: pointer;
+        &:hover {
+            transform: scale(1.1);
+        }
+    }
+
+    &.selected,
+    &.selected:hover {
+        box-shadow: 0px 0px 7px 2px green;
+        transform: scale(1.1);
+    }
+}

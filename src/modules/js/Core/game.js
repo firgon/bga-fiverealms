@@ -1,14 +1,18 @@
-var isDebug = window.location.host == 'studio.boardgamearena.com' || window.location.hash.indexOf('debug') > -1;
+var isDebug =
+  window.location.host == "studio.boardgamearena.com" ||
+  window.location.hash.indexOf("debug") > -1;
 var debug = isDebug ? console.info.bind(window.console) : function () {};
 
-define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouislider.min.js', 'ebg/core/gamegui'], (
-  dojo,
-  declare,
-  noUiSlider,
-) => {
-  const isPromise = (v) => typeof v === 'object' && typeof v.then === 'function';
+define([
+  "dojo",
+  "dojo/_base/declare",
+  g_gamethemeurl + "modules/js/vendor/nouislider.min.js",
+  "ebg/core/gamegui",
+], (dojo, declare, noUiSlider) => {
+  const isPromise = (v) =>
+    typeof v === "object" && typeof v.then === "function";
 
-  return declare('customgame.game', ebg.core.gamegui, {
+  return declare("customgame.game", ebg.core.gamegui, {
     /*
      * Constructor
      */
@@ -24,16 +28,26 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       this._registeredCustomTooltips = {};
 
       this._notif_uid_to_log_id = {};
+      this._notif_uid_to_mobile_log_id = {};
       this._last_notif = null;
-      dojo.place('loader_mask', 'overall-content', 'before');
-      dojo.style('loader_mask', {
-        height: '100vh',
-        position: 'fixed',
+      dojo.place("loader_mask", "overall-content", "before");
+      dojo.style("loader_mask", {
+        height: "100vh",
+        position: "fixed",
       });
     },
 
+    destroy(elem) {
+      if (this.tooltips[elem.id]) {
+        this.tooltips[elem.id].destroy();
+        delete this.tooltips[elem.id];
+      }
+
+      elem.remove();
+    },
+
     showMessage(msg, type) {
-      if (type == 'error') {
+      if (type == "error") {
         console.error(msg);
       }
       return this.inherited(arguments);
@@ -46,17 +60,17 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     setModeInstataneous() {
       if (this.instantaneousMode == false) {
         this.instantaneousMode = true;
-        dojo.style('leftright_page_wrapper', 'display', 'none');
-        dojo.style('loader_mask', 'display', 'block');
-        dojo.style('loader_mask', 'opacity', 1);
+        dojo.style("leftright_page_wrapper", "display", "none");
+        dojo.style("loader_mask", "display", "block");
+        dojo.style("loader_mask", "opacity", 1);
       }
     },
 
     unsetModeInstantaneous() {
       if (this.instantaneousMode) {
         this.instantaneousMode = false;
-        dojo.style('leftright_page_wrapper', 'display', 'block');
-        dojo.style('loader_mask', 'display', 'none');
+        dojo.style("leftright_page_wrapper", "display", "block");
+        dojo.style("loader_mask", "display", "none");
       }
     },
 
@@ -72,7 +86,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     },
 
     onLoadingComplete() {
-      debug('Loading complete');
+      debug("Loading complete");
       //      this.cancelLogs(this.gamedatas.canceledNotifIds);
     },
 
@@ -81,15 +95,25 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      */
     setup(gamedatas) {
       // Create a new div for buttons to avoid BGA auto clearing it
-      dojo.place("<div id='customActions' style='display:inline-block'></div>", $('generalactions'), 'after');
-      dojo.place("<div id='restartAction' style='display:inline-block'></div>", $('customActions'), 'after');
+      dojo.place(
+        "<div id='customActions' style='display:inline-block'></div>",
+        $("generalactions"),
+        "after",
+      );
+      dojo.place(
+        "<div id='restartAction' style='display:inline-block'></div>",
+        $("customActions"),
+        "after",
+      );
 
       this.attachRegisteredTooltips();
 
       this.setupNotifications();
       this.initPreferences();
-      dojo.connect(this.notifqueue, 'addToLog', () => {
-        this.checkLogCancel(this._last_notif == null ? null : this._last_notif.msg.uid);
+      dojo.connect(this.notifqueue, "addToLog", () => {
+        this.checkLogCancel(
+          this._last_notif == null ? null : this._last_notif.msg.uid,
+        );
         this.addLogClass();
       });
     },
@@ -98,7 +122,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      * Detect if spectator or replay
      */
     isReadOnly() {
-      return this.isSpectator || typeof g_replayFrom != 'undefined' || g_archive_mode;
+      return (
+        this.isSpectator || typeof g_replayFrom != "undefined" || g_archive_mode
+      );
     },
 
     /*
@@ -116,7 +142,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
       return new Promise((resolve, reject) => {
         this.ajaxcall(
-          '/' + this.game_name + '/' + this.game_name + '/' + action + '.html',
+          "/" + this.game_name + "/" + this.game_name + "/" + action + ".html",
           data,
           this,
           (data) => resolve(data),
@@ -136,18 +162,19 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      *  - mixed args : additional information
      */
     onEnteringState(stateName, args) {
-      debug('Entering state: ' + stateName, args);
-      this.stateName = stateName; //modified
+      debug("Entering state: " + stateName, args);
       if (this.isFastMode()) return;
-      if (this._activeStates.includes(stateName) && !this.isCurrentPlayerActive()) return;
-
-      //modify page title
-      if (args.args && args.args.suffix != "") {
-        this.changePageTitle(args.args.suffix);
-      }
+      if (
+        this._activeStates.includes(stateName) &&
+        !this.isCurrentPlayerActive()
+      )
+        return;
 
       // Call appropriate method
-      var methodName = 'onEnteringState' + stateName.charAt(0).toUpperCase() + stateName.slice(1);
+      var methodName =
+        "onEnteringState" +
+        stateName.charAt(0).toUpperCase() +
+        stateName.slice(1);
       if (this[methodName] !== undefined) this[methodName](args.args);
     },
 
@@ -159,27 +186,34 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      *  - str stateName : name of the state we are leaving
      */
     onLeavingState(stateName) {
-      debug('Leaving state: ' + stateName);
+      debug("Leaving state: " + stateName);
       if (this.isFastMode()) return;
       this.clearPossible();
 
       // Call appropriate method
-      var methodName = 'onLeavingState' + stateName.charAt(0).toUpperCase() + stateName.slice(1);
+      var methodName =
+        "onLeavingState" +
+        stateName.charAt(0).toUpperCase() +
+        stateName.slice(1);
       if (this[methodName] !== undefined) this[methodName]();
     },
 
-    clearPossible() {
+    removeAllActionButtons() {
       this.removeActionButtons();
-      dojo.empty('customActions');
-      dojo.empty('restartAction');
+      dojo.empty("customActions");
+      dojo.empty("restartAction");
+    },
 
+    clearPossible() {
+      this.removeAllActionButtons();
       this._connections.forEach(dojo.disconnect);
       this._connections = [];
       this._selectableNodes.forEach((node) => {
-        if ($(node)) dojo.removeClass(node, 'selectable selected');
+        if ($(node)) dojo.removeClass(node, "selectable selected");
       });
       this._selectableNodes = [];
-      dojo.query('.unselectable').removeClass('unselectable');
+      dojo.query(".unselectable").removeClass("unselectable");
+      dojo.query(".selectable").removeClass("selectable");
     },
 
     /**
@@ -188,12 +222,14 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     onUpdateActionButtons(stateName, args) {
       let status = this.isCurrentPlayerActive();
       if (status != this._activeStatus) {
-        debug('Update activity: ' + stateName, status);
+        debug("Update activity: " + stateName, status);
         this._activeStatus = status;
 
         // Call appropriate method
-        var methodName = 'onUpdateActivity' + stateName.charAt(0).toUpperCase() + stateName.slice(1);
-        debug(methodName);
+        var methodName =
+          "onUpdateActivity" +
+          stateName.charAt(0).toUpperCase() +
+          stateName.slice(1);
         if (this[methodName] !== undefined) this[methodName](args, status);
       }
     },
@@ -201,23 +237,40 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     /*
      * setupNotifications
      */
+    getVisibleTitleContainer() {
+      function isVisible(elem) {
+        return !!(
+          elem.offsetWidth ||
+          elem.offsetHeight ||
+          elem.getClientRects().length
+        );
+      }
+
+      if (isVisible($("pagemaintitletext"))) {
+        return $("pagemaintitletext");
+      } else {
+        return $("gameaction_status");
+      }
+    },
+
     setupNotifications() {
-      debug(this._notifications);
+      console.log(this._notifications);
       this._notifications.forEach((notif) => {
-        var functionName = 'notif_' + notif[0];
+        var functionName = "notif_" + notif[0];
 
         let wrapper = (args) => {
           let msg = this.format_string_recursive(args.log, args.args);
-          if (msg != '') {
-            $('gameaction_status').innerHTML = msg;
-            $('pagemaintitletext').innerHTML = msg;
+          if (msg != "") {
+            $("gameaction_status").innerHTML = msg;
+            $("pagemaintitletext").innerHTML = msg;
+            this.removeAllActionButtons();
           }
-
           let timing = this[functionName](args);
           if (timing === undefined) {
             if (notif[1] === undefined) {
               console.error(
-                "A notification don't have default timing and didn't send a timing as return value : " + notif[0],
+                "A notification don't have default timing and didn't send a timing as return value : " +
+                  notif[0],
               );
               return;
             }
@@ -240,10 +293,10 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
 
       // Load production bug report handler
-      dojo.subscribe('loadBug', this, (n) => this.notif_loadBug(n));
+      dojo.subscribe("loadBug", this, (n) => this.notif_loadBug(n));
 
       this.notifqueue.setSynchronousDuration = (duration) => {
-        setTimeout(() => dojo.publish('notifEnd', null), duration);
+        setTimeout(() => dojo.publish("notifEnd", null), duration);
       };
     },
 
@@ -251,45 +304,23 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      * Load production bug report handler
      */
     notif_loadBug(n) {
-      let self = this;
       function fetchNextUrl() {
         var url = n.args.urls.shift();
-        console.log('Fetching URL', url, '...');
-        // all the calls have to be made with ajaxcall in order to add the csrf token, otherwise you'll get "Invalid session information for this action. Please try reloading the page or logging in again"
-        self.ajaxcall(
-          url,
-          {
-            lock: true,
-          },
-          self,
-          function (success) {
-            console.log('=> Success ', success);
-
-            if (n.args.urls.length > 1) {
+        console.log("Fetching URL", url);
+        dojo.xhrGet({
+          url: url,
+          load: function (success) {
+            console.log("Success for URL", url, success);
+            if (n.args.urls.length > 0) {
               fetchNextUrl();
-            } else if (n.args.urls.length > 0) {
-              //except the last one, clearing php cache
-              url = n.args.urls.shift();
-              dojo.xhrGet({
-                url: url,
-                load: function (success) {
-                  console.log('Success for URL', url, success);
-                  console.log('Done, reloading page');
-                  window.location.reload();
-                },
-                handleAs: 'text',
-                error: function (error) {
-                  console.log('Error while loading : ', error);
-                },
-              });
+            } else {
+              console.log("Done, reloading page");
+              window.location.reload();
             }
           },
-          function (error) {
-            if (error) console.log('=> Error ', error);
-          }
-        );
+        });
       }
-      console.log('Notif: load bug', n.args);
+      console.log("Notif: load bug", n.args);
       fetchNextUrl();
     },
 
@@ -305,7 +336,11 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       var button = $(buttonId);
       var isReadOnly = this.isReadOnly();
       if (button == null || isReadOnly || pref == 2) {
-        debug('Ignoring startActionTimer(' + buttonId + ')', 'readOnly=' + isReadOnly, 'prefValue=' + pref);
+        debug(
+          "Ignoring startActionTimer(" + buttonId + ")",
+          "readOnly=" + isReadOnly,
+          "prefValue=" + pref,
+        );
         return;
       }
 
@@ -322,20 +357,21 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         if (button == null) {
           this.stopActionTimer();
         } else if (this._actionTimerSeconds-- > 1) {
-          button.innerHTML = this._actionTimerLabel + ' (' + this._actionTimerSeconds + ')';
+          button.innerHTML =
+            this._actionTimerLabel + " (" + this._actionTimerSeconds + ")";
         } else {
-          debug('Timer ' + buttonId + ' execute');
+          debug("Timer " + buttonId + " execute");
           button.click();
         }
       };
       this._actionTimerFunction();
       this._actionTimerId = window.setInterval(this._actionTimerFunction, 1000);
-      debug('Timer #' + this._actionTimerId + ' ' + buttonId + ' start');
+      debug("Timer #" + this._actionTimerId + " " + buttonId + " start");
     },
 
     stopActionTimer() {
       if (this._actionTimerId != null) {
-        debug('Timer #' + this._actionTimerId + ' stop');
+        debug("Timer #" + this._actionTimerId + " stop");
         window.clearInterval(this._actionTimerId);
         delete this._actionTimerId;
       }
@@ -355,19 +391,23 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
     changePageTitle(suffix = null, save = false) {
       if (suffix == null) {
-        suffix = 'generic';
+        suffix = "generic";
       }
 
-      if (!this.gamedatas.gamestate['descriptionmyturn' + suffix]) return;
+      if (!this.gamedatas.gamestate["descriptionmyturn" + suffix]) return;
 
       if (save) {
-        this.gamedatas.gamestate.descriptionmyturngeneric = this.gamedatas.gamestate.descriptionmyturn;
-        this.gamedatas.gamestate.descriptiongeneric = this.gamedatas.gamestate.description;
+        this.gamedatas.gamestate.descriptionmyturngeneric =
+          this.gamedatas.gamestate.descriptionmyturn;
+        this.gamedatas.gamestate.descriptiongeneric =
+          this.gamedatas.gamestate.description;
       }
 
-      this.gamedatas.gamestate.descriptionmyturn = this.gamedatas.gamestate['descriptionmyturn' + suffix];
-      if (this.gamedatas.gamestate['description' + suffix])
-        this.gamedatas.gamestate.description = this.gamedatas.gamestate['description' + suffix];
+      this.gamedatas.gamestate.descriptionmyturn =
+        this.gamedatas.gamestate["descriptionmyturn" + suffix];
+      if (this.gamedatas.gamestate["description" + suffix])
+        this.gamedatas.gamestate.description =
+          this.gamedatas.gamestate["description" + suffix];
       this.updatePageTitle();
     },
 
@@ -375,28 +415,28 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      * Remove non standard zoom property
      */
     onScreenWidthChange() {
-      dojo.style('page-content', 'zoom', '');
-      dojo.style('page-title', 'zoom', '');
-      dojo.style('right-side-first-part', 'zoom', '');
+      dojo.style("page-content", "zoom", "");
+      dojo.style("page-title", "zoom", "");
+      dojo.style("right-side-first-part", "zoom", "");
     },
 
     /*
      * Add a blue/grey button if it doesn't already exists
      */
-    addPrimaryActionButton(id, text, callback, zone = 'customActions') {
-      if (!$(id)) this.addActionButton(id, text, callback, zone, false, 'blue');
+    addPrimaryActionButton(id, text, callback, zone = "customActions") {
+      if (!$(id)) this.addActionButton(id, text, callback, zone, false, "blue");
     },
 
-    addSecondaryActionButton(id, text, callback, zone = 'customActions') {
-      if (!$(id)) this.addActionButton(id, text, callback, zone, false, 'gray');
+    addSecondaryActionButton(id, text, callback, zone = "customActions") {
+      if (!$(id)) this.addActionButton(id, text, callback, zone, false, "gray");
     },
 
-    addDangerActionButton(id, text, callback, zone = 'customActions') {
-      if (!$(id)) this.addActionButton(id, text, callback, zone, false, 'red');
+    addDangerActionButton(id, text, callback, zone = "customActions") {
+      if (!$(id)) this.addActionButton(id, text, callback, zone, false, "red");
     },
 
     clearActionButtons() {
-      dojo.empty('customActions');
+      dojo.empty("customActions");
     },
 
     /*
@@ -406,48 +446,73 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       var optionSel = 'option[value="' + newValue + '"]';
       dojo
         .query(
-          '#preference_control_' + number + ' > ' + optionSel + ', #preference_fontrol_' + number + ' > ' + optionSel,
+          "#preference_control_" +
+            number +
+            " > " +
+            optionSel +
+            ", #preference_fontrol_" +
+            number +
+            " > " +
+            optionSel,
         )
-        .attr('selected', true);
-      var select = $('preference_control_' + number);
+        .attr("selected", true);
+      var select = $("preference_control_" + number);
       if (dojo.isIE) {
-        select.fireEvent('onchange');
+        select.fireEvent("onchange");
       } else {
-        var event = document.createEvent('HTMLEvents');
-        event.initEvent('change', false, true);
+        var event = document.createEvent("HTMLEvents");
+        event.initEvent("change", false, true);
         select.dispatchEvent(event);
       }
     },
 
     initPreferencesObserver() {
-      dojo.query('.preference_control, preference_fontrol').on('change', (e) => {
-        var match = e.target.id.match(/^preference_[fc]ontrol_(\d+)$/);
-        if (!match) {
-          return;
-        }
-        var pref = match[1];
-        var newValue = e.target.value;
-        this.prefs[pref].value = newValue;
-        if (this.prefs[pref].attribute) {
-          $('ebd-body').setAttribute('data-' + this.prefs[pref].attribute, newValue);
-        }
+      dojo
+        .query(".preference_control, preference_fontrol")
+        .on("change", (e) => {
+          var match = e.target.id.match(/^preference_[fc]ontrol_(\d+)$/);
+          if (!match) {
+            return;
+          }
+          var pref = match[1];
+          var newValue = e.target.value;
+          this.prefs[pref].value = newValue;
+          if (this.prefs[pref].attribute) {
+            $("ebd-body").setAttribute(
+              "data-" + this.prefs[pref].attribute,
+              newValue,
+            );
+          }
 
-        $('preference_control_' + pref).value = newValue;
-        if ($('preference_fontrol_' + pref)) {
-          $('preference_fontrol_' + pref).value = newValue;
-        }
-        data = { pref: pref, lock: false, value: newValue, player: this.player_id };
-        this.takeAction('actChangePref', data, false, false);
-        this.onPreferenceChange(pref, newValue);
-      });
+          $("preference_control_" + pref).value = newValue;
+          if ($("preference_fontrol_" + pref)) {
+            $("preference_fontrol_" + pref).value = newValue;
+          }
+          data = {
+            pref: pref,
+            lock: false,
+            value: newValue,
+            player: this.player_id,
+          };
+          this.takeAction("actChangePref", data, false, false);
+          this.onPreferenceChange(pref, newValue);
+        });
     },
 
     checkPreferencesConsistency(backPrefs) {
       backPrefs.forEach((prefInfo) => {
         let pref = prefInfo.pref_id;
-        if (this.prefs[pref] != undefined && this.prefs[pref].value != prefInfo.pref_value) {
-          data = { pref: pref, lock: false, value: this.prefs[pref].value, player: this.player_id };
-          this.takeAction('actChangePref', data, false, false);
+        if (
+          this.prefs[pref] != undefined &&
+          this.prefs[pref].value != prefInfo.pref_value
+        ) {
+          data = {
+            pref: pref,
+            lock: false,
+            value: this.prefs[pref].value,
+            player: this.player_id,
+          };
+          this.takeAction("actChangePref", data, false, false);
         }
       });
     },
@@ -460,7 +525,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       Object.keys(this.prefs).forEach((prefId) => {
         let pref = this.prefs[prefId];
         if (pref.attribute) {
-          $('ebd-body').setAttribute('data-' + pref.attribute, pref.value);
+          $("ebd-body").setAttribute("data-" + pref.attribute, pref.value);
         }
       });
 
@@ -469,13 +534,15 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         Object.keys(this.gamedatas.localPrefs).forEach((prefId) => {
           let pref = this.gamedatas.localPrefs[prefId];
           pref.id = prefId;
-          let selectedValue = this.gamedatas.prefs.find((pref2) => pref2.pref_id == pref.id).pref_value;
+          let selectedValue = this.gamedatas.prefs.find(
+            (pref2) => pref2.pref_id == pref.id,
+          ).pref_value;
           pref.value = selectedValue;
           this.prefs[prefId] = pref;
           if (pref.attribute) {
-            $('ebd-body').setAttribute('data-' + pref.attribute, selectedValue);
+            $("ebd-body").setAttribute("data-" + pref.attribute, selectedValue);
           }
-          this.place('tplPreferenceSelect', pref, 'local-prefs-container');
+          this.place("tplPreferenceSelect", pref, "local-prefs-container");
         });
       }
 
@@ -491,11 +558,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       let values = Object.keys(pref.values)
         .map(
           (val) =>
-            `<option value='${val}' ${pref.value == val ? 'selected="selected"' : ''}>${_(
-              pref.values[val].name,
-            )}</option>`,
+            `<option value='${val}' ${pref.value == val ? 'selected="selected"' : ""}>${_(pref.values[val].name)}</option>`,
         )
-        .join('');
+        .join("");
 
       return `
         <div class="preference_choice">
@@ -519,25 +584,38 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      ******* SETTINGS ********
      ************************/
     setupSettings() {
-      dojo.connect($('show-settings'), 'onclick', () => this.toggleSettings());
-      this.addTooltip('show-settings', '', _('Display some settings about the game.'));
-      let container = $('settings-controls-container');
+      dojo.connect($("show-settings"), "onclick", () => this.toggleSettings());
+      this.addTooltip(
+        "show-settings",
+        "",
+        _("Display some settings about the game."),
+      );
+      let container = $("settings-controls-container");
 
-      if (this._settingsSections) {
-        dojo.place(`<div id='settings-controls-header'></div><div id='settings-controls-wrapper'></div>`, container);
+      if (this.getSettingsSections) {
+        this._settingsSections = this.getSettingsSections();
+        dojo.place(
+          `<div id='settings-controls-header'></div><div id='settings-controls-wrapper'></div>`,
+          container,
+        );
         Object.keys(this._settingsSections).forEach((sectionName, i) => {
           dojo.place(
             `<div id='settings-section-${sectionName}' class='settings-section'></div>`,
-            'settings-controls-wrapper',
+            "settings-controls-wrapper",
           );
-          let div = dojo.place(`<div>${this._settingsSections[sectionName]}</div>`, 'settings-controls-header');
+          let div = dojo.place(
+            `<div>${this._settingsSections[sectionName]}</div>`,
+            "settings-controls-header",
+          );
           let openSection = () => {
-            dojo.query('#settings-controls-header div').removeClass('open');
-            div.classList.add('open');
-            dojo.query('#settings-controls-wrapper div.settings-section').removeClass('open');
-            $(`settings-section-${sectionName}`).classList.add('open');
+            dojo.query("#settings-controls-header div").removeClass("open");
+            div.classList.add("open");
+            dojo
+              .query("#settings-controls-wrapper div.settings-section")
+              .removeClass("open");
+            $(`settings-section-${sectionName}`).classList.add("open");
           };
-          div.addEventListener('click', openSection);
+          div.addEventListener("click", openSection);
           if (i == 0) {
             openSection();
           }
@@ -545,6 +623,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       }
 
       this.settings = {};
+      this._settingsConfig = this.getSettingsConfig();
       Object.keys(this._settingsConfig).forEach((settingName) => {
         let config = this._settingsConfig[settingName];
         let localContainer = container;
@@ -552,12 +631,15 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
           localContainer = $(`settings-section-${config.section}`);
         }
 
-        if (config.type == 'pref') {
+        if (config.type == "pref") {
           if (config.local == true && this.isReadOnly()) {
             return;
           }
           // Pref type => just move the user pref around
-          dojo.place($('preference_control_' + config.prefId).parentNode.parentNode, localContainer);
+          dojo.place(
+            $("preference_control_" + config.prefId).parentNode.parentNode,
+            localContainer,
+          );
           return;
         }
 
@@ -566,47 +648,57 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         this.settings[settingName] = value;
 
         // Slider type => create DOM and initialize noUiSlider
-        if (config.type == 'slider') {
-          this.place('tplSettingSlider', { desc: config.name, id: settingName }, localContainer);
+        if (config.type == "slider") {
+          this.place(
+            "tplSettingSlider",
+            { desc: config.name, id: settingName },
+            localContainer,
+          );
           config.sliderConfig.start = [value];
-          noUiSlider.create($('setting-' + settingName), config.sliderConfig);
-          $('setting-' + settingName).noUiSlider.on('slide', (arg) =>
+          noUiSlider.create($("setting-" + settingName), config.sliderConfig);
+          $("setting-" + settingName).noUiSlider.on("slide", (arg) =>
             this.changeSetting(settingName, parseInt(arg[0])),
           );
-        } else if (config.type == 'multislider') {
-          this.place('tplSettingSlider', { desc: config.name, id: settingName }, localContainer);
+        } else if (config.type == "multislider") {
+          this.place(
+            "tplSettingSlider",
+            { desc: config.name, id: settingName },
+            localContainer,
+          );
           config.sliderConfig.start = value;
-          noUiSlider.create($('setting-' + settingName), config.sliderConfig);
-          $('setting-' + settingName).noUiSlider.on('slide', (arg) => this.changeSetting(settingName, arg));
+          noUiSlider.create($("setting-" + settingName), config.sliderConfig);
+          $("setting-" + settingName).noUiSlider.on("slide", (arg) =>
+            this.changeSetting(settingName, arg),
+          );
         }
 
         // Select type => create a select
-        else if (config.type == 'select') {
+        else if (config.type == "select") {
           config.id = settingName;
-          this.place('tplSettingSelect', config, localContainer);
-          $('setting-' + settingName).addEventListener('change', () => {
-            let newValue = $('setting-' + settingName).value;
+          this.place("tplSettingSelect", config, localContainer);
+          $("setting-" + settingName).addEventListener("change", () => {
+            let newValue = $("setting-" + settingName).value;
             this.changeSetting(settingName, newValue);
             if (config.attribute) {
-              $('ebd-body').setAttribute('data-' + config.attribute, newValue);
+              $("ebd-body").setAttribute("data-" + config.attribute, newValue);
             }
           });
         }
         // Switch type => create a select
-        else if (config.type == 'switch') {
+        else if (config.type == "switch") {
           config.id = settingName;
-          this.place('tplSettingSwitch', config, localContainer);
-          $('setting-' + settingName).addEventListener('change', () => {
-            let newValue = $('setting-' + settingName).checked ? 1 : 0;
+          this.place("tplSettingSwitch", config, localContainer);
+          $("setting-" + settingName).addEventListener("change", () => {
+            let newValue = $("setting-" + settingName).checked ? 1 : 0;
             this.changeSetting(settingName, newValue);
             if (config.attribute) {
-              $('ebd-body').setAttribute('data-' + config.attribute, newValue);
+              $("ebd-body").setAttribute("data-" + config.attribute, newValue);
             }
           });
         }
 
         if (config.attribute) {
-          $('ebd-body').setAttribute('data-' + config.attribute, value);
+          $("ebd-body").setAttribute("data-" + config.attribute, value);
         }
         this.changeSetting(settingName, value);
       });
@@ -616,7 +708,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       let suffix = settingName.charAt(0).toUpperCase() + settingName.slice(1);
       this.settings[settingName] = value;
       localStorage.setItem(this.game_name + suffix, value);
-      let methodName = 'onChange' + suffix + 'Setting';
+      let methodName = "onChange" + suffix + "Setting";
       if (this[methodName]) {
         this[methodName](value);
       }
@@ -639,9 +731,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         <div class='row-label'>${_(setting.name)}</div>
         <div class='row-value'>
           <label class="switch" for="setting-${setting.id}">
-            <input type="checkbox" id="setting-${setting.id}" ${
-        this.settings[setting.id] == 1 ? 'checked="checked"' : ''
-      } />
+            <input type="checkbox" id="setting-${setting.id}" ${this.settings[setting.id] == 1 ? 'checked="checked"' : ""} />
             <div class="slider round"></div>
           </label>
         </div>
@@ -653,20 +743,18 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       let values = Object.keys(setting.values)
         .map(
           (val) =>
-            `<option value='${val}' ${this.settings[setting.id] == val ? 'selected="selected"' : ''}>${_(
+            `<option value='${val}' ${this.settings[setting.id] == val ? 'selected="selected"' : ""}>${_(
               setting.values[val],
             )}</option>`,
         )
-        .join('');
+        .join("");
 
       return `
         <div class="preference_choice" data-id='${setting.id}'>
           <div class="row-data row-data-large">
             <div class="row-label">${_(setting.name)}</div>
             <div class="row-value">
-              <select id="setting-${
-                setting.id
-              }" class="preference_control game_local_preference_control" style="display: block;">
+              <select id="setting-${setting.id}" class="preference_control game_local_preference_control" style="display: block;">
                 ${values}
               </select>
             </div>
@@ -676,8 +764,6 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     },
 
     toggleSettings() {
-      if (!this._settingsModal) return;
-
       this._settingsModal.show();
       /*
       dojo.toggleClass('settings-controls-container', 'settingsControlsHidden');
@@ -695,12 +781,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     },
 
     getScale(id) {
-      let transform = dojo.style(id, 'transform');
-      if (transform == 'none') return 1;
+      let transform = dojo.style(id, "transform");
+      if (transform == "none") return 1;
 
-      var values = transform.split('(')[1];
-      values = values.split(')')[0];
-      values = values.split(',');
+      var values = transform.split("(")[1];
+      values = values.split(")")[0];
+      values = values.split(",");
       let a = values[0];
       let b = values[1];
       return Math.sqrt(a * a + b * b);
@@ -721,7 +807,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
           attach: true,
           changeParent: true, // Change parent during sliding to avoid zIndex issue
           pos: null,
-          className: 'moving',
+          className: "moving",
           from: null,
           clearPos: true,
           beforeBrother: null,
@@ -755,33 +841,38 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       // Handle phantom at start
       if (config.phantomStart && config.from == null) {
         mobile = dojo.clone(mobileElt);
-        dojo.attr(mobile, 'id', mobileElt.id + '_animated');
-        dojo.place(mobile, 'game_play_area');
+        dojo.attr(mobile, "id", mobileElt.id + "_animated");
+        dojo.place(mobile, "game_play_area");
         this.placeOnObject(mobile, mobileElt);
-        dojo.addClass(mobileElt, 'phantom');
+        dojo.addClass(mobileElt, "phantom");
         config.from = mobileElt;
       }
 
       // Handle phantom at end
       if (config.phantomEnd) {
         targetId = dojo.clone(mobileElt);
-        dojo.attr(targetId, 'id', mobileElt.id + '_afterSlide');
-        dojo.addClass(targetId, 'phantom');
+        dojo.attr(targetId, "id", mobileElt.id + "_afterSlide");
+        dojo.addClass(targetId, "phantom");
         if (config.beforeBrother != null) {
-          dojo.place(targetId, config.beforeBrother, 'before');
+          dojo.place(targetId, config.beforeBrother, "before");
         } else {
           dojo.place(targetId, targetElt);
         }
       }
 
-      dojo.style(mobile, 'zIndex', 5000);
+      dojo.style(mobile, "zIndex", 5000);
       dojo.addClass(mobile, config.className);
-      if (config.changeParent) this.changeParent(mobile, 'game_play_area');
+      if (config.changeParent) this.changeParent(mobile, "game_play_area");
       if (config.from != null) this.placeOnObject(mobile, config.from);
       return new Promise((resolve, reject) => {
         const animation =
           config.pos == null
-            ? this.slideToObject(mobile, config.to || targetId, config.duration, config.delay)
+            ? this.slideToObject(
+                mobile,
+                config.to || targetId,
+                config.duration,
+                config.delay,
+              )
             : this.slideToObjectPos(
                 mobile,
                 config.to || targetId,
@@ -791,20 +882,21 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
                 config.delay,
               );
 
-        dojo.connect(animation, 'onEnd', () => {
-          dojo.style(mobile, 'zIndex', null);
+        dojo.connect(animation, "onEnd", () => {
+          dojo.style(mobile, "zIndex", null);
           dojo.removeClass(mobile, config.className);
           if (config.phantomStart) {
-            dojo.place(mobileElt, mobile, 'replace');
-            dojo.removeClass(mobileElt, 'phantom');
+            dojo.place(mobileElt, mobile, "replace");
+            dojo.removeClass(mobileElt, "phantom");
             mobile = mobileElt;
           }
-          if (config.changeParent) {
-            if (config.phantomEnd) dojo.place(mobile, targetId, 'replace');
+          if (config.destroy) dojo.destroy(mobile);
+          else if (config.changeParent) {
+            if (config.phantomEnd) dojo.place(mobile, targetId, "replace");
             else this.changeParent(mobile, newParent);
           }
-          if (config.destroy) dojo.destroy(mobile);
-          if (config.clearPos && !config.destroy) dojo.style(mobile, { top: null, left: null, position: null });
+          if (config.clearPos && !config.destroy)
+            dojo.style(mobile, { top: null, left: null, position: null });
           resolve();
         });
         animation.play();
@@ -813,24 +905,24 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
     changeParent(mobile, new_parent, relation) {
       if (mobile === null) {
-        console.error('attachToNewParent: mobile obj is null');
+        console.error("attachToNewParent: mobile obj is null");
         return;
       }
       if (new_parent === null) {
-        console.error('attachToNewParent: new_parent is null');
+        console.error("attachToNewParent: new_parent is null");
         return;
       }
-      if (typeof mobile == 'string') {
+      if (typeof mobile == "string") {
         mobile = $(mobile);
       }
-      if (typeof new_parent == 'string') {
+      if (typeof new_parent == "string") {
         new_parent = $(new_parent);
       }
-      if (typeof relation == 'undefined') {
-        relation = 'last';
+      if (typeof relation == "undefined") {
+        relation = "last";
       }
       var src = dojo.position(mobile);
-      dojo.style(mobile, 'position', 'absolute');
+      dojo.style(mobile, "position", "absolute");
       dojo.place(mobile, new_parent, relation);
       var tgt = dojo.position(mobile);
       var box = dojo.marginBox(mobile);
@@ -845,13 +937,13 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
     positionObjectDirectly(mobileObj, x, y) {
       // do not remove this "dead" code some-how it makes difference
-      dojo.style(mobileObj, 'left'); // bug? re-compute style
+      dojo.style(mobileObj, "left"); // bug? re-compute style
       // console.log("place " + x + "," + y);
       dojo.style(mobileObj, {
-        left: x + 'px',
-        top: y + 'px',
+        left: x + "px",
+        top: y + "px",
       });
-      dojo.style(mobileObj, 'left'); // bug? re-compute style
+      dojo.style(mobileObj, "left"); // bug? re-compute style
     },
 
     /*
@@ -860,7 +952,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     flipAndReplace(target, newNode, duration = 1000) {
       // Fast replay mode
       if (this.isFastMode()) {
-        dojo.place(newNode, target, 'replace');
+        dojo.place(newNode, target, "replace");
         return;
       }
 
@@ -874,18 +966,18 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
             </div>
           </div>`,
           target,
-          'after',
+          "after",
         );
-        dojo.place(target, container.querySelector('.flip-back'));
-        dojo.place(newNode, container.querySelector('.flip-front'));
+        dojo.place(target, container.querySelector(".flip-back"));
+        dojo.place(newNode, container.querySelector(".flip-front"));
 
         // Trigget flip animation
         container.offsetWidth;
-        dojo.removeClass(container, 'flipped');
+        dojo.removeClass(container, "flipped");
 
         // Clean everything once it's done
         setTimeout(() => {
-          dojo.place(newNode, container, 'replace');
+          dojo.place(newNode, container, "replace");
           resolve();
         }, duration);
       });
@@ -896,60 +988,72 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      */
     coloredYou() {
       var color = this.gamedatas.players[this.player_id].color;
-      var color_bg = '';
-      if (this.gamedatas.players[this.player_id] && this.gamedatas.players[this.player_id].color_back) {
-        color_bg = 'background-color:#' + this.gamedatas.players[this.player_id].color_back + ';';
+      var color_bg = "";
+      if (
+        this.gamedatas.players[this.player_id] &&
+        this.gamedatas.players[this.player_id].color_back
+      ) {
+        color_bg =
+          "background-color:#" +
+          this.gamedatas.players[this.player_id].color_back +
+          ";";
       }
       var you =
         '<span style="font-weight:bold;color:#' +
         color +
-        ';' +
+        ";" +
         color_bg +
         '">' +
-        __('lang_mainsite', 'You') +
-        '</span>';
+        __("lang_mainsite", "You") +
+        "</span>";
       return you;
     },
 
     coloredPlayerName(name) {
-      const player = Object.values(this.gamedatas.players).find((player) => player.name == name);
-      if (player == undefined) return '<!--PNS--><span class="playername">' + name + '</span><!--PNE-->';
+      const player = Object.values(this.gamedatas.players).find(
+        (player) => player.name == name,
+      );
+      if (player == undefined)
+        return (
+          '<!--PNS--><span class="playername">' + name + "</span><!--PNE-->"
+        );
 
       const color = player.color;
       const color_bg = player.color_back
-        ? 'background-color:#' + this.gamedatas.players[this.player_id].color_back + ';'
-        : '';
+        ? "background-color:#" +
+          this.gamedatas.players[this.player_id].color_back +
+          ";"
+        : "";
       return (
-        '<!--PNS--><span class="playername" style="color:#' + color + ';' + color_bg + '">' + name + '</span><!--PNE-->'
+        '<!--PNS--><span class="playername" style="color:#' +
+        color +
+        ";" +
+        color_bg +
+        '">' +
+        name +
+        "</span><!--PNE-->"
       );
     },
 
     /*
      * Overwrite to allow to more player coloration than player_name and player_name2
-     * and add images
      */
     format_string_recursive(log, args) {
       try {
-        if (log && args && !args.processed) {
-          args.processed = true;
-          
-          let player_keys = Object.keys(args).filter((key) => key.substr(0, 11) == 'player_name');
+        if (log && args) {
+          //          if (args.msgYou && args.player_id == this.player_id) log = args.msgYou;
+
+          let player_keys = Object.keys(args).filter(
+            (key) => key.substr(0, 11) == "player_name",
+          );
           player_keys.forEach((key) => {
             args[key] = this.coloredPlayerName(args[key]);
           });
 
-          // list of special keys we want to replace with images
-          var keys = ['color','value', 'value2'];
-
-        
-          for ( var i in keys) {
-              const key = keys[i];
-              if (key in args) args[key] = this.getTokenDiv(key, args);                            
-
-          }
-      }
+          //          args.You = this.coloredYou();
+        }
       } catch (e) {
-        console.error(log, args, 'Exception thrown', e.stack);
+        console.error(log, args, "Exception thrown", e.stack);
       }
 
       return this.inherited(arguments);
@@ -957,12 +1061,20 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
     place(tplMethodName, object, container, position = null) {
       if ($(container) == null) {
-        console.error('Trying to place on null container', container, tplMethodName, object);
+        console.error(
+          "Trying to place on null container",
+          container,
+          tplMethodName,
+          object,
+        );
         return;
       }
 
       if (this[tplMethodName] == undefined) {
-        console.error('Trying to create a non-existing template', tplMethodName);
+        console.error(
+          "Trying to create a non-existing template",
+          tplMethodName,
+        );
         return;
       }
 
@@ -971,7 +1083,8 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
     /* Helper to work with local storage */
     getConfig(value, v) {
-      return localStorage.getItem(value) == null || isNaN(localStorage.getItem(value))
+      return localStorage.getItem(value) == null ||
+        isNaN(localStorage.getItem(value))
         ? v
         : localStorage.getItem(value);
     },
@@ -989,16 +1102,22 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
     activateHelpMode() {
       this._helpMode = true;
-      dojo.addClass('ebd-body', 'help-mode');
+      dojo.addClass("ebd-body", "help-mode");
       this._displayedTooltip = null;
-      document.body.addEventListener('click', this.closeCurrentTooltip.bind(this));
+      document.body.addEventListener(
+        "click",
+        this.closeCurrentTooltip.bind(this),
+      );
     },
 
     desactivateHelpMode() {
       this.closeCurrentTooltip();
       this._helpMode = false;
-      dojo.removeClass('ebd-body', 'help-mode');
-      document.body.removeEventListener('click', this.closeCurrentTooltip.bind(this));
+      dojo.removeClass("ebd-body", "help-mode");
+      document.body.removeEventListener(
+        "click",
+        this.closeCurrentTooltip.bind(this),
+      );
     },
 
     closeCurrentTooltip() {
@@ -1028,12 +1147,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       };
 
       if (temporary) {
-        this.connect($(node), 'click', safeCallback);
-        dojo.removeClass(node, 'unselectable');
-        dojo.addClass(node, 'selectable');
+        this.connect($(node), "click", safeCallback);
+        dojo.removeClass(node, "unselectable");
+        dojo.addClass(node, "selectable");
         this._selectableNodes.push(node);
       } else {
-        dojo.connect($(node), 'click', safeCallback);
+        dojo.connect($(node), "click", safeCallback);
       }
     },
 
@@ -1041,14 +1160,15 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      * Tooltip to work with help mode
      */
     registerCustomTooltip(html, id = null) {
-      id = id || this.game_name + '-tooltipable-' + this._customTooltipIdCounter++;
+      id =
+        id || this.game_name + "-tooltipable-" + this._customTooltipIdCounter++;
       this._registeredCustomTooltips[id] = html;
       return id;
     },
     attachRegisteredTooltips() {
       Object.keys(this._registeredCustomTooltips).forEach((id) => {
         if (!$(id)) {
-          console.error('Trying to attack tooltip on a null element', id);
+          console.error("Trying to attack tooltip on a null element", id);
         } else {
           this.addCustomTooltip(id, this._registeredCustomTooltips[id]);
         }
@@ -1061,7 +1181,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         return;
       }
 
-      html = '<div class="midSizeDialog">' + html + '</div>';
+      html = '<div class="midSizeDialog">' + html + "</div>";
       delay = delay || 400;
       let tooltip = new dijit.Tooltip({
         //        connectId: [id],
@@ -1070,21 +1190,23 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         showDelay: delay,
       });
       this.tooltips[id] = tooltip;
-      dojo.addClass(id, 'tooltipable');
+      dojo.addClass(id, "tooltipable");
       dojo.place(
-        `<div id='${id}-help' class='help-marker'>
-        <svg xmlns="http://www.w3.org/2000/svg" height="0.8em" viewBox="0 -40 320 600"><path d="M80 160c0-35.3 28.7-64 64-64h32c35.3 0 64 28.7 64 64v3.6c0 21.8-11.1 42.1-29.4 53.8l-42.2 27.1c-25.2 16.2-40.4 44.1-40.4 74V320c0 17.7 14.3 32 32 32s32-14.3 32-32v-1.4c0-8.2 4.2-15.8 11-20.2l42.2-27.1c36.6-23.6 58.8-64.1 58.8-107.7V160c0-70.7-57.3-128-128-128H144C73.3 32 16 89.3 16 160c0 17.7 14.3 32 32 32s32-14.3 32-32zm80 320a40 40 0 1 0 0-80 40 40 0 1 0 0 80z"/></svg>
-        </div>`,
+        `
+        <div class='help-marker'>
+          <svg><use href="#help-marker-svg" /></svg>
+        </div>
+      `,
         id,
       );
 
-      dojo.connect($(id), 'click', (evt) => {
+      dojo.connect($(id), "click", (evt) => {
         if (!this._helpMode) {
           tooltip.close();
         } else {
           evt.stopPropagation();
 
-          if (tooltip.state == 'SHOWING') {
+          if (tooltip.state == "SHOWING") {
             this.closeCurrentTooltip();
           } else {
             this.closeCurrentTooltip();
@@ -1095,7 +1217,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       });
 
       tooltip.showTimeout = null;
-      dojo.connect($(id), 'mouseenter', () => {
+      dojo.connect($(id), "mouseenter", () => {
         if (!this._helpMode && !this._dragndropMode) {
           if (tooltip.showTimeout != null) clearTimeout(tooltip.showTimeout);
 
@@ -1103,7 +1225,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         }
       });
 
-      dojo.connect($(id), 'mouseleave', () => {
+      dojo.connect($(id), "mouseleave", () => {
         if (!this._helpMode && !this._dragndropMode) {
           tooltip.close();
           if (tooltip.showTimeout != null) clearTimeout(tooltip.showTimeout);
@@ -1117,10 +1239,13 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      */
     onPlaceLogOnChannel(msg) {
       var currentLogId = this.notifqueue.next_log_id;
+      var currentMobileLogId = this.next_log_id;
       var res = this.inherited(arguments);
       this._notif_uid_to_log_id[msg.uid] = currentLogId;
+      this._notif_uid_to_mobile_log_id[msg.uid] = currentMobileLogId;
       this._last_notif = {
         logId: currentLogId,
+        mobileLogId: currentMobileLogId,
         msg,
       };
       return res;
@@ -1131,7 +1256,10 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      *   strikes all log messages related to the given array of notif ids
      */
     checkLogCancel(notifId) {
-      if (this.gamedatas.canceledNotifIds != null && this.gamedatas.canceledNotifIds.includes(notifId)) {
+      if (
+        this.gamedatas.canceledNotifIds != null &&
+        this.gamedatas.canceledNotifIds.includes(notifId)
+      ) {
         this.cancelLogs([notifId]);
       }
     },
@@ -1140,19 +1268,32 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
       notifIds.forEach((uid) => {
         if (this._notif_uid_to_log_id.hasOwnProperty(uid)) {
           let logId = this._notif_uid_to_log_id[uid];
-          if ($('log_' + logId)) dojo.addClass('log_' + logId, 'cancel');
+          if ($("log_" + logId)) dojo.addClass("log_" + logId, "cancel");
+        }
+        if (this._notif_uid_to_mobile_log_id.hasOwnProperty(uid)) {
+          let mobileLogId = this._notif_uid_to_mobile_log_id[uid];
+          if ($("dockedlog_" + mobileLogId))
+            dojo.addClass("dockedlog_" + mobileLogId, "cancel");
         }
       });
     },
 
     addLogClass() {
       if (this._last_notif == null) return;
-      let notif = this._last_notif;
-      if ($('log_' + notif.logId)) {
-        let type = notif.msg.type;
-        if (type == 'history_history') type = notif.msg.args.originalType;
 
-        dojo.addClass('log_' + notif.logId, 'notif_' + type);
+      let notif = this._last_notif;
+      let type = notif.msg.type;
+      if (type == "history_history") type = notif.msg.args.originalType;
+
+      if ($("log_" + notif.logId)) {
+        dojo.addClass("log_" + notif.logId, "notif_" + type);
+
+        var methodName =
+          "onAdding" + type.charAt(0).toUpperCase() + type.slice(1) + "ToLog";
+        if (this[methodName] !== undefined) this[methodName](notif);
+      }
+      if ($("dockedlog_" + notif.mobileLogId)) {
+        dojo.addClass("dockedlog_" + notif.mobileLogId, "notif_" + type);
       }
     },
 
@@ -1161,7 +1302,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
      */
     createCounter(id, defaultValue = 0, linked = null) {
       if (!$(id)) {
-        console.error('Counter : element does not exist', id);
+        console.error("Counter : element does not exist", id);
         return null;
       }
 
@@ -1189,7 +1330,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
           this.targetValue = +n;
           if (this.currentValue != n) {
-            this.span.classList.add('counter_in_progress');
+            this.span.classList.add("counter_in_progress");
             setTimeout(() => this.makeCounterProgress(), this.speed);
           }
         },
@@ -1203,12 +1344,18 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         },
         makeCounterProgress() {
           if (this.currentValue == this.targetValue) {
-            setTimeout(() => this.span.classList.remove('counter_in_progress'), this.speed);
+            setTimeout(
+              () => this.span.classList.remove("counter_in_progress"),
+              this.speed,
+            );
             return;
           }
 
-          let step = Math.ceil(Math.abs(this.targetValue - this.currentValue) / 5);
-          this.currentValue += (this.currentValue < this.targetValue ? 1 : -1) * step;
+          let step = Math.ceil(
+            Math.abs(this.targetValue - this.currentValue) / 5,
+          );
+          this.currentValue +=
+            (this.currentValue < this.targetValue ? 1 : -1) * step;
           this.span.innerHTML = this.currentValue;
           if (this.linked) this.linked.innerHTML = this.currentValue;
           setTimeout(() => this.makeCounterProgress(), this.speed);
@@ -1242,10 +1389,12 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
 
     addCancelStateBtn(text = null) {
       if (text == null) {
-        text = _('Cancel');
+        text = _("Cancel");
       }
 
-      this.addSecondaryActionButton('btnCancel', text, () => this.clearClientState());
+      this.addSecondaryActionButton("btnCancel", text, () =>
+        this.clearClientState(),
+      );
     },
 
     clearClientState() {
@@ -1254,7 +1403,7 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     },
 
     translate(t) {
-      if (typeof t === 'object') {
+      if (typeof t === "object") {
         return this.format_string_recursive(t.log, t.args);
       } else {
         return _(t);
@@ -1268,9 +1417,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
     onSelectN(elements, n, callback) {
       let selectedElements = [];
       let updateStatus = () => {
-        if ($('btnConfirmChoice')) $('btnConfirmChoice').remove();
+        if ($("btnConfirmChoice")) $("btnConfirmChoice").remove();
         if (selectedElements.length == n) {
-          this.addPrimaryActionButton('btnConfirmChoice', _('Confirm'), () => {
+          this.addPrimaryActionButton("btnConfirmChoice", _("Confirm"), () => {
             if (callback(selectedElements)) {
               selectedElements = [];
               updateStatus();
@@ -1278,9 +1427,9 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
           });
         }
 
-        if ($('btnCancelChoice')) $('btnCancelChoice').remove();
+        if ($("btnCancelChoice")) $("btnCancelChoice").remove();
         if (selectedElements > 0) {
-          this.addSecondaryActionButton('btnCancelChoice', _('Cancel'), () => {
+          this.addSecondaryActionButton("btnCancelChoice", _("Cancel"), () => {
             selectedElements = [];
             updateStatus();
           });
@@ -1289,8 +1438,11 @@ define(['dojo', 'dojo/_base/declare', g_gamethemeurl + 'modules/js/vendor/nouisl
         Object.keys(elements).forEach((id) => {
           let elt = elements[id];
           let selected = selectedElements.includes(id);
-          elt.classList.toggle('selected', selected);
-          elt.classList.toggle('selectable', selected || selectedElements.length < n);
+          elt.classList.toggle("selected", selected);
+          elt.classList.toggle(
+            "selectable",
+            selected || selectedElements.length < n,
+          );
         });
       };
 

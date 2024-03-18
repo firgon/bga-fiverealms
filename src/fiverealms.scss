@@ -1,0 +1,197 @@
+/**
+ *------
+ * BGA framework: © Gregory Isabelli <gisabelli@boardgamearena.com> & Emmanuel Colin <ecolin@boardgamearena.com>
+ * FiveRealms implementation : © Emmanuel Albisser <emmanuel.albisser@gmail.com>
+ *
+ * This code has been produced on the BGA studio platform for use on http://boardgamearena.com.
+ * See http://en.boardgamearena.com/#!doc/Studio for more information.
+ * -----
+ *
+ * fiverealms.css
+ *
+ * FiveRealms stylesheet
+ *
+ */
+
+/*
+    This is the CSS stylesheet of your game User Interface.
+    
+    Styles defined on this file will be applied to the HTML elements you define in your
+    HTML template (fiverealms_fiverealms.tpl), and to HTML elements you create dynamically
+    (in fiverealms.js).
+    
+    Usually, you are using CSS to:
+    
+    1°) define the overall layout of your game
+        (ex: place the board on the top left, place player's hand beside, place the deck on the right, ...).
+
+    2°) create your CSS-sprites:
+        All images of your games should be gathered into a small number of image files. Then, using
+        background-image and background-position CSS properties, you create HTML blocks that can 
+        display these images correctly (see example below).
+    
+    3°) ... anything else:
+        It is really easy to add and remove CSS classes dynamically from your Javascript with
+        dojo.addClass and dojo.removeClass. It is also easy to check if an element has a class
+        (dojo.hasClass) or to get all elements with a specific class (dojo.query). This is why,
+        very often, using CSS classes for the logic of your user interface allow you to do complex
+        thing easily.
+        
+        
+     Note: on the production platform, this file will be compressed and comments will be removed.
+           Consequently, don't hesitate to put as many comments as necessary.
+*/
+
+/* Note: you must not use any @import directive */
+@import "modules/css/player-panel";
+@import "modules/css/player-board";
+@import "modules/css/central-board";
+@import "modules/css/cards";
+@import "modules/css/settings";
+@import "modules/css/nouislider";
+@import "modules/css/flip";
+@import "modules/css/modals";
+@import "modules/css/variables";
+
+html {
+  // background: url("img/background.jpg");
+  // background-size: cover;
+  // background-attachment: fixed;
+}
+
+.phantom {
+  visibility: hidden;
+}
+
+#pagemaintitletext,
+#gameaction_status {
+  .fiverealms-card,
+  .fiverealms-tile,
+  .fiverealms-meeple {
+    position: absolute;
+    left: 50%;
+    top: 0px;
+    transform: translateX(-50%);
+  }
+}
+
+#page-title {
+  z-index: 948;
+}
+
+.bgabutton.selected,
+.bgabutton.selected:hover {
+  background: #d97050;
+}
+
+#logs .log.notif_newUndoableStep {
+  margin-top: 0px;
+
+  .roundedbox {
+    display: none;
+    text-align: center;
+    cursor: pointer;
+    background-color: #c4c2c2;
+    font-size: 12px;
+    padding: 2px 5px;
+
+    &::before,
+    &::after {
+      content: "\f0e2";
+      font: normal normal normal 12px/1 FontAwesome;
+      margin: 0px 10px;
+    }
+  }
+
+  &.selectable .roundedbox {
+    display: block;
+  }
+}
+
+.chatwindowlogs_zone .log.notif_newUndoableStep {
+  margin-bottom: -4px;
+  padding: 0px;
+  display: none !important;
+
+  &.selectable {
+    display: block !important;
+
+    .roundedboxinner {
+      text-align: center;
+      cursor: pointer;
+      background-color: #c4c2c2;
+      font-size: 12px;
+      padding: 2px 5px;
+
+      &::before,
+      &::after {
+        content: "\f0e2";
+        font: normal normal normal 12px/1 FontAwesome;
+        margin: 0px 10px;
+      }
+
+      .msgtime {
+        display: none;
+      }
+    }
+  }
+}
+
+/* Cancelled notification messages */
+.log.cancel {
+  color: #c62828 !important;
+  text-decoration: line-through;
+}
+
+/* Desktop logs */
+.log.cancel .roundedbox {
+  background-color: rgba(240, 186, 117, 0.6) !important;
+}
+
+/* Mobile logs */
+.log.cancel.roundedbox {
+  background-color: #ef9a9a;
+}
+
+#box-reserve {
+  position: absolute;
+  top: 0%;
+  left: 0%;
+
+  & > div.fiverealms-meeple:not(.moving) {
+    position: absolute;
+    top: 0;
+    visibility: hidden;
+    pointer-events: none;
+  }
+}
+
+// SAFE MODE
+#ebd-body.help-mode {
+  .tooltipable {
+    cursor: help;
+  }
+}
+
+.help-marker {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  z-index: 900;
+  border: 1px solid black;
+  border-radius: 50%;
+
+  svg {
+    width: 20px;
+    height: 20px;
+  }
+}
+
+#ebd-body:not(.help-mode) {
+  .help-marker {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
