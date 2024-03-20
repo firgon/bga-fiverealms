@@ -26,6 +26,11 @@ class Card extends \FRMS\Helpers\DB_Model
         'playerId' => ['player_id', 'int']
     ];
 
+    public $bindedAttributes = [
+        'type' => ''
+    ];
+
+
     protected $staticAttributes = [];
 
     public function placeOnAlkane($coordOrSpaceId)
