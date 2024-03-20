@@ -64,6 +64,11 @@ define([
       this.inherited(arguments);
     },
 
+    clearPossible() {
+      document.querySelectorAll(".tmp-card").forEach((elt) => elt.remove());
+      this.inherited(arguments);
+    },
+
     onEnteringState(stateName, args) {
       debug("Entering state: " + stateName, args);
       if (this.isFastMode() && ![].includes(stateName)) return;
@@ -193,6 +198,162 @@ define([
       });
 
       this.setupCards();
+    },
+
+    /////////////////////////
+    //  ____  _
+    // |  _ \| | __ _ _   _
+    // | |_) | |/ _` | | | |
+    // |  __/| | (_| | |_| |
+    // |_|   |_|\__,_|\__, |
+    //                |___/
+    /////////////////////////
+    getCell(x, y = null) {
+      if (y == null) {
+        t = x.split("_");
+        x = t[0];
+        y = t[1];
+      }
+
+      return $(`alkane-${x}-${y}`);
+    },
+
+    highlightSpaces(spaceIds, className = "") {
+      spaceIds.forEach((spaceId) => {
+        this.getCell(spaceId).classList.add("highlighted");
+        if (className != "") this.getCell(spaceId).classList.add(className);
+      });
+    },
+
+    clearHighlights() {
+      $("alkane-container")
+        .querySelectorAll(".highlighted")
+        .forEach((cell) => cell.classList.remove("highlighted"));
+    },
+
+    onEnteringStatePlay(args) {
+      Object.entries(args.possibleSpaceIds).forEach(([spaceId, infos]) => {
+        this.onClick(this.getCell(spaceId), () => {
+          this.clientState("playChooseRealm", _("You must choose a realm"), {
+            cardId: args.nextCard.id,
+            spaceId,
+            realms: infos,
+          });
+        });
+      });
+    },
+
+    onEnteringStatePlayChooseRealm(args) {
+      this.addCancelStateBtn();
+
+      // Duplicate card as "phantom"
+      let oCard = $(`card-${args.cardId}`).cloneNode(true);
+      oCard.id += "_copy";
+      oCard.classList.add("tmp-card");
+      this.getCell(args.spaceId).insertAdjacentElement("beforeend", oCard);
+
+      let selectRealm = (realm) => {
+        return () => {
+          this.clientState(
+            "playChooseAction",
+            _("Do you want to recruit or influence?"),
+            {
+              cardId: args.cardId,
+              spaceId: args.spaceId,
+              realm,
+              spaceIds: args.realms[realm],
+            },
+          );
+        };
+      };
+
+      const REALMS = {
+        reptiles: _("Reptiles"),
+        felines: _("Felines"),
+        raptors: _("Raptors"),
+        ursids: _("Ursids"),
+        marines: _("Marines"),
+
+        religious: _("Religious"),
+        imperial: _("Imperial"),
+      };
+
+      // Add buttons
+      Object.entries(args.realms).forEach(([realm, spaceIds]) => {
+        this.addPrimaryActionButton(
+          `btn${realm}`,
+          REALMS[realm],
+          selectRealm(realm),
+        );
+        this.connect($(`btn${realm}`), "mouseover", () =>
+          this.highlightSpaces(spaceIds),
+        );
+        this.connect($(`btn${realm}`), "mouseout", () =>
+          this.clearHighlights(),
+        );
+
+        spaceIds.forEach((spaceId) => {
+          let cell = this.getCell(spaceId);
+          this.onClick(cell, selectRealm(realm));
+          this.connect(cell, "mouseover", () => this.highlightSpaces(spaceIds));
+          this.connect(cell, "mouseout", () => this.clearHighlights());
+        });
+      });
+    },
+
+    onEnteringStatePlayChooseAction(args) {
+      this.addCancelStateBtn();
+
+      // Duplicate card as "phantom"
+      let oCard = $(`card-${args.cardId}`).cloneNode(true);
+      oCard.id += "_copy";
+      oCard.classList.add("tmp-card");
+      this.getCell(args.spaceId).insertAdjacentElement("beforeend", oCard);
+
+      // Highlight cards
+      this.highlightSpaces(args.spaceIds, "selected");
+
+      // Add buttons
+      this.addPrimaryActionButton("btnRecruit", _("Recruit"), () =>
+        this.takeAction("actRecruit", {
+          spaceId: args.spaceId,
+          realm: args.realm,
+        }),
+      );
+      this.addPrimaryActionButton("btnInfluence", _("Influence"), () => {
+        if (args.realm == "imperial") {
+          this.clientState(
+            "chooseInfluenceColumns",
+            _("You must choose on which column(s) to place the Imperial cards"),
+            args,
+          );
+        } else {
+          this.takeAction("actRecruit", {
+            spaceId: args.spaceId,
+            realm: args.realm,
+          });
+        }
+      });
+
+      if (args.realm == "religious") {
+        $("btnInfluence").classList.add("disabled");
+      }
+    },
+
+    onEnteringStateChooseInfluenceColumns(args) {
+      this.addCancelStateBtn();
+
+      // Duplicate card as "phantom"
+      let oCard = $(`card-${args.cardId}`).cloneNode(true);
+      oCard.id += "_copy";
+      oCard.classList.add("tmp-card");
+      this.getCell(args.spaceId).insertAdjacentElement("beforeend", oCard);
+
+      // Highlight cards
+      this.highlightSpaces(args.spaceIds);
+
+      // TODO
+      console.log("TODOOO");
     },
 
     ////////////////////////////////////////
@@ -362,7 +523,9 @@ define([
 
     setupCards() {
       // This function is refreshUI compatible
-      let cardIds = this.gamedatas.cards.alkane.map((card) => {
+      let cards = this.gamedatas.cards;
+      let allCards = [...cards.alkane, cards.deck, ...cards.visible];
+      let cardIds = allCards.map((card) => {
         if (!$(`card-${card.id}`)) {
           this.addCard(card);
         }
@@ -418,6 +581,9 @@ define([
       let t = card.location.split("_");
       if (card.location == "alkane") {
         return $(`alkane-${card.x}-${card.y}`);
+      }
+      if (card.location == "deck") {
+        return $("fiverealms-deck");
       }
       // if (t[0] == "order") {
       //   return $(card.location).querySelector(".space-order-container");

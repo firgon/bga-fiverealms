@@ -7,6 +7,10 @@
     box-shadow: 1px 1px 5px black;
     border-radius: 5px;
 
+    &.tmp-card {
+        opacity: 0.6;
+    }
+
     // @for $i from 1 through 46 {
     //     &[data-type="#{$i}"] {
     //         background-position-x: ($i % 9) * 100% / 8;

@@ -333,36 +333,65 @@
   display: flex;
   justify-content: center;
   flex-wrap: wrap; }
-  #fiverealms-main-container #fiverealms-resizable-board {
-    width: calc(var(--boardScale) * 1650px);
-    height: calc(var(--boardScale) * 665px);
-    margin-bottom: 10px; }
-  #fiverealms-main-container #alkane-container {
-    width: 600px;
-    height: 824px;
-    transform: scale(var(--boardScale));
-    transform-origin: top left;
-    background: black;
-    border-radius: 10px;
-    border: 2px solid black;
-    box-shadow: 1px 1px 10px black;
-    position: relative;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-template-rows: repeat(4, 1fr); }
-    #fiverealms-main-container #alkane-container .alkane-slot {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: rgba(204, 204, 204, 0.8);
-      border-radius: 7px; }
-      #fiverealms-main-container #alkane-container .alkane-slot.selectable {
-        cursor: pointer;
-        background: rgba(242, 125, 125, 0.55); }
-        #fiverealms-main-container #alkane-container .alkane-slot.selectable:hover {
-          background: rgba(242, 125, 125, 0.65); }
-      #fiverealms-main-container #alkane-container .alkane-slot.selected, #fiverealms-main-container #alkane-container .alkane-slot.selected:hover {
-        background: rgba(122, 252, 62, 0.55); }
+  #fiverealms-main-container #resizable-central-board {
+    width: calc(var(--boardScale) * 775px);
+    height: calc(var(--boardScale) * 824px);
+    margin: 10px; }
+    #fiverealms-main-container #resizable-central-board #central-board {
+      width: 775px;
+      height: 824px;
+      transform: scale(var(--boardScale));
+      transform-origin: top left;
+      display: flex; }
+      #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column {
+        width: 160px;
+        margin-right: 15px;
+        display: flex;
+        flex-flow: column;
+        align-items: center; }
+        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-deck,
+        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-discard {
+          width: 160px;
+          height: 216px;
+          background: white;
+          border-radius: 5px;
+          border: 1px solid black;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-bottom: 10px; }
+      #fiverealms-main-container #resizable-central-board #central-board #alkane-container {
+        width: 600px;
+        height: 824px;
+        background: black;
+        border-radius: 10px;
+        border: 2px solid black;
+        box-shadow: 1px 1px 10px black;
+        position: relative;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        grid-template-rows: repeat(4, 1fr); }
+        #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          background: rgba(204, 204, 204, 0.8);
+          border-radius: 7px; }
+          #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot.selectable {
+            cursor: pointer;
+            background: rgba(242, 125, 125, 0.55); }
+            #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot.selectable:hover {
+              background: rgba(242, 125, 125, 0.65); }
+          #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot.selected, #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot.selected:hover {
+            background: rgba(122, 252, 62, 0.55); }
+          #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot.highlighted {
+            background: rgba(242, 125, 125, 0.65); }
+            #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot.highlighted.selected {
+              background: rgba(122, 252, 62, 0.55); }
+            #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot.highlighted .fiverealms-card {
+              opacity: 0.5; }
+          #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot .fiverealms-card {
+            pointer-events: none; }
 
 .fiverealms-card {
   width: 143px;
@@ -373,6 +402,8 @@
   box-shadow: 1px 1px 5px black;
   border-radius: 5px;
   position: relative; }
+  .fiverealms-card.tmp-card {
+    opacity: 0.6; }
   .fiverealms-card[data-realm="reptiles"] {
     background-position-x: 0%; }
   .fiverealms-card[data-realm="ursids"] {
