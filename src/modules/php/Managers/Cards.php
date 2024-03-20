@@ -31,13 +31,20 @@ class Cards extends \FRMS\Helpers\Pieces
     public static function getUiData()
     {
         return [
-            'alkane' => static::getInLocation(ALKANE)->toArray(),
+            'alkane' => static::getInLocation(ALKANE)->ui(),
             'deckN' => static::countInLocation(DECK),
             'deck' => static::getTopOf(DECK)->getUiData(),
             'discard' => static::getTopOf(DISCARD),
             'discardN' => static::countInLocation(DISCARD),
+            'visible' => static::getVisibleCards(),
 
         ];
+    }
+
+    public static function getVisibleCards()
+    {
+        $toExclude = [DECK, DECK . THRONE, DISCARD, ALKANE];
+        return static::getAll()->filter(fn ($card) => !in_array($card->getLocation(), $toExclude))->ui();
     }
 
     /* Creation of the Cards */
