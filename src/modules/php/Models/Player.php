@@ -60,15 +60,16 @@ class Player extends \FRMS\Helpers\DB_Model
   public function addCardInInfluence($card, $realm)
   {
     $card->setPlayerId($this->getId());
-    $card->setLocation($realm);
+    $card->setLocation(INFLUENCE);
+    $card->setState($realm);
     $card->setX(-10);
     $card->setY(-10);
   }
 
 
-  public function countSpecificBanner($banner)
+  public function countSpecificBanner($realm)
   {
-    return Cards::getInLocationPId($banner, $this->getId())->count();
+    return Cards::getInLocationPId(INFLUENCE, $this->getId(), $realm)->count();
   }
 
 
