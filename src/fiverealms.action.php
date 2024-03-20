@@ -47,7 +47,7 @@ class action_fiverealms extends APP_GameAction
     $influence = self::getArg('influence', AT_json, true);
     $this->validateJSonAlphaNum($influence, 'influence');
 
-    $this->actInfluence($spaceId, $realm, $influence);
+    $this->game->actInfluence($spaceId, $realm, $influence);
     self::ajaxResponse();
   }
 
@@ -57,7 +57,7 @@ class action_fiverealms extends APP_GameAction
     $spaceId = self::getArg("spaceId", AT_alphanum, true);
     $realm = self::getArg("realm", AT_alphanum, true);
 
-    $this->actRecruit($spaceId, $realm);
+    $this->game->actRecruit($spaceId, $realm);
     self::ajaxResponse();
   }
 

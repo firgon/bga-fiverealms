@@ -47,16 +47,14 @@ trait TurnTrait
 		$currentPlayer = Players::get($pId);
 
 		$args = $this->getArgs();
-
-		if (!in_array($spaceId, $args['possibleSpaceIds'])) {
+		$realms = $args['possibleSpaceIds'][$spaceId] ?? null;
+		if (is_null($realms)) {
 			throw new \BgaVisibleSystemException("You can't play your card here.");
 		}
-
-		if (!in_array($realm, $args['possibleSpaceIds'][$spaceId])) {
+		$spaceIds = $realms[$realm] ?? null;
+		if (is_null($spaceIds)) {
 			throw new \BgaVisibleSystemException("You can't recruit this realm $realm.");
 		}
-
-		$spaceIds = $args['possibleSpaceIds'][$spaceId][$realm];
 
 		//only if played card has not been already picked
 		if (!in_array($spaceId, $spaceIds)) {
@@ -88,7 +86,7 @@ trait TurnTrait
 
 		$args = $this->getArgs();
 
-		if (!in_array($spaceId, $args['possibleSpaceIds'])) {
+		if (!array_key_exists($spaceId, $args['possibleSpaceIds'])) {
 			throw new \BgaVisibleSystemException("You can't play your card here.");
 		}
 

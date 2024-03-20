@@ -27,8 +27,8 @@ class Player extends \FRMS\Helpers\DB_Model
     'score' => ['player_score', 'int'],
     'scoreAux' => ['player_score_aux', 'int'],
     'canUndo' => ['player_can_undo', 'int'],
-    'pendingActions' => ['player_pending_actions', 'obj'],
-    'thronePlayed' => 'bool'
+    'pendingActions' => ['pending_actions', 'obj'],
+    'thronePlayed' => ['throne_played', 'bool'],
   ];
 
   public function getUiData($currentPlayerId = null)
@@ -149,7 +149,7 @@ class Player extends \FRMS\Helpers\DB_Model
 
   public function addActionToPendingAction($action, $bFirst = false)
   {
-    $pendingActions = $this->getPendingActions();
+    $pendingActions = $this->getPendingActions() ?? [];
 
     if ($bFirst) {
       array_unshift($pendingActions, $action);

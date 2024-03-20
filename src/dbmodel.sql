@@ -41,8 +41,8 @@ CREATE TABLE IF NOT EXISTS `cards` (
 
 	-- ALTER player TABLE --
 ALTER TABLE `player`
-ADD `thronePlayed` int(1) NULL,
-ADD `pendingAction` JSON NULL;
+ADD `throne_played` int(1) NULL,
+ADD `pending_actions` JSON NULL;
 
 	-- CORE TABLES --
 CREATE TABLE IF NOT EXISTS `global_variables` (
