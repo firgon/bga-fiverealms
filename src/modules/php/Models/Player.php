@@ -38,6 +38,10 @@ class Player extends \FRMS\Helpers\DB_Model
       $data[INFLUENCE][$realm] = $this->countSpecificBanner($realm);
     }
     $data[TITANS] = $this->countTitans();
+    foreach (NORMAL_BANNERS as $realm) {
+      $data[INFLUENCE][$realm] = $this->countSpecificBanner($realm);
+    }
+    $data[TITANS] = $this->countTitans();
     return $data;
   }
 
@@ -106,6 +110,10 @@ class Player extends \FRMS\Helpers\DB_Model
 
   public function countSpecificBanner($realm)
   {
+    return Cards::getInLocationQ(INFLUENCE)
+      ->where('player_id', $this->getId())
+      ->where('influence_column', $realm)
+      ->count();
     return Cards::getInLocationQ(INFLUENCE)
       ->where('player_id', $this->getId())
       ->where('influence_column', $realm)
