@@ -9,7 +9,6 @@ use FRMS\Core\Globals;
 
 class Notifications
 {
-
   public static function newAlkane()
   {
     $data = [
@@ -44,74 +43,40 @@ class Notifications
     static::notifyAll('influence', $msg, $data);
   }
 
+  public static function chooseCharacter($currentPlayer, $card, $placeId)
+  {
+    $data = [
+      'player' => $currentPlayer,
+      'card' => $card,
+      'placeId' => $placeId,
+      'titanN' => $currentPlayer->countTitans()
+    ];
+    $msg = $card->isTitan() ? clienttranslate('${player_name} add a ${cardName} card in his collection, now he has ${titanN} Titans')
+      : clienttranslate('${player_name} add a ${cardName} card in his council');
+    static::notifyAll('chooseCharacter', $msg, $data);
+  }
+
+  public static function discard($currentPlayer, $card)
+  {
+    $data = [
+      'player' => $currentPlayer,
+      'card' => $card,
+    ];
+    $msg = clienttranslate('${player_name} discard a ${cardName} card from his council');
+    static::notifyAll('discardCharacter', $msg, $data);
+  }
+
   public static function getNewCastleCards($score, $card, $player)
   {
-    switch ($card->getType()) {
-      case KING:
-        $name =  clienttranslate('King');
-        break;
-
-      case REINE:
-        $name =  clienttranslate('Reine');
-        break;
-
-      case WITCH:
-        $name =  clienttranslate('Witch');
-        break;
-
-      case WARRIOR:
-        $name =  clienttranslate('Warrior');
-        break;
-
-      case TITAN:
-        $name =  clienttranslate('Titan');
-        break;
-
-
-      case POPESS:
-        $name =  clienttranslate('Popess');
-        break;
-
-      case WARRIOR_MONK:
-        $name =  clienttranslate('Warrior Monk');
-        break;
-
-      case GAIA:
-        $name =  clienttranslate('Gaia');
-        break;
-
-      case OURANOS:
-        $name =  clienttranslate('Ouranos');
-        break;
-
-
-      case COLONEL:
-        $name =  clienttranslate('Colonel');
-        break;
-
-      case GENERAL:
-        $name =  clienttranslate('General');
-        break;
-
-      case CAPTAIN:
-        $name =  clienttranslate('Captain');
-        break;
-
-      case MARSHAL:
-        $name =  clienttranslate('Marshal');
-        break;
-    }
     $data = [
-      'name' => $name,
       'player' => $player,
       'incScore' => $score,
       'card' => $card,
-      'i18n' => ['name']
     ];
 
     $msg = $score > 0
-      ? clienttranslate('Thanks to ${name}, ${player_name} receives ${incScore} new castle cards')
-      : clienttranslate('Thanks to ${name}, ${player_name} looses ${incScore} new castle cards');
+      ? clienttranslate('Thanks to ${cardName} card, ${player_name} receives ${incScore} new castle cards')
+      : clienttranslate('Thanks to ${cardName} card, ${player_name} looses ${incScore} new castle cards');
 
     static::notifyAll("newCastleCards", $msg, $data);
   }
@@ -181,22 +146,63 @@ class Notifications
     }
 
     if (isset($data['card'])) {
-      $data['value'] = $data['card']->getValue();
-      $data['color'] = $data['card']->getColor();
-      $data['cardId'] = $data['card']->getId();
-      unset($data['card']);
-      if (isset($data['card2'])) {
-        $data['value2'] = $data['card2']->getValue();
-        $data['color2'] = $data['card2']->getColor();
-        $data['cardId2'] = $data['card2']->getId();
-        unset($data['card2']);
-        if (isset($data['card3'])) {
-          $data['value3'] = $data['card3']->getValue();
-          $data['color3'] = $data['card3']->getColor();
-          $data['cardId3'] = $data['card3']->getId();
-          unset($data['card3']);
-        }
+      switch ($data['card']->getType()) {
+        case KING:
+          $name =  clienttranslate('King');
+          break;
+
+        case REINE:
+          $name =  clienttranslate('Reine');
+          break;
+
+        case WITCH:
+          $name =  clienttranslate('Witch');
+          break;
+
+        case WARRIOR:
+          $name =  clienttranslate('Warrior');
+          break;
+
+        case TITAN:
+          $name =  clienttranslate('Titan');
+          break;
+
+
+        case POPESS:
+          $name =  clienttranslate('Popess');
+          break;
+
+        case WARRIOR_MONK:
+          $name =  clienttranslate('Warrior Monk');
+          break;
+
+        case GAIA:
+          $name =  clienttranslate('Gaia');
+          break;
+
+        case OURANOS:
+          $name =  clienttranslate('Ouranos');
+          break;
+
+
+        case COLONEL:
+          $name =  clienttranslate('Colonel');
+          break;
+
+        case GENERAL:
+          $name =  clienttranslate('General');
+          break;
+
+        case CAPTAIN:
+          $name =  clienttranslate('Captain');
+          break;
+
+        case MARSHAL:
+          $name =  clienttranslate('Marshal');
+          break;
       }
+      $data['cardName'] = $name;
+      $data['i18n'][] = 'cardName';
     }
   }
 
@@ -215,10 +221,5 @@ class Notifications
   public static function cheat()
   {
     static::notifyAll('refresh', "", []);
-  }
-
-  public static function invitePlayersToAlpha($name, $message, $data)
-  {
-    static::notify(Players::getCurrent(), $name, $message, $data);
   }
 }

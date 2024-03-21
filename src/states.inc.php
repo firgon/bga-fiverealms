@@ -73,7 +73,6 @@ $machinestates = [
         "possibleactions" => ['actRecruit', 'actInfluence'],
         "transitions" => [
             END_TURN => ST_NEXT_PLAYER,
-            END_GAME => ST_PRE_END_OF_GAME
         ]
     ],
 
@@ -81,7 +80,23 @@ $machinestates = [
         'name' => 'nextPlayer',
         'type' => GAME,
         'action' => 'stNextPlayer',
-        'transitions' => ['' => ST_PLAY],
+        'transitions' => [
+            END_TURN => ST_PLAY,
+            END_GAME => ST_PRE_END_OF_GAME
+        ],
+    ],
+
+    ST_RECRUIT => [
+        "name" => "recruit",
+        "description" => clienttranslate('${actplayer} must choose one character to place in this council'),
+        "descriptionmyturn" => clienttranslate('${you} must choose one character to place in this council'),
+        "type" => ACTIVE_PLAYER,
+        "args" => "argRecruit",
+        // "action" => "stPlay",
+        "possibleactions" => ['actChooseCharacter', 'actDiscard'],
+        "transitions" => [
+            END_TURN => ST_NEXT_PLAYER,
+        ]
     ],
 
     ST_PRE_END_OF_GAME => [

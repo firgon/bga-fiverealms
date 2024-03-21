@@ -61,6 +61,15 @@ class action_fiverealms extends APP_GameAction
     self::ajaxResponse();
   }
 
+  public function actChooseCharacter()
+  {
+    self::setAjaxMode();
+    $cardId = self::getArg("cardId", AT_posint, true);
+    $placeId = self::getArg("placeId", AT_posint, true);
+
+    $this->game->actChooseCharacter($cardId, $placeId);
+    self::ajaxResponse();
+  }
   // public function tick()
   // {
   //   self::setAjaxMode();
