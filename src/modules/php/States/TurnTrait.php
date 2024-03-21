@@ -57,7 +57,7 @@ trait TurnTrait
 		}
 
 		$card = Cards::getTopOf(DECK);
-		$card->placeOnAlkane($spaceId);
+		$card->placeOnAlkane($currentPlayer, $spaceId);
 
 		foreach ($spaceIds as $spaceId) {
 			$card = Cards::getCardFromSpaceId($spaceId);
@@ -92,15 +92,9 @@ trait TurnTrait
 
 		$possibleSpaceIds = $args['possibleSpaceIds'][$spaceId][$realm];
 
+		$card = Cards::getTopOf(DECK);
+		$card->placeOnAlkane($currentPlayer, $spaceId);
 
-		//only if played card has not been picked
-		if (!in_array($spaceId, $possibleSpaceIds)) {
-			$card = Cards::getTopOf(DECK);
-			$card->placeOnAlkane($spaceId);
-		}
-
-
-		$playedRealms = [];
 		//for each space ids, place the matching card in the 
 		foreach ($influence as $playedRealm => $spaceIds) {
 			foreach ($spaceIds as $spaceId) {

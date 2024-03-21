@@ -2,6 +2,7 @@
 
 namespace FRMS\Models;
 
+use FRMS\Core\Notifications;
 use FRMS\Managers\Cards;
 use FRMS\Managers\Players;
 
@@ -34,11 +35,13 @@ class Card extends \FRMS\Helpers\DB_Model
 
     protected $staticAttributes = [];
 
-    public function placeOnAlkane($coordOrSpaceId)
+    public function placeOnAlkane($currentPlayer, $coordOrSpaceId)
     {
         $coord = (is_array($coordOrSpaceId)) ? $coordOrSpaceId : Cards::getCoord($coordOrSpaceId);
         $this->setLocation(ALKANE);
         $this->setCoord($coord);
+
+        Notifications::placeCard($currentPlayer, $this->getRealm(), $coord[0], $coord[1]);
     }
 
     public function setCoord($coord)
