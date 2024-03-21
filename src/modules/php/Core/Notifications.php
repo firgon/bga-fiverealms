@@ -27,8 +27,8 @@ class Notifications
       'realm' => $realm,
     ];
 
-    $msg = clienttranslate('${player_name} place a ${realm} in ${x} ${y}');
-    static::notifyAll('placeCard', '', $data);
+    $msg = clienttranslate('${player_name} place a ${realm} in (${x}, ${y})');
+    static::notifyAll('placeCard', $msg, $data);
   }
 
   public static function influence($currentPlayer, $spaceIds, $realm, $influence)
