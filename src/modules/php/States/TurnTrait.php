@@ -16,15 +16,20 @@ trait TurnTrait
 {
 	public function stNextPlayer()
 	{
+		Cards::adjustAlkane();
 		$activePlayer = Players::getActive();
 		$nextState = $activePlayer->getNextPendingAction();
 
 		if ($nextState) {
 			Game::goTo($nextState);
 		} else {
-			$this->activeNextPlayer();
-			$this->giveExtraTime(Players::getActiveId());
-			Game::transition();
+			if (Cards::countInLocation(DECK)) {
+				$this->activeNextPlayer();
+				$this->giveExtraTime(Players::getActiveId());
+				Game::transition(END_TURN);
+			} else {
+				Game::transition(END_GAME);
+			}
 		}
 	}
 

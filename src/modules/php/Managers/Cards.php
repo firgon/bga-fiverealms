@@ -234,13 +234,15 @@ class Cards extends \FRMS\Helpers\Pieces
 
     /**
      * replace alkane from starting position 1,1
-     * return true if Alkane has been replaced
      */
     public static function adjustAlkane()
     {
         [$minX, $minY, $maxX, $maxY] = static::getAlkaneBorders();
         $cards = static::getInLocation(ALKANE);
         $toRefresh = false;
+        if ($cards->count() < 2) {
+            Cards::generateAlkane(true);
+        }
         if ($minX != 1) {
             $toRefresh = true;
             foreach ($cards as $card) {
@@ -253,7 +255,9 @@ class Cards extends \FRMS\Helpers\Pieces
                 $card->incY(1 - $minY);
             }
         }
-        return $toRefresh;
+        if ($toRefresh) {
+            Notifications::adjustAlkane();
+        }
     }
 
     protected static function getAlkaneBorders()

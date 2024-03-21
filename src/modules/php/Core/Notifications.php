@@ -18,6 +18,15 @@ class Notifications
     static::notifyAll('newAlkane', clienttranslate('The Alkane square is completed'), $data);
   }
 
+  public static function adjustAlkane()
+  {
+    $data = [
+      'alkane' => Cards::getInLocation(ALKANE)->ui()
+    ];
+
+    static::notifyAll('adjustAlkane', '', $data);
+  }
+
   public static function placeCard($currentPlayer, $realm, $x, $y)
   {
     $data = [
