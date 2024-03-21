@@ -61,7 +61,7 @@ trait TurnTrait
 
 		foreach ($spaceIds as $spaceId) {
 			$card = Cards::getCardFromSpaceId($spaceId);
-			$currentPlayer->setCardInHand($card);
+			$currentPlayer->addCardInHand($card);
 		}
 
 		Notifications::recruit($currentPlayer, $spaceIds, $realm);
