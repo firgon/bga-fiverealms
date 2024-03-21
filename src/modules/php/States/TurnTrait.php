@@ -56,23 +56,19 @@ trait TurnTrait
 			throw new \BgaVisibleSystemException("You can't recruit this realm $realm.");
 		}
 
-		//only if played card has not been already picked
-		if (!in_array($spaceId, $spaceIds)) {
-			$card = Cards::getTopOf(DECK);
-			$card->placeOnAlkane($spaceId);
-		}
+		$card = Cards::getTopOf(DECK);
+		$card->placeOnAlkane($spaceId);
 
 		foreach ($spaceIds as $spaceId) {
 			$card = Cards::getCardFromSpaceId($spaceId);
-			$card->setLocation(HAND);
-			$card->setPlayerId($pId);
+			$currentPlayer->setCardInHand($card);
 		}
 
 		Notifications::recruit($currentPlayer, $spaceIds, $realm);
 
 		$currentPlayer->addActionToPendingAction(ST_RECRUIT);
 
-		$this->gamestate->nextState('');
+		$this->gamestate->nextState(END_TURN);
 	}
 
 	public function actInfluence($spaceId, $realm, $influence)

@@ -31,6 +31,7 @@ CREATE TABLE IF NOT EXISTS `cards` (
 	`card_location` varchar(32) NOT NULL,
 	`extra_datas` JSON NULL,
 	`type` varchar(16) NOT NULL,
+  `influence_column` varchar(16) NULL,
 	`realm` varchar(16) NOT NULL,
 	`player_id` int(10) NULL,
   `x` int(1) NULL,

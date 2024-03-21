@@ -48,6 +48,7 @@ class FiveRealms extends Table
 {
     use FRMS\DebugTrait;
     use FRMS\States\TurnTrait;
+    use FRMS\States\RecruitTrait;
 
     public static $instance = null;
     function __construct()

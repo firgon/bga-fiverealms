@@ -34,17 +34,41 @@ class Player extends \FRMS\Helpers\DB_Model
   public function getUiData($currentPlayerId = null)
   {
     $data = parent::getUiData();
-    // foreach (NORMAL_BANNERS as $banner) {
-    //   $data[INFLUENCE][$banner] = $this->countSpecificBanner($banner);
-    // }
-    // $isCurrent = $this->id == $currentPlayerId;
-
+    foreach (NORMAL_BANNERS as $realm) {
+      $data[INFLUENCE][$realm] = $this->countSpecificBanner($realm);
+    }
+    $data[TITANS] = $this->countTitans();
     return $data;
+  }
+
+  public function getChoosableCardsAndPlaces()
+  {
+    $cards = $this->getCardsInHand(true);
+    $council = $this->getCharactersInCouncil();
+    $choosableCards = $cards->filter(fn ($card) => !in_array($card->getType(), array_values($council)));
+    $choosablePlaces = array_diff([1, 2, 3, 4], array_keys($council));
+    return [$cards, $choosableCards, $choosablePlaces];
+  }
+
+  public function getCharactersInCouncil()
+  {
+    $result = [];
+    $cardsInCouncil = Cards::getInLocationPId(COUNCIL, $this->getId());
+
+    foreach ($cardsInCouncil as $cardId => $card) {
+      $result[$card->getState()] = $card->getType();
+    }
+    return $result;
   }
 
   public function getCardsInHand($isCurrent = true)
   {
-    return ($isCurrent) ? Cards::getInLocation('hand', $this->id) : Cards::countInLocation('hand', $this->id);
+    return ($isCurrent) ? Cards::getInLocationPId(HAND, $this->id) : Cards::getInLocationPId(HAND, $this->id)->count();
+  }
+
+  public function countTitans()
+  {
+    return Cards::getInLocationPId(TITANS, $this->getId())->count();
   }
 
   public function canUseThrone()
@@ -61,15 +85,31 @@ class Player extends \FRMS\Helpers\DB_Model
   {
     $card->setPlayerId($this->getId());
     $card->setLocation(INFLUENCE);
-    $card->setState($realm);
+    $card->setInfluenceColumn($realm);
     $card->setX(-10);
     $card->setY(-10);
   }
 
+  public function addCardInHand($card)
+  {
+    $card->setLocation(HAND);
+    $card->setState(0);
+    $card->setPlayerId($this->getId());
+    $card->setFlipped(NOT_FLIPPED);
+  }
+
+  public function discardCardInHand()
+  {
+    $cards = $this->getCardsInHand(true);
+    Cards::move($cards->getIds(), DISCARD);
+  }
 
   public function countSpecificBanner($realm)
   {
-    return Cards::getInLocationPId(INFLUENCE, $this->getId(), $realm)->count();
+    return Cards::getInLocationQ(INFLUENCE)
+      ->where('player_id', $this->getId())
+      ->where('influence_column', $realm)
+      ->count();
   }
 
 
@@ -78,14 +118,6 @@ class Player extends \FRMS\Helpers\DB_Model
     return Cards::getInLocationQ(COUNCIL)
       ->where('player_id', $this->getId())
       ->get()->filter(fn ($card) => $card->isWarrior())->count();
-  }
-
-
-  public function countTitans()
-  {
-    return Cards::getInLocationQ(TITANS)
-      ->where('player_id', $this->getId())
-      ->get()->count();
   }
 
   public function countLines()

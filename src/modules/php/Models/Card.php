@@ -17,6 +17,7 @@ class Card extends \FRMS\Helpers\DB_Model
         'id' => ['card_id', 'int'],
         'location' => 'card_location',
         'state' => ['card_state', 'int'],
+        'influenceColumn' => 'influence_column',
         'extraDatas' => ['extra_datas', 'obj'],
         'flipped' => ['flipped', 'int'],
         'x' => ['x', 'int'],
