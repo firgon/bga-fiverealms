@@ -64,12 +64,14 @@ trait TurnTrait
 		$card = Cards::getTopOf(DECK);
 		$card->placeOnAlkane($currentPlayer, $spaceId);
 
+		$cards = [];
 		foreach ($spaceIds as $spaceId) {
 			$card = Cards::getCardFromSpaceId($spaceId);
 			$currentPlayer->addCardInHand($card);
+			$cards[] = $card;
 		}
 
-		Notifications::recruit($currentPlayer, $spaceIds, $realm);
+		Notifications::recruit($currentPlayer, $spaceIds, $realm, $cards);
 
 		$currentPlayer->addActionToPendingAction(ST_RECRUIT);
 

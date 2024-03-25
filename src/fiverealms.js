@@ -35,6 +35,8 @@ define([
       this._notifications = [
         ["clearTurn", 200],
         ["refreshUI", 200],
+        ["placeCard", 1200],
+        ["recruit", null],
       ];
 
       // Fix mobile viewport (remove CSS zoom)
@@ -66,6 +68,7 @@ define([
 
     clearPossible() {
       document.querySelectorAll(".tmp-card").forEach((elt) => elt.remove());
+      this.clearHighlights();
       this.inherited(arguments);
     },
 
@@ -267,6 +270,13 @@ define([
         };
       };
 
+      // Auto select if only one realm
+      let realms = Object.keys(args.realms);
+      if (realms.length == 1) {
+        selectRealm(realms[0])();
+        return;
+      }
+
       const REALMS = {
         reptiles: _("Reptiles"),
         felines: _("Felines"),
@@ -356,6 +366,69 @@ define([
       console.log("TODOOO");
     },
 
+    notif_placeCard(n) {
+      debug("Notif: place a card", n);
+      let card = n.args.card;
+      this.clearPossible();
+      this.slide(`card-${card.id}`, this.getCardContainer(card));
+    },
+
+    notif_recruit(n) {
+      debug("Notif: choose to recruit", n);
+
+      Promise.all(
+        n.args.cards.map((card, i) =>
+          this.slide(`card-${card.id}`, "pending-recruit", {
+            delay: 100 * i,
+            phantom: false,
+          }),
+        ),
+      ).then(() => {
+        Promise.all(
+          n.args.cards.map((card, i) => {
+            let oCard = $(`card-${card.id}`);
+            oCard.id += "_old";
+            return this.wait(100 * i).then(() =>
+              this.flipAndReplace(oCard, this.addCard(card)),
+            );
+          }),
+        ).then(() => {
+          console.log("toto");
+          this.notifqueue.setSynchronousDuration(100);
+        });
+      });
+    },
+
+    onEnteringStateRecruit(args) {
+      $("resizable-central-board").classList.add("recruiting");
+      args.choosableCards.forEach((card) => {
+        this.onClick(`card-${card.id}`, () =>
+          this.clientState(
+            "recruitChoosePlace",
+            _("Where do you want to place that recruit?"),
+            {
+              cardId: card.id,
+              places: args.availablePlaces,
+            },
+          ),
+        );
+      });
+    },
+
+    onEnteringStateRecruitChoosePlace(args) {
+      this.addCancelStateBtn();
+      $(`card-${args.cardId}`).classList.add("selected");
+
+      args.places.forEach((slot) => {
+        this.onClick(`throne-${this.player_id}-${slot}`, () => {
+          this.takeAction("actChooseCharacter", {
+            cardId: args.cardId,
+            placeId: slot,
+          });
+        });
+      });
+    },
+
     ////////////////////////////////////////
     //  ____  _
     // |  _ \| | __ _ _   _  ___ _ __ ___
@@ -402,8 +475,23 @@ define([
     },
 
     tplPlayerBoard(player) {
+      debug(player);
       return `<div class='fiverealms-board' id='board-${player.id}' data-color='${player.color}'>
         <div class='player-board-fixed-size'>
+          <div class='throne-row'>
+            <div class='throne-slot' id='throne-${player.id}-0'></div>
+            <div class='throne-slot' id='throne-${player.id}-1'></div>
+            <div class='throne-slot' id='throne-${player.id}-2'></div>
+            <div class='throne-slot' id='throne-${player.id}-3'></div>
+            <div class='throne-slot' id='throne-${player.id}-4'></div>
+          </div>
+          <div class='influence-area'>  
+            <div class='influence-realm realm-reptiles' id='influence-reptiles-${player.id}'></div>
+            <div class='influence-realm realm-felines' id='influence-felines-${player.id}'></div>
+            <div class='influence-realm realm-raptors' id='influence-raptors-${player.id}'></div>
+            <div class='influence-realm realm-ursids' id='influence-ursids-${player.id}'></div>
+            <div class='influence-realm realm-marines' id='influence-marines-${player.id}'></div>
+          </div>
         </div>
       </div>`;
     },
@@ -585,9 +673,12 @@ define([
       if (card.location == "deck") {
         return $("fiverealms-deck");
       }
-      // if (t[0] == "order") {
-      //   return $(card.location).querySelector(".space-order-container");
-      // }
+      if (card.location == "hand") {
+        return $("pending-recruit");
+      }
+      if (card.location == "Throne" || card.location == "council") {
+        return $(`throne-${card.pId}-${card.state}`);
+      }
 
       console.error("Trying to get container of a card", card);
       return "game_play_area";

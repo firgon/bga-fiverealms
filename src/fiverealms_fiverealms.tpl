@@ -2,6 +2,7 @@
 
 <div id="fiverealms-main-container">
     <div id="resizable-central-board">
+        <div id="pending-recruit"></div>
         <div id="central-board">
             <div id="central-board-left-column">
                 <div id="fiverealms-deck"></div>

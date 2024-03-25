@@ -27,13 +27,14 @@ class Notifications
     static::notifyAll('adjustAlkane', '', $data);
   }
 
-  public static function placeCard($currentPlayer, $realm, $x, $y)
+  public static function placeCard($currentPlayer, $card, $x, $y)
   {
     $data = [
       'player' => $currentPlayer,
       'x' => $x,
       'y' => $y,
-      'realm' => $realm,
+      'card' => $card,
+      'realm' => $card->getRealm(),
     ];
 
     $msg = clienttranslate('${player_name} place a ${realm} in (${x}, ${y})');
@@ -53,16 +54,17 @@ class Notifications
     static::notifyAll('influence', $msg, $data);
   }
 
-  public static function recruit($currentPlayer, $spaceIds, $realm)
+  public static function recruit($currentPlayer, $spaceIds, $realm, $cards)
   {
     $data = [
       'player' => $currentPlayer,
       'spaceIds' => $spaceIds,
       'realm' => $realm,
-      'nb' => count($spaceIds)
+      'nb' => count($spaceIds),
+      'cards' => $cards,
     ];
     $msg = clienttranslate('${player_name} collects ${nb} ${realm} and choose to recruit');
-    static::notifyAll('influence', $msg, $data);
+    static::notifyAll('recruit', $msg, $data);
   }
 
   public static function chooseCharacter($currentPlayer, $card, $placeId)
@@ -234,6 +236,7 @@ class Notifications
       }
       $data['cardName'] = $name;
       $data['i18n'][] = 'cardName';
+      $data['card'] = $data['card']->jsonSerialize();
     }
   }
 

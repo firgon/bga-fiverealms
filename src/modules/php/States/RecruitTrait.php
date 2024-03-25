@@ -18,7 +18,7 @@ trait RecruitTrait
 	{
 		[$cards, $choosableCards, $choosablePlaces] = Players::getActive()->getChoosableCardsAndPlaces();
 		return [
-			'cards' => $cards->ui(),
+			'cards' => $cards,
 			'choosableCards' => $choosableCards->ui(),
 			'availablePlaces' => $choosablePlaces
 		];
@@ -39,12 +39,12 @@ trait RecruitTrait
 
 		$card = Cards::get($cardId);
 
-		if (!$card->isTitan() || !in_array($placeId, $args['availablePlaces'])) {
+		if (!$card->isTitan() && !in_array($placeId, $args['availablePlaces'])) {
 			throw new \BgaVisibleSystemException("You can't choose this place. " . $placeId);
 		}
 
 		//if discard a card is needed
-		$discardCard = Cards::getInLocationPId(COUNCIL, $pId, $placeId);
+		$discardCard = Cards::getInLocationPId(COUNCIL, $pId, $placeId)->first();
 		if (!is_null($discardCard)) {
 			$discardCard->setLocation(DISCARD);
 			Notifications::discard($currentPlayer, $discardCard);
