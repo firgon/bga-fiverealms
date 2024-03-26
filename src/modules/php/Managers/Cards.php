@@ -15,7 +15,7 @@ class Cards extends \FRMS\Helpers\Pieces
     protected static $prefix = 'card_';
     protected static $autoIncrement = true;
     protected static $autoremovePrefix = false;
-    protected static $customFields = ['extra_datas', 'type', 'realm', 'x', 'y', 'flipped', 'influence_column'];
+    protected static $customFields = ['extra_datas', 'type', 'realm', 'x', 'y', 'flipped', 'influence_column', 'player_id'];
 
     protected static $autoreshuffle = true; // If true, a new deck is automatically formed with a reshuffled discard as soon at is needed
     // If defined, tell the name of the deck and what is the corresponding discard (ex : "mydeck" => "mydiscard")
