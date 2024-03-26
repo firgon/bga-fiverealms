@@ -152,7 +152,9 @@
 #pending-recruit {
   display: flex;
   justify-content: center;
-  align-items: center; }
+  align-items: center;
+  height: 0px;
+  transition: height 0.4s; }
   #pending-recruit .fiverealms-card {
     margin: 5px; }
   #pending-recruit .flip-container {
@@ -174,6 +176,8 @@
     margin: 10px; }
     #fiverealms-main-container #resizable-central-board.recruiting {
       height: calc(var(--boardScale) * 1064px); }
+      #fiverealms-main-container #resizable-central-board.recruiting #pending-recruit {
+        height: 212px; }
     #fiverealms-main-container #resizable-central-board #central-board {
       width: 775px;
       height: 824px;

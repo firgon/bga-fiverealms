@@ -21,6 +21,8 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    height: 0px;
+    transition: height 0.4s;
 
     .fiverealms-card {
         margin: 5px;
@@ -51,6 +53,9 @@
         margin: 10px;
         &.recruiting {
             height: calc(var(--boardScale) * 1064px);
+            #pending-recruit {
+                height: 212px;
+            }
         }
 
         #central-board {

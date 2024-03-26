@@ -37,6 +37,7 @@ define([
         ["refreshUI", 200],
         ["placeCard", 1200],
         ["recruit", null],
+        ["chooseCharacter", 2400],
       ];
 
       // Fix mobile viewport (remove CSS zoom)
@@ -376,6 +377,7 @@ define([
     notif_recruit(n) {
       debug("Notif: choose to recruit", n);
 
+      $("resizable-central-board").classList.add("recruiting");
       Promise.all(
         n.args.cards.map((card, i) =>
           this.slide(`card-${card.id}`, "pending-recruit", {
@@ -393,7 +395,6 @@ define([
             );
           }),
         ).then(() => {
-          console.log("toto");
           this.notifqueue.setSynchronousDuration(100);
         });
       });
@@ -426,6 +427,24 @@ define([
             placeId: slot,
           });
         });
+      });
+    },
+
+    notif_chooseCharacter(n) {
+      debug("Notif: choosing character to recruit", n);
+      let card = n.args.card;
+      this.slide(`card-${card.id}`, this.getCardContainer(card)).then(() => {
+        Promise.all(
+          [...$("pending-recruit").querySelectorAll(".fiverealms-card")].map(
+            (elt, i) =>
+              this.slide(elt, this.getVisibleTitleContainer(), {
+                destroy: true,
+                delay: 100 * i,
+              }),
+          ),
+        ).then(() =>
+          $("resizable-central-board").classList.remove("recruiting"),
+        );
       });
     },
 
@@ -677,7 +696,7 @@ define([
         return $("pending-recruit");
       }
       if (card.location == "Throne" || card.location == "council") {
-        return $(`throne-${card.pId}-${card.state}`);
+        return $(`throne-${card.playerId}-${card.state}`);
       }
 
       console.error("Trying to get container of a card", card);
