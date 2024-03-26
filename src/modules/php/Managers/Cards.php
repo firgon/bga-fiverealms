@@ -159,7 +159,7 @@ class Cards extends \FRMS\Helpers\Pieces
                             if (isset($adjacentColors[$adjacentCard->getRealm()])) {
                                 $adjacentColors[$adjacentCard->getRealm()] = array_merge($adjacentColors[$adjacentCard->getRealm()], $zoneRealmsBySpaceId[$adjacentCard->getSpaceId()]);
                             } else {
-                                $adjacentColors[$adjacentCard->getRealm()] = $spaceIdByRealms[$adjacentCard->getRealm()];
+                                $adjacentColors[$adjacentCard->getRealm()] = $zoneRealmsBySpaceId[$adjacentCard->getSpaceId()];
                             }
                         }
                     }
@@ -220,7 +220,10 @@ class Cards extends \FRMS\Helpers\Pieces
     public static function getCardFromSpaceId($spaceId)
     {
         $coord = static::getCoord($spaceId);
-        return static::getInLocationQ(ALKANE)->where('x', $coord[0])->where('y', $coord[1])->getSingle();
+        return static::getInLocationQ(ALKANE)
+            ->where('x', $coord[0])
+            ->where('y', $coord[1])
+            ->getSingle();
     }
 
     protected static function getNeighbours($x, $y)

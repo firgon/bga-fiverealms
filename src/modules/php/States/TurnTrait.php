@@ -67,6 +67,9 @@ trait TurnTrait
 		$cards = [];
 		foreach ($spaceIds as $spaceId) {
 			$card = Cards::getCardFromSpaceId($spaceId);
+			if (!$card) {
+				throw new \BgaVisibleSystemException("There is no card on $spaceId.");
+			}
 			$currentPlayer->addCardInHand($card);
 			$cards[] = $card;
 		}

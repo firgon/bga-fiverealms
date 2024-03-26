@@ -202,7 +202,7 @@ class Player extends \FRMS\Helpers\DB_Model
 
   public function getNextPendingAction($bFirst = true, $bDestructive = true)
   {
-    $pendingActions = $this->getPendingActions();
+    $pendingActions = $this->getPendingActions() ?? [];
 
     if ($bFirst) {
       $action = array_shift($pendingActions);

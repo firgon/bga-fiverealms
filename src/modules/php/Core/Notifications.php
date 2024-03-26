@@ -73,14 +73,15 @@ class Notifications
       'player' => $currentPlayer,
       'card' => $card,
       'placeId' => $placeId,
-      'titanN' => $currentPlayer->countTitans()
+      'titanN' => $currentPlayer->countTitans(),
+      'preserve' => ['placeId']
     ];
     $msg = $card->isTitan() ? clienttranslate('${player_name} recruit a ${cardName} card, now he has ${titanN} Titans')
       : clienttranslate('${player_name} recruit a ${cardName} card in his council');
     static::notifyAll('chooseCharacter', $msg, $data);
   }
 
-  public function passChooseCharacter($player)
+  public static function passChooseCharacter($player)
   {
     $data = [
       'player' => $player,
