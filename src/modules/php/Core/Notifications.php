@@ -41,14 +41,15 @@ class Notifications
     static::notifyAll('placeCard', $msg, $data);
   }
 
-  public static function influence($currentPlayer, $spaceIds, $realm, $influence)
+  public static function influence($currentPlayer, $spaceIds, $realm, $influence, $cards)
   {
     $data = [
       'player' => $currentPlayer,
       'spaceIds' => $spaceIds,
       'realm' => $realm,
       'influence' => $influence,
-      'nb' => count($spaceIds)
+      'nb' => count($spaceIds),
+      'cards' => $cards,
     ];
     $msg = clienttranslate('${player_name} add ${nb} ${realm} to his influence');
     static::notifyAll('influence', $msg, $data);

@@ -92,20 +92,21 @@ trait TurnTrait
 
 		$args = $this->getArgs();
 
-		if (!array_key_exists($spaceId, $args['possibleSpaceIds'])) {
+		$realms = $args['possibleSpaceIds'][$spaceId] ?? null;
+		if (is_null($realms)) {
 			throw new \BgaVisibleSystemException("You can't play your card here.");
 		}
-
-		if (!in_array($realm, $args['possibleSpaceIds'][$spaceId])) {
-			throw new \BgaVisibleSystemException("You can't influence this realm $realm.");
+		$possibleSpaceIds = $realms[$realm] ?? null;
+		if (is_null($possibleSpaceIds)) {
+			throw new \BgaVisibleSystemException("You can't recruit this realm $realm.");
 		}
 
-		$possibleSpaceIds = $args['possibleSpaceIds'][$spaceId][$realm];
 
 		$card = Cards::getTopOf(DECK);
 		$card->placeOnAlkane($currentPlayer, $spaceId);
 
-		//for each space ids, place the matching card in the 
+		//for each space ids, place the matching card in the ???
+		$cards = [];
 		foreach ($influence as $playedRealm => $spaceIds) {
 			foreach ($spaceIds as $spaceId) {
 				if (!in_array($spaceId, $possibleSpaceIds)) {
@@ -115,11 +116,12 @@ trait TurnTrait
 				if (($card->getRealm() != $playedRealm && $card->getRealm() != IMPERIAL) || $card->getRealm() == RELIGIOUS) {
 					throw new \BgaVisibleSystemException("You can't place this card $card->id here.");
 				}
+				$cards[] = $card;
 				$currentPlayer->addCardInInfluence($card, $playedRealm);
 			}
 		}
 
-		Notifications::influence($currentPlayer, $spaceIds, $realm, $influence);
+		Notifications::influence($currentPlayer, $spaceIds, $realm, $influence, $cards);
 
 		//for each realm column where player added cards, activate council.
 		$currentPlayer->activateCouncil($influence);
