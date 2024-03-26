@@ -41,7 +41,7 @@ class Card extends \FRMS\Helpers\DB_Model
         $this->setLocation(ALKANE);
         $this->setCoord($coord);
 
-        Notifications::placeCard($currentPlayer, $this->getRealm(), $coord[0], $coord[1]);
+        Notifications::placeCard($currentPlayer, $this, $coord[0], $coord[1]);
     }
 
     public function setCoord($coord)
@@ -164,6 +164,11 @@ class Card extends \FRMS\Helpers\DB_Model
     }
 
     public function isWitch()
+    {
+        return false;
+    }
+
+    public function isTitan()
     {
         return false;
     }

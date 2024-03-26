@@ -214,6 +214,7 @@ define([
       this._selectableNodes = [];
       dojo.query(".unselectable").removeClass("unselectable");
       dojo.query(".selectable").removeClass("selectable");
+      dojo.query(".selected").removeClass("selected");
     },
 
     /**
