@@ -37,6 +37,7 @@ define([
         ["refreshUI", 200],
         ["placeCard", 1200],
         ["recruit", null],
+        ["influence", null],
         ["chooseCharacter", 2400],
       ];
 
@@ -339,9 +340,13 @@ define([
             args,
           );
         } else {
-          this.takeAction("actRecruit", {
+          let influence = {};
+          influence[args.realm] = args.spaceIds;
+
+          this.takeAction("actInfluence", {
             spaceId: args.spaceId,
             realm: args.realm,
+            influence: JSON.stringify(influence),
           });
         }
       });
@@ -372,6 +377,26 @@ define([
       let card = n.args.card;
       this.clearPossible();
       this.slide(`card-${card.id}`, this.getCardContainer(card));
+    },
+
+    notif_influence(n) {
+      debug("Notif: choose to influence", n);
+      let increases = {};
+      Promise.all(
+        n.args.cards.map((card, i) => {
+          let realm = card.influenceColumn;
+          increases[realm] = (increases[realm] || 0) + 1;
+          return this.slide(`card-${card.id}`, this.getCardContainer(card), {
+            delay: 100 * i,
+            phantom: false,
+          });
+        }),
+      ).then(() => {
+        Object.entries(increases).forEach(([realm, inc]) => {
+          this._counters[n.args.player_id][realm].incValue(inc);
+        });
+        this.notifqueue.setSynchronousDuration(800);
+      });
     },
 
     notif_recruit(n) {
@@ -472,10 +497,15 @@ define([
         this.place("tplPlayerBoard", player, "fiverealms-main-container");
 
         let pId = player.id;
-        // this._counters[pId] = {
-        //   worker: this.createCounter(`counter-${pId}-worker`, player.workers),
-        //   money: this.createCounter(`counter-${pId}-money`, player.money),
-        // };
+        this._counters[pId] = {};
+        ["reptiles", "felines", "raptors", "ursids", "marines"].forEach(
+          (realm) => {
+            this._counters[pId][realm] = this.createCounter(
+              `influence-${realm}-${pId}`,
+              player.influence[realm],
+            );
+          },
+        );
 
         // Useful to order boards
         nPlayers++;
@@ -505,11 +535,11 @@ define([
             <div class='throne-slot' id='throne-${player.id}-4'></div>
           </div>
           <div class='influence-area'>  
-            <div class='influence-realm realm-reptiles' id='influence-reptiles-${player.id}'></div>
-            <div class='influence-realm realm-felines' id='influence-felines-${player.id}'></div>
-            <div class='influence-realm realm-raptors' id='influence-raptors-${player.id}'></div>
-            <div class='influence-realm realm-ursids' id='influence-ursids-${player.id}'></div>
-            <div class='influence-realm realm-marines' id='influence-marines-${player.id}'></div>
+            <div class='influence-realm realm-reptiles'><div class="influence-counter" id='influence-reptiles-${player.id}'></div></div>
+            <div class='influence-realm realm-felines'><div class="influence-counter" id='influence-felines-${player.id}'></div></div>
+            <div class='influence-realm realm-raptors'><div class="influence-counter" id='influence-raptors-${player.id}'></div></div>
+            <div class='influence-realm realm-ursids'><div class="influence-counter" id='influence-ursids-${player.id}'></div></div>
+            <div class='influence-realm realm-marines'><div class="influence-counter" id='influence-marines-${player.id}'></div></div>
           </div>
         </div>
       </div>`;
@@ -697,6 +727,10 @@ define([
       }
       if (card.location == "Throne" || card.location == "council") {
         return $(`throne-${card.playerId}-${card.state}`);
+      }
+      if (card.location == "influence") {
+        return $(`influence-${card.influenceColumn}-${card.playerId}`)
+          .parentNode;
       }
 
       console.error("Trying to get container of a card", card);

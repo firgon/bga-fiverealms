@@ -132,6 +132,9 @@
   height: calc(var(--playerBoardScale) * 500px); }
   #fiverealms-main-container .fiverealms-board .player-board-fixed-size {
     display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
     width: 1000px;
     height: 500px;
     transform: scale(var(--playerBoardScale));
@@ -148,6 +151,45 @@
           cursor: pointer; }
           #fiverealms-main-container .fiverealms-board .player-board-fixed-size .throne-row .throne-slot.selectable:hover {
             background: green; }
+    #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area {
+      display: grid;
+      height: 200px;
+      grid-template-columns: repeat(5, 143px);
+      grid-column-gap: 5px; }
+      #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm {
+        background-image: url("img/cards.jpg");
+        background-size: 700% 700%;
+        background-position-y: 0%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative; }
+        #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm.realm-reptiles {
+          background-position-x: 0%; }
+        #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm.realm-ursids {
+          background-position-x: 16.6666666667%; }
+        #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm.realm-marines {
+          background-position-x: 33.3333333333%; }
+        #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm.realm-raptors {
+          background-position-x: 50%; }
+        #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm.realm-felines {
+          background-position-x: 66.6666666667%; }
+        #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm .fiverealms-card {
+          position: absolute;
+          top: 0;
+          left: 0;
+          visibility: hidden; }
+        #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm .influence-counter {
+          background: #fffe;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          border: 1px solid black;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 30px;
+          box-shadow: 0px 0px 5px 1px black; }
 
 #pending-recruit {
   display: flex;
