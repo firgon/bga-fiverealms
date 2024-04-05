@@ -473,7 +473,6 @@ define([
         n.args.cards.map((card, i) =>
           this.slide(`card-${card.id}`, "pending-recruit", {
             delay: 100 * i,
-            phantom: false,
           }),
         ),
       ).then(() => {
@@ -481,9 +480,14 @@ define([
           n.args.cards.map((card, i) => {
             let oCard = $(`card-${card.id}`);
             oCard.id += "_old";
-            return this.wait(100 * i).then(() =>
-              this.flipAndReplace(oCard, this.addCard(card)),
-            );
+            return this.wait(100 * i).then(() => {
+              this.flipAndReplace(oCard, this.addCard(card));
+              this.addCustomTooltip(
+                `card-${card.id}`,
+                this.getCardTooltip(card),
+                { forceRecreate: true },
+              );
+            });
           }),
         ).then(() => {
           this.notifqueue.setSynchronousDuration(100);
@@ -532,8 +536,7 @@ define([
         Promise.all(
           [...$("pending-recruit").querySelectorAll(".fiverealms-card")].map(
             (elt, i) =>
-              this.slide(elt, this.getVisibleTitleContainer(), {
-                destroy: true,
+              this.slide(elt, "fiverealms-discard", {
                 delay: 100 * i,
               }),
           ),
@@ -731,7 +734,12 @@ define([
     setupCards() {
       // This function is refreshUI compatible
       let cards = this.gamedatas.cards;
-      let allCards = [...cards.alkane, cards.deck, ...cards.visible];
+      let allCards = [
+        ...cards.alkane,
+        cards.deck,
+        ...cards.visible,
+        cards.discard,
+      ];
       let cardIds = allCards.map((card) => {
         if (!$(`card-${card.id}`)) {
           this.addCard(card);
@@ -832,6 +840,82 @@ define([
           </p>`;
       }
 
+      if (card.type == "Popess") {
+        desc += `<h4>${_("Popess")}</h4>
+          <p>
+          ${_(
+            "Throughout the game, when you influence the 4th banner of any Realm: earn 2 castles.",
+          )}
+          </p>`;
+      }
+      if (card.type == "Warrior Monk") {
+        desc += `<h4>${_("Warrior Monk")}</h4>
+          <p>
+          ${_("When recruited, steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile.")}
+          <br />
+          ${_(
+            "At the end of the game, if you strictly have more Warriors and Warrior Monk, steal 2 castles from your opponent.",
+          )}
+          </p>`;
+      }
+      if (card.type == "Gaia") {
+        desc += `<h4>${_("Gaia (Titan)")}</h4>
+          <p>
+          ${_("When recruited, earn 1 castle.")}
+          <br />
+          ${_(
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+          )}
+          <br />
+          ${_(
+            "At the end of the game, if you strictly have more Titans, Gaia included, earn 1 castle.",
+          )}
+          </p>`;
+      }
+      if (card.type == "Ouranos") {
+        desc += `<h4>${_("Ouranos (Titan)")}</h4>
+          <p>
+          ${_("When recruited, earn 1 castle.")}
+          <br />
+          ${_(
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+          )}
+          </p>`;
+      }
+
+      if (card.type == "Colonel") {
+        desc += `<h4>${_("Colonel")}</h4>
+          <p>
+          ${_("Throughout the game, when you create 1 line of 5 influences: earn 1 castle.")}
+          <br />
+          ${_(
+            "At the end of the game, if you strictly have more lines of influence: earn 2 castles.",
+          )}
+          </p>`;
+      }
+      if (card.type == "General") {
+        desc += `<h4>${_("General")}</h4>
+          <p>
+          ${_("Throughout the game, when you create 1 line of 5 influences: Immediately play a new turn.")}
+          </p>`;
+      }
+      if (card.type == "Captain") {
+        desc += `<h4>${_("Captain")}</h4>
+          <p>
+          ${_("When recruited, earn 1 castle by Realm for which you have strictly more influence.")}
+          <br />
+          ${_(
+            "At the end of the game, earn 1 castle by Realm for which you have strictly more influence.",
+          )}
+          </p>`;
+      }
+      if (card.type == "Marshal") {
+        desc += `<h4>${_("Marshal")}</h4>
+          <p>
+          ${_("At the end of the game, if you strictly have more Characters from the Imperial Order: earn 3 castles.")}
+          </p>`;
+      }
+
       return `<div class='card-tooltip'>
         ${this.tplCard(card)}
         <div class='card-desc'>
@@ -853,6 +937,9 @@ define([
       }
       if (card.location == "deck") {
         return $("fiverealms-deck");
+      }
+      if (card.location == "discard") {
+        return $("fiverealms-discard");
       }
       if (card.location == "hand") {
         return $("pending-recruit");

@@ -256,12 +256,15 @@
           background: white;
           border-radius: 5px;
           border: 1px solid black;
-          margin-bottom: 10px; }
+          margin-bottom: 10px;
+          position: relative; }
           #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-deck .fiverealms-card,
           #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-discard .fiverealms-card {
             position: absolute;
             top: 7px;
             left: 7px; }
+        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-discard .fiverealms-card {
+          filter: grayscale(1); }
       #fiverealms-main-container #resizable-central-board #central-board #alkane-container {
         width: 600px;
         height: 824px;
@@ -303,7 +306,7 @@
   background-size: 700% 700%;
   border: 1px solid black;
   box-shadow: 1px 1px 5px black;
-  border-radius: 5px;
+  border-radius: 13px;
   position: relative; }
   .fiverealms-card.tmp-card {
     opacity: 0.6; }
@@ -366,7 +369,8 @@
   .card-tooltip .fiverealms-card {
     width: 286px;
     height: 400px;
-    flex-shrink: 0; }
+    flex-shrink: 0;
+    border-radius: 25px; }
   .card-tooltip .card-id {
     position: absolute;
     left: 15px;

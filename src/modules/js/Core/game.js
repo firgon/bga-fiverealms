@@ -815,6 +815,8 @@ define([
           to: null,
 
           phantom: true,
+          phantomStart: false,
+          phantomEnd: false,
         },
         options,
       );
@@ -873,6 +875,7 @@ define([
                   mobile,
                   config.to || targetId,
                   config.duration,
+                  0,
                 )
               : this.slideToObjectPos(
                   mobile,
@@ -880,9 +883,12 @@ define([
                   config.pos.x,
                   config.pos.y,
                   config.duration,
+                  0,
                 );
 
           dojo.connect(animation, "onEnd", () => {
+            console.log("test");
+
             dojo.style(mobile, "zIndex", null);
             dojo.removeClass(mobile, config.className);
             if (config.phantomStart) {
@@ -1176,28 +1182,42 @@ define([
       });
       this._registeredCustomTooltips = {};
     },
-    addCustomTooltip(id, html, delay) {
-      if (this.tooltips[id]) {
-        this.tooltips[id].label = html;
+    addCustomTooltip(id, html, config = {}) {
+      config = Object.assign(
+        {
+          delay: 400,
+          midSize: true,
+          forceRecreate: false,
+        },
+        config,
+      );
+
+      // Handle dynamic content out of the box
+      let getContent = () => {
+        let content = typeof html === "function" ? html() : html;
+        if (config.midSize) {
+          content = '<div class="midSizeDialog">' + content + "</div>";
+        }
+        return content;
+      };
+
+      if (this.tooltips[id] && !config.forceRecreate) {
+        this.tooltips[id].getContent = getContent;
         return;
       }
 
-      html = '<div class="midSizeDialog">' + html + "</div>";
-      delay = delay || 400;
       let tooltip = new dijit.Tooltip({
         //        connectId: [id],
-        label: html,
+        getContent,
         position: this.defaultTooltipPosition,
-        showDelay: delay,
+        showDelay: config.delay,
       });
       this.tooltips[id] = tooltip;
       dojo.addClass(id, "tooltipable");
       dojo.place(
-        `
-        <div class='help-marker'>
+        `<div class='help-marker'>
           <svg><use href="#help-marker-svg" /></svg>
-        </div>
-      `,
+        </div>`,
         id,
       );
 
@@ -1218,18 +1238,24 @@ define([
       });
 
       tooltip.showTimeout = null;
-      dojo.connect($(id), "mouseenter", () => {
+      dojo.connect($(id), "mouseenter", (evt) => {
+        evt.stopPropagation();
         if (!this._helpMode && !this._dragndropMode) {
+          this._displayedTooltip = tooltip;
           if (tooltip.showTimeout != null) clearTimeout(tooltip.showTimeout);
 
-          tooltip.showTimeout = setTimeout(() => tooltip.open($(id)), delay);
+          tooltip.showTimeout = setTimeout(() => {
+            if ($(id)) tooltip.open($(id));
+          }, config.delay);
         }
       });
 
-      dojo.connect($(id), "mouseleave", () => {
+      dojo.connect($(id), "mouseleave", (evt) => {
+        evt.stopPropagation();
         if (!this._helpMode && !this._dragndropMode) {
           tooltip.close();
           if (tooltip.showTimeout != null) clearTimeout(tooltip.showTimeout);
+          this._displayedTooltip = null;
         }
       });
     },

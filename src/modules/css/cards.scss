@@ -5,7 +5,7 @@
     background-size: 700% 700%;
     border: 1px solid black;
     box-shadow: 1px 1px 5px black;
-    border-radius: 5px;
+    border-radius: 13px;
 
     &.tmp-card {
         opacity: 0.6;
@@ -114,6 +114,7 @@
         width: 286px;
         height: 400px;
         flex-shrink: 0;
+        border-radius: 25px;
     }
 
     .card-id {

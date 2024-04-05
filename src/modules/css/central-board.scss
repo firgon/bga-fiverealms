@@ -80,11 +80,18 @@
                     border-radius: 5px;
                     border: 1px solid black;
                     margin-bottom: 10px;
+                    position: relative;
 
                     .fiverealms-card {
                         position: absolute;
                         top: 7px;
                         left: 7px;
+                    }
+                }
+
+                #fiverealms-discard {
+                    .fiverealms-card {
+                        filter: grayscale(1);
                     }
                 }
             }
