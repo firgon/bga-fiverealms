@@ -37,6 +37,14 @@ trait TurnTrait
 	{
 		$nextCard = Cards::getTopOf(DECK);
 
+		//safe but probably useless
+		if (!$nextCard) {
+			return [
+				'possibleSpaceIds' => [],
+				'nextCard' => null
+			];
+		}
+
 		return [
 			'possibleSpaceIds' => Cards::getPlayablePlaces($nextCard->getRealm()),
 			'nextCard' => $nextCard->getUiData(false)

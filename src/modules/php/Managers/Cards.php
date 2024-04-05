@@ -33,12 +33,19 @@ class Cards extends \FRMS\Helpers\Pieces
         return [
             'alkane' => static::getInLocation(ALKANE)->ui(),
             'deckN' => static::countInLocation(DECK),
-            'deck' => static::getTopOf(DECK)->getUiData(),
+            'deck' => static::getNextCard(),
             'discard' => static::getTopOf(DISCARD),
             'discardN' => static::countInLocation(DISCARD),
             'visible' => static::getVisibleCards(),
 
         ];
+    }
+
+    public static function getNextCard()
+    {
+        $nextCard = static::getTopOf(DECK);
+
+        return $nextCard ? $nextCard->getUiData(false) : null;
     }
 
     public static function getVisibleCards()
@@ -103,6 +110,8 @@ class Cards extends \FRMS\Helpers\Pieces
         return $cardA->type == $cardB->type;
     }
 
+
+
     //   █████████   ████  █████                                   
     //  ███░░░░░███ ░░███ ░░███                                    
     // ░███    ░███  ░███  ░███ █████  ██████   ████████    ██████ 
@@ -132,10 +141,15 @@ class Cards extends \FRMS\Helpers\Pieces
         }
         for ($i = $index; $i < count($possiblePlaces); $i++) {
             $newCard = static::getTopOf(DECK);
+            if (!$newCard) {
+                //deck empty
+                return false;
+            }
             $newCard->setCoord($possiblePlaces[$index++]);
             $newCard->setLocation(ALKANE);
         }
         if ($notifNeeded) Notifications::newAlkane();
+        return true;
     }
 
     public static function getPlayablePlaces($realm)
