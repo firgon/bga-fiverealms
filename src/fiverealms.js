@@ -40,7 +40,7 @@ define([
         ["influence", null],
         ["chooseCharacter", 2400],
         ["newAlkane", 2000],
-        ["adjustAlkane", 2000],
+        ["adjustAlkane", null],
       ];
 
       // Fix mobile viewport (remove CSS zoom)
@@ -244,13 +244,13 @@ define([
     },
 
     onEnteringStatePlay(args) {
-      if (!$(`card-${args.nextCard.id}`)) this.addCard(args.nextCard);
+      if (args.deck) this.addCard(args.deck);
       if (!this.isCurrentPlayerActive()) return;
 
       Object.entries(args.possibleSpaceIds).forEach(([spaceId, infos]) => {
         this.onClick(this.getCell(spaceId), () => {
           this.clientState("playChooseRealm", _("You must choose a realm"), {
-            cardId: args.nextCard.id,
+            cardId: args.deck.id,
             spaceId,
             realms: infos,
           });
@@ -443,6 +443,7 @@ define([
       let card = n.args.card;
       this.clearPossible();
       this.slide(`card-${card.id}`, this.getCardContainer(card));
+      if (n.args.deck) this.addCard(n.args.deck);
     },
 
     notif_influence(n) {
@@ -809,8 +810,8 @@ define([
     notif_newAlkane(n) {
       debug("Notif: new alkane cards", n);
 
-      if (n.args.nextCard) {
-        this.addCard(n.args.nextCard);
+      if (n.args.deck) {
+        this.addCard(n.args.deck);
       }
 
       n.args.alkane.forEach((card, i) => {
@@ -823,6 +824,17 @@ define([
 
     notif_adjustAlkane(n) {
       debug("Notif: adjusting alkane", n);
+
+      let moving = false;
+      n.args.alkane.forEach((card) => {
+        let container = this.getCardContainer(card);
+        if (container != $(`card-${card.id}`).parentNode) {
+          moving = true;
+          this.slide(`card-${card.id}`, container);
+        }
+      });
+
+      this.notifqueue.setSynchronousDuration(moving ? 1200 : 10);
     },
 
     ////////////////////////////////////////////////////////////

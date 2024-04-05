@@ -41,13 +41,13 @@ trait TurnTrait
 		if (!$nextCard) {
 			return [
 				'possibleSpaceIds' => [],
-				'nextCard' => null
+				'deck' => null
 			];
 		}
 
 		return [
 			'possibleSpaceIds' => Cards::getPlayablePlaces($nextCard->getRealm()),
-			'nextCard' => $nextCard->getUiData(false)
+			'deck' => $nextCard->getUiData(false)
 		];
 	}
 

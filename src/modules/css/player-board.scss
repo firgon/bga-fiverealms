@@ -26,11 +26,8 @@
                 height: 200px;
                 grid-template-columns: repeat(5, 143px);
                 grid-column-gap: 5px;
-                background: red;
 
                 .throne-slot {
-                    background: blue;
-
                     &.selectable {
                         cursor: pointer;
                         &:hover {

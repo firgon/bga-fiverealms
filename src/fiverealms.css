@@ -296,7 +296,8 @@
             #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot.highlighted .fiverealms-card {
               opacity: 0.5; }
           #fiverealms-main-container #resizable-central-board #central-board #alkane-container .alkane-slot .fiverealms-card {
-            pointer-events: none; }
+            pointer-events: none;
+            position: absolute; }
 
 .fiverealms-card {
   width: 143px;

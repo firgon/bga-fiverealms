@@ -13,7 +13,7 @@ class Notifications
   {
     $data = [
       'alkane' => Cards::getInLocation(ALKANE)->ui(),
-      'nextCard' => Cards::getTopOf(DECK)->getUiData(false),
+      'deck' => Cards::getNextCard(),
     ];
 
     static::notifyAll('newAlkane', clienttranslate('The Alkane square is completed'), $data);
@@ -36,7 +36,7 @@ class Notifications
       'y' => $y,
       'card' => $card,
       'realm' => $card->getRealm(),
-      'nextCard' => Cards::getNextCard()
+      'deck' => Cards::getNextCard()
     ];
 
     $msg = clienttranslate('${player_name} place a ${realm} in (${x}, ${y})');
