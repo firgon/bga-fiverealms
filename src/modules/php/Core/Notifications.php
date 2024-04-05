@@ -35,6 +35,7 @@ class Notifications
       'y' => $y,
       'card' => $card,
       'realm' => $card->getRealm(),
+      'nextCard' => Cards::getNextCard()
     ];
 
     $msg = clienttranslate('${player_name} place a ${realm} in (${x}, ${y})');
