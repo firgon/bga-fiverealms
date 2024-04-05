@@ -767,17 +767,79 @@ define([
       );
       let tooltipDesc = this.getCardTooltip(card);
       if (tooltipDesc != null) {
-        this.addCustomTooltip(
-          o.id,
-          tooltipDesc.map((t) => this.formatString(t)).join("<br/>"),
-        );
+        this.addCustomTooltip(o.id, tooltipDesc);
       }
 
       return o;
     },
 
     getCardTooltip(card) {
-      return null;
+      card.uid = card.id + "tooltip";
+
+      let desc = "";
+      const REALMS = {
+        reptiles: _("Reptiles"),
+        felines: _("Felines"),
+        raptors: _("Raptors"),
+        ursids: _("Ursids"),
+        marines: _("Marines"),
+
+        religious: _("Religious"),
+        imperial: _("Imperial"),
+      };
+      desc += `<h4 class='realm-desc'>${_("Realm:")} ${REALMS[card.realm]}</h4>`;
+
+      if (card.type == "King") {
+        desc += `<h4>${_("King")}</h4>
+          <p>
+            ${_(
+              "At the end of the game, if you strictly have more influence in the Realm of this King: earn 3 castles.",
+            )}
+          </p>`;
+      }
+      if (card.type == "Reine") {
+        desc += `<h4>${_("Queen")}</h4>
+          <p>
+            ${_(
+              "Throughout the game, when you influence the 3rd , 4th and 5th Banner of the Realm of this Queen: earn 1 castle.",
+            )}
+          </p>`;
+      }
+      if (card.type == "Witch") {
+        desc += `<h4>${_("Witch")}</h4>
+          <p>
+            ${_(
+              "Throughout the game, when you influence the 3rd and 5th Banner of the Realm of this Witch: look at all the cards in the discard pile, and pick 1 card that you mayRECRUIT or INFLUENCE.",
+            )}
+          </p>`;
+      }
+      if (card.type == "Warrior") {
+        desc += `<h4>${_("Warrior")}</h4>
+          <p>
+            ${_(
+              "Throughout the game, when you influence the 4th Banner of the Realm of this Warrior: steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile.",
+            )}
+          </p>`;
+      }
+      if (card.type == "Titan") {
+        desc += `<h4>${_("Titan")}</h4>
+          <p>
+          ${_("When recruited, earn 1 castle.")}
+          <br />
+          ${_(
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+          )}
+          </p>`;
+      }
+
+      return `<div class='card-tooltip'>
+        ${this.tplCard(card)}
+        <div class='card-desc'>
+          <h4 class='card-id'>Id: ${card.id}</h4>
+          ${desc}
+        </div>
+      </div>  
+      `;
     },
 
     tplCard(card) {

@@ -105,3 +105,30 @@
         transform: scale(1.1);
     }
 }
+
+.card-tooltip {
+    display: flex;
+    position: relative;
+
+    .fiverealms-card {
+        width: 286px;
+        height: 400px;
+        flex-shrink: 0;
+    }
+
+    .card-id {
+        position: absolute;
+        left: 15px;
+        top: 0;
+        background: yellow;
+        border: 1px solid black;
+        border-radius: 5px;
+        padding: 5px 7px;
+        box-shadow: 2px 2px 5px black;
+    }
+
+    .card-desc {
+        margin-left: 20px;
+        font-size: 16px;
+    }
+}
