@@ -31,7 +31,7 @@ define([
 ], function (dojo, declare) {
   return declare("bgagame.fiverealms", [customgame.game], {
     constructor() {
-      this._inactiveStates = [];
+      this._inactiveStates = ["recruit", "play"];
       this._notifications = [
         ["clearTurn", 200],
         ["refreshUI", 200],
@@ -39,6 +39,8 @@ define([
         ["recruit", null],
         ["influence", null],
         ["chooseCharacter", 2400],
+        ["newAlkane", 2000],
+        ["adjustAlkane", 2000],
       ];
 
       // Fix mobile viewport (remove CSS zoom)
@@ -71,6 +73,11 @@ define([
     clearPossible() {
       document.querySelectorAll(".tmp-card").forEach((elt) => elt.remove());
       this.clearHighlights();
+      if ($(`board-${this.player_id}`)) {
+        $(`board-${this.player_id}`)
+          .querySelectorAll(`.influence-realm`)
+          .forEach((e) => delete e.dataset.n);
+      }
       this.inherited(arguments);
     },
 
@@ -237,6 +244,9 @@ define([
     },
 
     onEnteringStatePlay(args) {
+      if (!$(`card-${args.nextCard.id}`)) this.addCard(args.nextCard);
+      if (!this.isCurrentPlayerActive()) return;
+
       Object.entries(args.possibleSpaceIds).forEach(([spaceId, infos]) => {
         this.onClick(this.getCell(spaceId), () => {
           this.clientState("playChooseRealm", _("You must choose a realm"), {
@@ -366,10 +376,66 @@ define([
       this.getCell(args.spaceId).insertAdjacentElement("beforeend", oCard);
 
       // Highlight cards
-      this.highlightSpaces(args.spaceIds);
+      this.highlightSpaces(args.spaceIds, "selected");
 
-      // TODO
-      console.log("TODOOO");
+      const REALMS = ["reptiles", "felines", "raptors", "ursids", "marines"];
+      let selection = {},
+        totalSelected = 0,
+        n = args.spaceIds.length;
+      let updateSelection = () => {
+        totalSelected = 0;
+        REALMS.forEach((realm) => {
+          $(`board-${this.player_id}`).querySelector(
+            `.influence-realm.realm-${realm}`,
+          ).dataset.n = selection[realm];
+          totalSelected += selection[realm];
+        });
+
+        $("btnConfirm").classList.toggle("disabled", totalSelected < n);
+        if (totalSelected > 0) {
+          this.addSecondaryActionButton("btnReset", _("Reset"), () => {
+            REALMS.forEach((realm) => {
+              selection[realm] = 0;
+            });
+            updateSelection();
+          });
+        } else if ($("btnReset")) $("btnReset").remove();
+      };
+
+      REALMS.forEach((realm) => {
+        selection[realm] = 0;
+
+        // Cant place on empty col
+        if (this._counters[this.player_id][realm].getValue() == 0) return;
+
+        let influence = $(`board-${this.player_id}`).querySelector(
+          `.influence-realm.realm-${realm}`,
+        );
+        this.onClick(influence, () => {
+          if (totalSelected >= args.spaceIds.length) return;
+          selection[realm] += 1;
+          updateSelection();
+        });
+      });
+
+      this.addPrimaryActionButton("btnConfirm", _("Confirm"), () => {
+        let i = 0;
+        let influence = {};
+        REALMS.forEach((realm) => {
+          if (selection[realm] == 0) return;
+          influence[realm] = [];
+          for (let j = 0; j < selection[realm]; j++) {
+            influence[realm].push(args.spaceIds[i++]);
+          }
+        });
+
+        this.takeAction("actInfluence", {
+          spaceId: args.spaceId,
+          realm: args.realm,
+          influence: JSON.stringify(influence),
+        });
+      });
+      updateSelection();
     },
 
     notif_placeCard(n) {
@@ -388,7 +454,6 @@ define([
           increases[realm] = (increases[realm] || 0) + 1;
           return this.slide(`card-${card.id}`, this.getCardContainer(card), {
             delay: 100 * i,
-            phantom: false,
           });
         }),
       ).then(() => {
@@ -427,6 +492,8 @@ define([
 
     onEnteringStateRecruit(args) {
       $("resizable-central-board").classList.add("recruiting");
+      if (!this.isCurrentPlayerActive()) return;
+
       args.choosableCards.forEach((card) => {
         this.onClick(`card-${card.id}`, () =>
           this.clientState(
@@ -459,6 +526,8 @@ define([
       debug("Notif: choosing character to recruit", n);
       let card = n.args.card;
       this.slide(`card-${card.id}`, this.getCardContainer(card)).then(() => {
+        $(`card-${card.id}`).classList.remove("selected");
+
         Promise.all(
           [...$("pending-recruit").querySelectorAll(".fiverealms-card")].map(
             (elt, i) =>
@@ -735,6 +804,25 @@ define([
 
       console.error("Trying to get container of a card", card);
       return "game_play_area";
+    },
+
+    notif_newAlkane(n) {
+      debug("Notif: new alkane cards", n);
+
+      if (n.args.nextCard) {
+        this.addCard(n.args.nextCard);
+      }
+
+      n.args.alkane.forEach((card, i) => {
+        this.addCard(card, "fiverealms-deck");
+        this.wait(100 * i).then(() =>
+          this.slide(`card-${card.id}`, this.getCardContainer(card)),
+        );
+      });
+    },
+
+    notif_adjustAlkane(n) {
+      debug("Notif: adjusting alkane", n);
     },
 
     ////////////////////////////////////////////////////////////

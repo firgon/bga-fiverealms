@@ -866,41 +866,41 @@ define([
       if (config.changeParent) this.changeParent(mobile, "game_play_area");
       if (config.from != null) this.placeOnObject(mobile, config.from);
       return new Promise((resolve, reject) => {
-        const animation =
-          config.pos == null
-            ? this.slideToObject(
-                mobile,
-                config.to || targetId,
-                config.duration,
-                config.delay,
-              )
-            : this.slideToObjectPos(
-                mobile,
-                config.to || targetId,
-                config.pos.x,
-                config.pos.y,
-                config.duration,
-                config.delay,
-              );
+        this.wait(config.delay).then(() => {
+          const animation =
+            config.pos == null
+              ? this.slideToObject(
+                  mobile,
+                  config.to || targetId,
+                  config.duration,
+                )
+              : this.slideToObjectPos(
+                  mobile,
+                  config.to || targetId,
+                  config.pos.x,
+                  config.pos.y,
+                  config.duration,
+                );
 
-        dojo.connect(animation, "onEnd", () => {
-          dojo.style(mobile, "zIndex", null);
-          dojo.removeClass(mobile, config.className);
-          if (config.phantomStart) {
-            dojo.place(mobileElt, mobile, "replace");
-            dojo.removeClass(mobileElt, "phantom");
-            mobile = mobileElt;
-          }
-          if (config.destroy) dojo.destroy(mobile);
-          else if (config.changeParent) {
-            if (config.phantomEnd) dojo.place(mobile, targetId, "replace");
-            else this.changeParent(mobile, newParent);
-          }
-          if (config.clearPos && !config.destroy)
-            dojo.style(mobile, { top: null, left: null, position: null });
-          resolve();
+          dojo.connect(animation, "onEnd", () => {
+            dojo.style(mobile, "zIndex", null);
+            dojo.removeClass(mobile, config.className);
+            if (config.phantomStart) {
+              dojo.place(mobileElt, mobile, "replace");
+              dojo.removeClass(mobileElt, "phantom");
+              mobile = mobileElt;
+            }
+            if (config.destroy) dojo.destroy(mobile);
+            else if (config.changeParent) {
+              if (config.phantomEnd) dojo.place(mobile, targetId, "replace");
+              else this.changeParent(mobile, newParent);
+            }
+            if (config.clearPos && !config.destroy)
+              dojo.style(mobile, { top: null, left: null, position: null });
+            resolve();
+          });
+          animation.play();
         });
-        animation.play();
       });
     },
 

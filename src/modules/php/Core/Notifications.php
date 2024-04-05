@@ -12,7 +12,8 @@ class Notifications
   public static function newAlkane()
   {
     $data = [
-      'alkane' => Cards::getInLocation(ALKANE)->ui()
+      'alkane' => Cards::getInLocation(ALKANE)->ui(),
+      'nextCard' => Cards::getTopOf(DECK)->getUiData(false),
     ];
 
     static::notifyAll('newAlkane', clienttranslate('The Alkane square is completed'), $data);

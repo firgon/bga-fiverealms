@@ -79,10 +79,13 @@
                     background: white;
                     border-radius: 5px;
                     border: 1px solid black;
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
                     margin-bottom: 10px;
+
+                    .fiverealms-card {
+                        position: absolute;
+                        top: 7px;
+                        left: 7px;
+                    }
                 }
             }
 

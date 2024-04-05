@@ -52,8 +52,32 @@
                     background-position-y: 0 * 100% / 6;
                     display: flex;
                     justify-content: center;
-                    align-items: center;
+                    align-items: end;
                     position: relative;
+                    padding-bottom: 11px;
+
+                    &.selectable {
+                        cursor: pointer;
+                    }
+                    &[data-n]::before {
+                        content: attr(data-n);
+                        display: block;
+                        position: absolute;
+                        top: 2px;
+                        background: rgba(255, 255, 255, 0.9);
+                        width: 30px;
+                        height: 30px;
+                        border-radius: 50%;
+                        border: 1px solid black;
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        font-size: 20px;
+                        box-shadow: 0px 0px 5px 1px black;
+                    }
+                    &[data-n="0"]::before {
+                        display: none;
+                    }
 
                     &.realm-reptiles {
                         background-position-x: 0%;
