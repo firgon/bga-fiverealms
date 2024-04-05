@@ -50,7 +50,7 @@ class Player extends \FRMS\Helpers\DB_Model
     $cards = $this->getCardsInHand(true);
     $council = $this->getCharactersInCouncil();
     $choosableCards = $cards->filter(fn ($card) => !in_array($card->getType(), array_values($council)));
-    $choosablePlaces = array_diff([1, 2, 3, 4], array_keys($council));
+    $choosablePlaces = array_values(array_diff([1, 2, 3, 4], array_keys($council)));
     return [$cards, $choosableCards, $choosablePlaces];
   }
 

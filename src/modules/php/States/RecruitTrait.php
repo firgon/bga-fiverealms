@@ -51,7 +51,7 @@ trait RecruitTrait
 		}
 
 
-		$card->setLocation($card->getType() == TITAN ? TITANS : COUNCIL);
+		$card->setLocation($card->isTitan() ? TITANS : COUNCIL);
 		$card->setPlayerId($pId);
 		$card->setState($placeId);
 
