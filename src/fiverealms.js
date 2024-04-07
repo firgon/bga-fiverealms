@@ -104,12 +104,12 @@ define([
       if (args.args && args.args.previousSteps) {
         args.args.previousSteps.forEach((stepId) => {
           let logEntry = $("logs").querySelector(
-            `.log.notif_newUndoableStep[data-step="${stepId}"]`,
+            `.log.notif_newUndoableStep[data-step="${stepId}"]`
           );
           if (logEntry) this.onClick(logEntry, () => this.undoToStep(stepId));
 
           logEntry = document.querySelector(
-            `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`,
+            `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`
           );
           if (logEntry) this.onClick(logEntry, () => this.undoToStep(stepId));
         });
@@ -129,7 +129,7 @@ define([
               "btnUndoLastStep",
               _("Undo last step"),
               () => this.undoToStep(lastStep),
-              "restartAction",
+              "restartAction"
             );
         }
 
@@ -141,7 +141,7 @@ define([
             this.stopActionTimer();
             this.takeAction("actRestart");
           },
-          "restartAction",
+          "restartAction"
         );
       }
 
@@ -171,7 +171,7 @@ define([
 
         if ($(`dockedlog_${notif.mobileLogId}`))
           this.onClick($(`dockedlog_${notif.mobileLogId}`), () =>
-            this.undoToStep(stepId),
+            this.undoToStep(stepId)
           );
       }
     },
@@ -188,7 +188,7 @@ define([
       this.startActionTimer(
         "btnConfirmTurn",
         timer,
-        this.prefs[OPTION_CONFIRM].value,
+        this.prefs[OPTION_CONFIRM].value
       );
     },
 
@@ -277,7 +277,7 @@ define([
               spaceId: args.spaceId,
               realm,
               spaceIds: args.realms[realm],
-            },
+            }
           );
         };
       };
@@ -305,13 +305,13 @@ define([
         this.addPrimaryActionButton(
           `btn${realm}`,
           REALMS[realm],
-          selectRealm(realm),
+          selectRealm(realm)
         );
         this.connect($(`btn${realm}`), "mouseover", () =>
-          this.highlightSpaces(spaceIds),
+          this.highlightSpaces(spaceIds)
         );
         this.connect($(`btn${realm}`), "mouseout", () =>
-          this.clearHighlights(),
+          this.clearHighlights()
         );
 
         spaceIds.forEach((spaceId) => {
@@ -340,14 +340,14 @@ define([
         this.takeAction("actRecruit", {
           spaceId: args.spaceId,
           realm: args.realm,
-        }),
+        })
       );
       this.addPrimaryActionButton("btnInfluence", _("Influence"), () => {
         if (args.realm == "imperial") {
           this.clientState(
             "chooseInfluenceColumns",
             _("You must choose on which column(s) to place the Imperial cards"),
-            args,
+            args
           );
         } else {
           let influence = {};
@@ -386,7 +386,7 @@ define([
         totalSelected = 0;
         REALMS.forEach((realm) => {
           $(`board-${this.player_id}`).querySelector(
-            `.influence-realm.realm-${realm}`,
+            `.influence-realm.realm-${realm}`
           ).dataset.n = selection[realm];
           totalSelected += selection[realm];
         });
@@ -409,7 +409,7 @@ define([
         if (this._counters[this.player_id][realm].getValue() == 0) return;
 
         let influence = $(`board-${this.player_id}`).querySelector(
-          `.influence-realm.realm-${realm}`,
+          `.influence-realm.realm-${realm}`
         );
         this.onClick(influence, () => {
           if (totalSelected >= args.spaceIds.length) return;
@@ -456,7 +456,7 @@ define([
           return this.slide(`card-${card.id}`, this.getCardContainer(card), {
             delay: 100 * i,
           });
-        }),
+        })
       ).then(() => {
         Object.entries(increases).forEach(([realm, inc]) => {
           this._counters[n.args.player_id][realm].incValue(inc);
@@ -473,8 +473,8 @@ define([
         n.args.cards.map((card, i) =>
           this.slide(`card-${card.id}`, "pending-recruit", {
             delay: 100 * i,
-          }),
-        ),
+          })
+        )
       ).then(() => {
         Promise.all(
           n.args.cards.map((card, i) => {
@@ -485,10 +485,10 @@ define([
               this.addCustomTooltip(
                 `card-${card.id}`,
                 this.getCardTooltip(card),
-                { forceRecreate: true },
+                { forceRecreate: true }
               );
             });
-          }),
+          })
         ).then(() => {
           this.notifqueue.setSynchronousDuration(100);
         });
@@ -507,8 +507,8 @@ define([
             {
               cardId: card.id,
               places: args.availablePlaces,
-            },
-          ),
+            }
+          )
         );
       });
     },
@@ -538,10 +538,10 @@ define([
             (elt, i) =>
               this.slide(elt, "fiverealms-discard", {
                 delay: 100 * i,
-              }),
-          ),
+              })
+          )
         ).then(() =>
-          $("resizable-central-board").classList.remove("recruiting"),
+          $("resizable-central-board").classList.remove("recruiting")
         );
       });
     },
@@ -565,7 +565,7 @@ define([
           "tplPlayerPanel",
           player,
           `player_panel_content_${player.color}`,
-          "after",
+          "after"
         );
         this.place("tplPlayerBoard", player, "fiverealms-main-container");
 
@@ -575,9 +575,9 @@ define([
           (realm) => {
             this._counters[pId][realm] = this.createCounter(
               `influence-${realm}-${pId}`,
-              player.influence[realm],
+              player.influence[realm]
             );
-          },
+          }
         );
 
         // Useful to order boards
@@ -673,7 +673,7 @@ define([
             destroy: true,
             phantom: false,
             duration: 1200,
-          },
+          }
         );
       }
     },
@@ -708,7 +708,7 @@ define([
             destroy: true,
             phantom: false,
             duration: 1100,
-          },
+          }
         );
       }
     },
@@ -741,6 +741,7 @@ define([
         cards.discard,
       ];
       let cardIds = allCards.map((card) => {
+        if (!card) return null;
         if (!$(`card-${card.id}`)) {
           this.addCard(card);
         }
@@ -771,7 +772,7 @@ define([
       let o = this.place(
         "tplCard",
         card,
-        location == null ? this.getCardContainer(card) : location,
+        location == null ? this.getCardContainer(card) : location
       );
       let tooltipDesc = this.getCardTooltip(card);
       if (tooltipDesc != null) {
@@ -795,13 +796,15 @@ define([
         religious: _("Religious"),
         imperial: _("Imperial"),
       };
-      desc += `<h4 class='realm-desc'>${_("Realm:")} ${REALMS[card.realm]}</h4>`;
+      desc += `<h4 class='realm-desc'>${_("Realm:")} ${
+        REALMS[card.realm]
+      }</h4>`;
 
       if (card.type == "King") {
         desc += `<h4>${_("King")}</h4>
           <p>
             ${_(
-              "At the end of the game, if you strictly have more influence in the Realm of this King: earn 3 castles.",
+              "At the end of the game, if you strictly have more influence in the Realm of this King: earn 3 castles."
             )}
           </p>`;
       }
@@ -809,7 +812,7 @@ define([
         desc += `<h4>${_("Queen")}</h4>
           <p>
             ${_(
-              "Throughout the game, when you influence the 3rd , 4th and 5th Banner of the Realm of this Queen: earn 1 castle.",
+              "Throughout the game, when you influence the 3rd , 4th and 5th Banner of the Realm of this Queen: earn 1 castle."
             )}
           </p>`;
       }
@@ -817,7 +820,7 @@ define([
         desc += `<h4>${_("Witch")}</h4>
           <p>
             ${_(
-              "Throughout the game, when you influence the 3rd and 5th Banner of the Realm of this Witch: look at all the cards in the discard pile, and pick 1 card that you mayRECRUIT or INFLUENCE.",
+              "Throughout the game, when you influence the 3rd and 5th Banner of the Realm of this Witch: look at all the cards in the discard pile, and pick 1 card that you mayRECRUIT or INFLUENCE."
             )}
           </p>`;
       }
@@ -825,7 +828,7 @@ define([
         desc += `<h4>${_("Warrior")}</h4>
           <p>
             ${_(
-              "Throughout the game, when you influence the 4th Banner of the Realm of this Warrior: steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile.",
+              "Throughout the game, when you influence the 4th Banner of the Realm of this Warrior: steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile."
             )}
           </p>`;
       }
@@ -835,7 +838,7 @@ define([
           ${_("When recruited, earn 1 castle.")}
           <br />
           ${_(
-            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game."
           )}
           </p>`;
       }
@@ -844,17 +847,19 @@ define([
         desc += `<h4>${_("Popess")}</h4>
           <p>
           ${_(
-            "Throughout the game, when you influence the 4th banner of any Realm: earn 2 castles.",
+            "Throughout the game, when you influence the 4th banner of any Realm: earn 2 castles."
           )}
           </p>`;
       }
       if (card.type == "Warrior Monk") {
         desc += `<h4>${_("Warrior Monk")}</h4>
           <p>
-          ${_("When recruited, steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile.")}
+          ${_(
+            "When recruited, steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile."
+          )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more Warriors and Warrior Monk, steal 2 castles from your opponent.",
+            "At the end of the game, if you strictly have more Warriors and Warrior Monk, steal 2 castles from your opponent."
           )}
           </p>`;
       }
@@ -864,11 +869,11 @@ define([
           ${_("When recruited, earn 1 castle.")}
           <br />
           ${_(
-            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game."
           )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more Titans, Gaia included, earn 1 castle.",
+            "At the end of the game, if you strictly have more Titans, Gaia included, earn 1 castle."
           )}
           </p>`;
       }
@@ -878,7 +883,7 @@ define([
           ${_("When recruited, earn 1 castle.")}
           <br />
           ${_(
-            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game."
           )}
           </p>`;
       }
@@ -886,33 +891,41 @@ define([
       if (card.type == "Colonel") {
         desc += `<h4>${_("Colonel")}</h4>
           <p>
-          ${_("Throughout the game, when you create 1 line of 5 influences: earn 1 castle.")}
+          ${_(
+            "Throughout the game, when you create 1 line of 5 influences: earn 1 castle."
+          )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more lines of influence: earn 2 castles.",
+            "At the end of the game, if you strictly have more lines of influence: earn 2 castles."
           )}
           </p>`;
       }
       if (card.type == "General") {
         desc += `<h4>${_("General")}</h4>
           <p>
-          ${_("Throughout the game, when you create 1 line of 5 influences: Immediately play a new turn.")}
+          ${_(
+            "Throughout the game, when you create 1 line of 5 influences: Immediately play a new turn."
+          )}
           </p>`;
       }
       if (card.type == "Captain") {
         desc += `<h4>${_("Captain")}</h4>
           <p>
-          ${_("When recruited, earn 1 castle by Realm for which you have strictly more influence.")}
+          ${_(
+            "When recruited, earn 1 castle by Realm for which you have strictly more influence."
+          )}
           <br />
           ${_(
-            "At the end of the game, earn 1 castle by Realm for which you have strictly more influence.",
+            "At the end of the game, earn 1 castle by Realm for which you have strictly more influence."
           )}
           </p>`;
       }
       if (card.type == "Marshal") {
         desc += `<h4>${_("Marshal")}</h4>
           <p>
-          ${_("At the end of the game, if you strictly have more Characters from the Imperial Order: earn 3 castles.")}
+          ${_(
+            "At the end of the game, if you strictly have more Characters from the Imperial Order: earn 3 castles."
+          )}
           </p>`;
       }
 
@@ -966,7 +979,7 @@ define([
       n.args.alkane.forEach((card, i) => {
         this.addCard(card, "fiverealms-deck");
         this.wait(100 * i).then(() =>
-          this.slide(`card-${card.id}`, this.getCardContainer(card)),
+          this.slide(`card-${card.id}`, this.getCardContainer(card))
         );
       });
     },
@@ -1003,8 +1016,12 @@ define([
       const NO_TEXT_ICONS = [];
       let noText = NO_TEXT_ICONS.includes(name);
       let text = n == null ? "" : `<span>${n}</span>`;
-      return `${noText ? text : ""}<div class="icon-container icon-container-${type}">
-            <div class="fiverealms-icon icon-${type}">${noText ? "" : text}</div>
+      return `${
+        noText ? text : ""
+      }<div class="icon-container icon-container-${type}">
+            <div class="fiverealms-icon icon-${type}">${
+        noText ? "" : text
+      }</div>
           </div>`;
     },
 
@@ -1018,12 +1035,12 @@ define([
         // WITHOUT TEXT
         str = str.replaceAll(
           new RegExp("<" + name + ">", "g"),
-          this.formatIcon(name),
+          this.formatIcon(name)
         );
       });
       str = str.replace(
         /__([^_]+)__/g,
-        '<span class="action-card-name-reference">$1</span>',
+        '<span class="action-card-name-reference">$1</span>'
       );
       str = str.replace(/\*\*([^\*]+)\*\*/g, "<b>$1</b>");
 

@@ -172,4 +172,90 @@ class Card extends \FRMS\Helpers\DB_Model
     {
         return false;
     }
+
+    public function getTranslatableName()
+    {
+        switch ($this->getType()) {
+            case KING:
+                return clienttranslate('King');
+                break;
+
+            case REINE:
+                return clienttranslate('Reine');
+                break;
+
+            case WITCH:
+                return clienttranslate('Witch');
+                break;
+
+            case WARRIOR:
+                return clienttranslate('Warrior');
+                break;
+
+            case TITAN:
+                return clienttranslate('Titan');
+                break;
+
+            case POPESS:
+                return clienttranslate('Popess');
+                break;
+
+            case WARRIOR_MONK:
+                return clienttranslate('Warrior Monk');
+                break;
+
+            case GAIA:
+                return clienttranslate('Gaia');
+                break;
+
+            case OURANOS:
+                return clienttranslate('Ouranos');
+                break;
+
+
+            case COLONEL:
+                return clienttranslate('Colonel');
+                break;
+
+            case GENERAL:
+                return clienttranslate('General');
+                break;
+
+            case CAPTAIN:
+                return clienttranslate('the Captain');
+                break;
+
+            case MARSHAL:
+                return clienttranslate('Marshal');
+                break;
+            case THRONE:
+                return clienttranslate('Throne');
+                break;
+            default:
+                die("error with " . $this->getType());
+        }
+    }
+
+    public function getTranslatableRealm()
+    {
+        switch ($this->getRealm()) {
+            case URSIDS:
+                return clienttranslate('Ursids');
+            case IMPERIAL:
+                return clienttranslate('The Imperial Order');
+            case REPTILES:
+                return clienttranslate('Reptiles');
+            case RAPTORS:
+                return clienttranslate('Raptors');
+            case FELINES:
+                return clienttranslate('Felines');
+            case MARINES:
+                return clienttranslate('Marines');
+            case RELIGIOUS:
+                return clienttranslate('The Religious Order');
+
+            default:
+                die("error with " . $this->getRealms());
+        }
+    }
 }

@@ -23,8 +23,7 @@ class Cards extends \FRMS\Helpers\Pieces
 
     protected static function cast($row)
     {
-        // $type = '\FRMS\Models\Characters\\' . $row['type'];
-        $type = '\FRMS\Models\Card';
+        $type = '\FRMS\Models\Characters\\' . str_replace(" ", "", $row['type']);
         return new $type($row);
     }
 
@@ -171,9 +170,13 @@ class Cards extends \FRMS\Helpers\Pieces
                             $adjacentCard = $grid[$x + $coord[0]][$y + $coord[1]];
                             //add adjacent zone to adjacent colors
                             if (isset($adjacentColors[$adjacentCard->getRealm()])) {
-                                $adjacentColors[$adjacentCard->getRealm()] = array_merge($adjacentColors[$adjacentCard->getRealm()], $zoneRealmsBySpaceId[$adjacentCard->getSpaceId()]);
+                                if ($adjacentCard->getRealm() == $realm) {
+                                    $adjacentColors[$adjacentCard->getRealm()] = array_merge($adjacentColors[$adjacentCard->getRealm()], $zoneRealmsBySpaceId[$adjacentCard->getSpaceId()]);
+                                }
                             } else {
-                                $adjacentColors[$adjacentCard->getRealm()] = $zoneRealmsBySpaceId[$adjacentCard->getSpaceId()];
+                                $adjacentColors[$adjacentCard->getRealm()] = $adjacentCard->getRealm() == $realm
+                                    ? $zoneRealmsBySpaceId[$adjacentCard->getSpaceId()]
+                                    : $spaceIdByRealms[$adjacentCard->getRealm()];
                             }
                         }
                     }

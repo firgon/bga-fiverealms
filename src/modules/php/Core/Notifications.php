@@ -35,11 +35,10 @@ class Notifications
       'x' => $x,
       'y' => $y,
       'card' => $card,
-      'realm' => $card->getRealm(),
       'deck' => Cards::getNextCard()
     ];
 
-    $msg = clienttranslate('${player_name} place a ${realm} in (${x}, ${y})');
+    $msg = clienttranslate('${player_name} place a ${realm} card in (${x}, ${y})');
     static::notifyAll('placeCard', $msg, $data);
   }
 
@@ -53,7 +52,7 @@ class Notifications
       'nb' => count($spaceIds),
       'cards' => $cards,
     ];
-    $msg = clienttranslate('${player_name} add ${nb} ${realm} to his influence');
+    $msg = clienttranslate('${player_name} add ${nb} card(s) in his ${realm} influence');
     static::notifyAll('influence', $msg, $data);
   }
 
@@ -66,7 +65,7 @@ class Notifications
       'nb' => count($spaceIds),
       'cards' => $cards,
     ];
-    $msg = clienttranslate('${player_name} collects ${nb} ${realm} and choose to recruit');
+    $msg = clienttranslate('${player_name} collects ${nb} ${realm} cards and choose to recruit');
     static::notifyAll('recruit', $msg, $data);
   }
 
@@ -79,8 +78,8 @@ class Notifications
       'titanN' => $currentPlayer->countTitans(),
       'preserve' => ['placeId']
     ];
-    $msg = $card->isTitan() ? clienttranslate('${player_name} recruit a ${cardName} card, now he has ${titanN} Titans')
-      : clienttranslate('${player_name} recruit a ${cardName} card in his council');
+    $msg = $card->isTitan() ? clienttranslate('${player_name} recruit a ${cardName} card from ${realm}, now he has ${titanN} Titans')
+      : clienttranslate('${player_name} recruit a ${cardName} card from ${realm} in his council');
     static::notifyAll('chooseCharacter', $msg, $data);
   }
 
@@ -99,7 +98,7 @@ class Notifications
       'player' => $currentPlayer,
       'card' => $card,
     ];
-    $msg = clienttranslate('${player_name} discard a ${cardName} card from his council');
+    $msg = clienttranslate('${player_name} discard a ${cardName} card from ${realm} from his council');
     static::notifyAll('discardCharacter', $msg, $data);
   }
 
@@ -107,13 +106,13 @@ class Notifications
   {
     $data = [
       'player' => $player,
-      'incScore' => $score,
+      'incScore' => abs($score),
       'card' => $card,
     ];
 
     $msg = $score > 0
-      ? clienttranslate('Thanks to ${cardName} card, ${player_name} receives ${incScore} new castle cards')
-      : clienttranslate('Thanks to ${cardName} card, ${player_name} looses ${incScore} new castle cards');
+      ? clienttranslate('Thanks to ${cardName}, ${player_name} receives ${incScore} new castle card(s)')
+      : clienttranslate('Thanks to ${cardName}, ${player_name} looses ${incScore} new castle card(s)');
 
     static::notifyAll("newCastleCards", $msg, $data);
   }
@@ -183,62 +182,9 @@ class Notifications
     }
 
     if (isset($data['card'])) {
-      switch ($data['card']->getType()) {
-        case KING:
-          $name =  clienttranslate('King');
-          break;
 
-        case REINE:
-          $name =  clienttranslate('Reine');
-          break;
-
-        case WITCH:
-          $name =  clienttranslate('Witch');
-          break;
-
-        case WARRIOR:
-          $name =  clienttranslate('Warrior');
-          break;
-
-        case TITAN:
-          $name =  clienttranslate('Titan');
-          break;
-
-
-        case POPESS:
-          $name =  clienttranslate('Popess');
-          break;
-
-        case WARRIOR_MONK:
-          $name =  clienttranslate('Warrior Monk');
-          break;
-
-        case GAIA:
-          $name =  clienttranslate('Gaia');
-          break;
-
-        case OURANOS:
-          $name =  clienttranslate('Ouranos');
-          break;
-
-
-        case COLONEL:
-          $name =  clienttranslate('Colonel');
-          break;
-
-        case GENERAL:
-          $name =  clienttranslate('General');
-          break;
-
-        case CAPTAIN:
-          $name =  clienttranslate('Captain');
-          break;
-
-        case MARSHAL:
-          $name =  clienttranslate('Marshal');
-          break;
-      }
-      $data['cardName'] = $name;
+      $data['cardName'] = $data['card']->getTranslatableName();
+      $data['realm'] = $data['card']->getTranslatableRealm();
       $data['i18n'][] = 'cardName';
       $data['card'] = $data['card']->jsonSerialize();
     }

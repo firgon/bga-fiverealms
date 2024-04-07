@@ -57,7 +57,13 @@ trait RecruitTrait
 
 		Notifications::chooseCharacter($currentPlayer, $card, $placeId);
 
-		$card->recruitEffect();
+		$score = $card->recruitEffect();
+
+		// die(var_dump($s));
+
+		if (is_int($score)) {
+			$currentPlayer->increaseScore($score, $card);
+		}
 
 		$currentPlayer->discardCardInHand();
 

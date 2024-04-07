@@ -114,8 +114,9 @@ trait TurnTrait
 		$card->placeOnAlkane($currentPlayer, $spaceId);
 
 		//for each space ids, place the matching card in the ???
-		$cards = [];
+
 		foreach ($influence as $playedRealm => $spaceIds) {
+			$cards = [];
 			foreach ($spaceIds as $spaceId) {
 				if (!in_array($spaceId, $possibleSpaceIds)) {
 					throw new \BgaVisibleSystemException("You can't take this card. Should not happen");
@@ -127,9 +128,10 @@ trait TurnTrait
 				$cards[] = $card;
 				$currentPlayer->addCardInInfluence($card, $playedRealm);
 			}
+			//TODO
+			Notifications::influence($currentPlayer, $spaceIds, $card->getTranslatableRealm(), $influence, $cards);
 		}
 
-		Notifications::influence($currentPlayer, $spaceIds, $realm, $influence, $cards);
 
 		//for each realm column where player added cards, activate council.
 		$currentPlayer->activateCouncil($influence);
