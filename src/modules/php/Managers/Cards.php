@@ -68,6 +68,9 @@ class Cards extends \FRMS\Helpers\Pieces
             ];
         }
 
+        static::create($cards);
+        $cards = [];
+
         //create normal banner cards
         foreach (ALL_BANNERS as $banner) {
             $characters = (in_array($banner, NORMAL_BANNERS))
@@ -85,9 +88,11 @@ class Cards extends \FRMS\Helpers\Pieces
             }
         }
 
-        shuffle($cards);
+        for ($i = 0; $i < 2; $i++) {
+            shuffle($cards);
+            static::create($cards);
+        }
 
-        static::create($cards);
 
         static::shuffle(DECK);
         static::shuffle(DECK . THRONE);

@@ -21,6 +21,7 @@ class General extends \FRMS\Models\Card
 
 	protected function replay()
 	{
+		$this->getPlayer()->addActionToPendingAction(ST_PLAY);
 	}
 
 	public function isTitan()
