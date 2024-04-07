@@ -14,12 +14,7 @@ class WarriorMonk extends \FRMS\Models\Card
 	//steal
 	public function recruitEffect()
 	{
-		return $this->steal();
-	}
-
-	protected function steal()
-	{
-		//TODO next state steal
+		$this->stealOrDestroy();
 	}
 
 	public function endEffect()

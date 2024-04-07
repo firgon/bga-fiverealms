@@ -2,6 +2,7 @@
 
 namespace FRMS\Models;
 
+use Exception;
 use FRMS\Core\Notifications;
 use FRMS\Managers\Cards;
 use FRMS\Managers\Players;
@@ -96,6 +97,8 @@ class Card extends \FRMS\Helpers\DB_Model
             $count = $this->$thresold($nthOfCards);
         }
 
+        if ($count == 0) return;
+
         if (is_string($reward)) {
             for ($i = 0; $i < $count; $i++) {
                 $this->$reward();
@@ -152,6 +155,17 @@ class Card extends \FRMS\Helpers\DB_Model
         }
 
         $player->increaseScore($majorities, $this);
+    }
+
+    public function stealOrDestroy()
+    {
+        $this->getPlayer()->addActionToPendingAction(ST_STEAL_OR_DESTROY);
+    }
+
+    public function steal()
+    {
+        //TODO
+        throw new Exception('Unimplemented method');
     }
 
     //

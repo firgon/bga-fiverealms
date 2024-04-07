@@ -9,6 +9,18 @@ use FRMS\Core\Globals;
 
 class Notifications
 {
+  public static function destroy($player, $card)
+  {
+    $data = [
+      'player' => $player,
+      'card' => $card,
+      'player2' => $player->getOpponent()
+    ];
+
+    $msg = clienttranslate('${player_name} destroyed a ${cardName} card from ${realm} in the council of ${player_name2}');
+    static::notifyAll('destroy', $msg, $data);
+  }
+
   public static function newAlkane()
   {
     $data = [
@@ -54,6 +66,18 @@ class Notifications
     ];
     $msg = clienttranslate('${player_name} add ${nb} card(s) in his ${realm} influence');
     static::notifyAll('influence', $msg, $data);
+  }
+
+  public static function influenceWitch($currentPlayer, $realm, $influence, $cards)
+  {
+    $data = [
+      'player' => $currentPlayer,
+      'realm' => $realm,
+      'influence' => $influence,
+      'cards' => $cards,
+    ];
+    $msg = clienttranslate('${player_name} add one card in his ${realm} influence');
+    static::notifyAll('influenceWitch', $msg, $data);
   }
 
   public static function recruit($currentPlayer, $spaceIds, $realm, $cards)
@@ -102,7 +126,20 @@ class Notifications
     static::notifyAll('discardCharacter', $msg, $data);
   }
 
-  public static function getNewCastleCards($score, $card, $player)
+  public static function steal($player, $nb)
+  {
+    $data = [
+      'player' => $player,
+      'incScore' => $nb,
+      'player2' => $player->getOpponent()
+    ];
+
+    $msg = clienttranslate('Thanks to Warrior Monk, ${player_name} steal ${incScore} castle card(s) to ${player_name2}');
+
+    static::notifyAll("steal", $msg, $data);
+  }
+
+  public static function getNewCastleCards($score, $card, $player, $silent = false)
   {
     $data = [
       'player' => $player,
@@ -112,9 +149,9 @@ class Notifications
 
     $msg = $score > 0
       ? clienttranslate('Thanks to ${cardName}, ${player_name} receives ${incScore} new castle card(s)')
-      : clienttranslate('Thanks to ${cardName}, ${player_name} looses ${incScore} new castle card(s)');
+      : clienttranslate('Due to ${cardName}, ${player_name} looses ${incScore} new castle card(s)');
 
-    static::notifyAll("newCastleCards", $msg, $data);
+    static::notifyAll("newCastleCards", $silent ? '' : $msg, $data);
   }
 
   public static function refreshUI($data)

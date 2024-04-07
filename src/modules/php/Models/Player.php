@@ -45,9 +45,9 @@ class Player extends \FRMS\Helpers\DB_Model
     return $data;
   }
 
-  public function getChoosableCardsAndPlaces()
+  public function getChoosableCardsAndPlaces($bFromDiscard = false)
   {
-    $cards = $this->getCardsInHand(true);
+    $cards = $bFromDiscard ? Cards::getInLocation(DISCARD) : $this->getCardsInHand(true);
     $council = $this->getCharactersInCouncil();
     $choosableCards = $cards->filter(fn ($card) => !in_array($card->getType(), array_values($council)));
     $choosablePlaces = count(array_keys($council)) != 4

@@ -12,12 +12,12 @@ class Witch extends \FRMS\Models\Card
 {
 	public function anytimeEffect($influence)
 	{
-		return $this->getRewards($influence, [3, 5], 'witch');
+		$this->getRewards($influence, [3, 5], 'witch');
 	}
 
 	protected function witch()
 	{
-		//add next_state
+		$this->getPlayer()->addActionToPendingAction(ST_WITCH);
 	}
 
 	//

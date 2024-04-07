@@ -262,21 +262,22 @@ class Cards extends \FRMS\Helpers\Pieces
         $toRefresh = false;
         if ($cards->count() < 2) {
             Cards::generateAlkane(true);
-        }
-        if ($minX != 1) {
-            $toRefresh = true;
-            foreach ($cards as $card) {
-                $card->incX(1 - $minX);
+        } else {
+            if ($minX != 1) {
+                $toRefresh = true;
+                foreach ($cards as $card) {
+                    $card->incX(1 - $minX);
+                }
             }
-        }
-        if ($minY != 1) {
-            $toRefresh = true;
-            foreach ($cards as $card) {
-                $card->incY(1 - $minY);
+            if ($minY != 1) {
+                $toRefresh = true;
+                foreach ($cards as $card) {
+                    $card->incY(1 - $minY);
+                }
             }
-        }
-        if ($toRefresh) {
-            Notifications::adjustAlkane();
+            if ($toRefresh) {
+                Notifications::adjustAlkane();
+            }
         }
     }
 

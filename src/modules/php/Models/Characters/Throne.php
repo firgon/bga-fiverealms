@@ -12,7 +12,7 @@ class Throne extends \FRMS\Models\Card
 {
 	public function anytimeEffect($influence)
 	{
-		return $this->getRewards($influence, [2], 2);
+		$this->getRewards($influence, [3], 2);
 	}
 
 	public function isTitan()

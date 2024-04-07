@@ -15,12 +15,6 @@ class Colonel extends \FRMS\Models\Card
 		return $this->getRewards($influence, 'countNewLines', 1);
 	}
 
-	//
-	public function recruitEffect()
-	{
-		return 0;
-	}
-
 	public function endEffect()
 	{
 		return $this->majorityOfLines();

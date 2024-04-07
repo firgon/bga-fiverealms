@@ -12,7 +12,7 @@ class Reine extends \FRMS\Models\Card
 {
 	public function anytimeEffect($influence)
 	{
-		return $this->getRewards($influence, [3, 4, 5], 1);
+		$this->getRewards($influence, [3, 4, 5], 1);
 	}
 
 	//

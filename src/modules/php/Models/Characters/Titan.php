@@ -13,7 +13,8 @@ class Titan extends \FRMS\Models\Card
 	//1
 	public function recruitEffect()
 	{
-		return 1;
+		$player = $this->getPlayer();
+		$player->increaseScore(1, $this);
 	}
 
 	public function isTitan()

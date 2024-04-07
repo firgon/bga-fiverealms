@@ -10,15 +10,11 @@ use FRMS\Managers\Players;
 
 class Captain extends \FRMS\Models\Card
 {
-	public function anytimeEffect($influence)
-	{
-		return $this->countMajorities();
-	}
 
 	//
 	public function recruitEffect()
 	{
-		return 0;
+		$this->countMajorities();
 	}
 
 	public function endEffect()

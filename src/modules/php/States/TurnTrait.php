@@ -92,7 +92,6 @@ trait TurnTrait
 	public function actInfluence($spaceId, $realm, $influence)
 	{
 		// get infos
-
 		$pId = Game::get()->getCurrentPlayerId();
 		self::checkAction('actInfluence');
 
@@ -109,11 +108,10 @@ trait TurnTrait
 			throw new \BgaVisibleSystemException("You can't recruit this realm $realm.");
 		}
 
-
 		$card = Cards::getTopOf(DECK);
 		$card->placeOnAlkane($currentPlayer, $spaceId);
 
-		//for each space ids, place the matching card in the ???
+		//for each space ids, place the matching card in the influence column
 
 		foreach ($influence as $playedRealm => $spaceIds) {
 			$cards = [];
@@ -128,14 +126,20 @@ trait TurnTrait
 				$cards[] = $card;
 				$currentPlayer->addCardInInfluence($card, $playedRealm);
 			}
-			//TODO
-			Notifications::influence($currentPlayer, $spaceIds, $card->getTranslatableRealm(), $influence, $cards);
+			Notifications::influence($currentPlayer, $spaceIds, $playedRealm, $influence, $cards);
 		}
-
 
 		//for each realm column where player added cards, activate council.
 		$currentPlayer->activateCouncil($influence);
 
 		$this->gamestate->nextState('');
+	}
+
+	public function stPreEndOfGame()
+	{
+		foreach (Players::getAll() as $pId => $player) {
+			$player->activateCouncil([], true);
+		}
+		Game::transition();
 	}
 }

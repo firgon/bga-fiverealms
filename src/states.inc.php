@@ -99,6 +99,34 @@ $machinestates = [
         ]
     ],
 
+    ST_STEAL_OR_DESTROY => [
+        "name" => "steal",
+        "description" => clienttranslate('${actplayer} can steal a Castle Card or destroy one of your titans or characters'),
+        "descriptionmyturn" => clienttranslate('${you} can steal a Castle Card or destroy one of your titans or characters'),
+        "descriptionimpossible" => clienttranslate('${actplayer} can\'t steal a Castle Card or destroy one of your titans or characters'),
+        "descriptionmyturnimpossible" => clienttranslate('${you} cann\'t steal a Castle Card or destroy one of your titans or characters'),
+        "type" => ACTIVE_PLAYER,
+        "args" => "argSteal",
+        // "action" => "stPlay",
+        "possibleactions" => ['actSteal', 'actDestroy', 'actPass'],
+        "transitions" => [
+            END_TURN => ST_NEXT_PLAYER,
+        ]
+    ],
+
+    ST_WITCH => [
+        "name" => "witch",
+        "description" => clienttranslate('${actplayer} can recruit or influence a card from discard'),
+        "descriptionmyturn" => clienttranslate('${you} can recruit or influence a card from discard'),
+        "type" => ACTIVE_PLAYER,
+        "args" => "argWitch",
+        // "action" => "stPlay",
+        "possibleactions" => ['actPass', 'actChooseCharacter', 'actInfluenceWitch'],
+        "transitions" => [
+            END_TURN => ST_NEXT_PLAYER,
+        ]
+    ],
+
     ST_PRE_END_OF_GAME => [
         'name' => 'preEndOfGame',
         'type' => GAME,
