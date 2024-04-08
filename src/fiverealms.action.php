@@ -70,6 +70,41 @@ class action_fiverealms extends APP_GameAction
     $this->game->actChooseCharacter($cardId, $placeId);
     self::ajaxResponse();
   }
+
+  public function actDestroy()
+  {
+    self::setAjaxMode();
+    $cardId = self::getArg("cardId", AT_posint, true);
+
+    $this->game->actDestroy($cardId);
+    self::ajaxResponse();
+  }
+
+  public function actInfluenceWitch()
+  {
+    self::setAjaxMode();
+    $influence = self::getArg('influence', AT_json, true);
+    $this->validateJSonAlphaNum($influence, 'influence');
+
+    $this->game->actInfluenceWitch($influence);
+    self::ajaxResponse();
+  }
+
+  public function actPass()
+  {
+    self::setAjaxMode();
+
+    $this->game->actPass();
+    self::ajaxResponse();
+  }
+
+  public function actSteal()
+  {
+    self::setAjaxMode();
+
+    $this->game->actSteal();
+    self::ajaxResponse();
+  }
   // public function tick()
   // {
   //   self::setAjaxMode();
