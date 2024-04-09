@@ -71,6 +71,14 @@ class action_fiverealms extends APP_GameAction
     self::ajaxResponse();
   }
 
+  public function actPassChooseCharacter()
+  {
+    self::setAjaxMode();
+    $this->game->actPassChooseCharacter();
+    self::ajaxResponse();
+  }
+
+
   public function actDestroy()
   {
     self::setAjaxMode();

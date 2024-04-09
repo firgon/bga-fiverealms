@@ -88,12 +88,12 @@ $machinestates = [
 
     ST_RECRUIT => [
         "name" => "recruit",
-        "description" => clienttranslate('${actplayer} must choose one character to place in this council'),
-        "descriptionmyturn" => clienttranslate('${you} must choose one character to place in this council'),
+        "description" => clienttranslate('${actplayer} may choose one character to place in this council'),
+        "descriptionmyturn" => clienttranslate('${you} may choose one character to place in this council'),
         "type" => ACTIVE_PLAYER,
         "args" => "argRecruit",
         // "action" => "stPlay",
-        "possibleactions" => ['actChooseCharacter', 'actDiscard'],
+        "possibleactions" => ['actChooseCharacter', 'actDiscard', 'actPassChooseCharacter'],
         "transitions" => [
             END_TURN => ST_NEXT_PLAYER,
         ]
