@@ -129,14 +129,14 @@
   background-color: #d5a257;
   position: relative;
   width: calc(var(--playerBoardScale) * 1000px);
-  height: calc(var(--playerBoardScale) * 500px); }
+  height: calc(var(--playerBoardScale) * 700px); }
   #fiverealms-main-container .fiverealms-board .player-board-fixed-size {
     display: flex;
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
     width: 1000px;
-    height: 500px;
+    height: 700px;
     transform: scale(var(--playerBoardScale));
     transform-origin: top left; }
     #fiverealms-main-container .fiverealms-board .player-board-fixed-size .throne-row {
@@ -207,6 +207,8 @@
           align-items: center;
           font-size: 30px;
           box-shadow: 0px 0px 5px 1px black; }
+    #fiverealms-main-container .fiverealms-board .player-board-fixed-size .titans-area {
+      display: flex; }
 
 #pending-recruit {
   display: flex;

@@ -9,7 +9,7 @@
         background-color: #d5a257;
         position: relative;
         width: calc(var(--playerBoardScale) * 1000px);
-        height: calc(var(--playerBoardScale) * 500px);
+        height: calc(var(--playerBoardScale) * 700px);
 
         .player-board-fixed-size {
             display: flex;
@@ -17,7 +17,7 @@
             justify-content: space-around;
             align-items: center;
             width: 1000px;
-            height: 500px;
+            height: 700px;
             transform: scale(var(--playerBoardScale));
             transform-origin: top left;
 
@@ -112,6 +112,10 @@
                         box-shadow: 0px 0px 5px 1px black;
                     }
                 }
+            }
+
+            .titans-area {
+                display: flex;
             }
         }
     }

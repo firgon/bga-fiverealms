@@ -42,7 +42,7 @@ define([
         ["passChooseCharacter", 1200],
         ["newAlkane", 2000],
         ["adjustAlkane", null],
-        ["newCastleCards", 10000],
+        ["newCastleCards", 1000],
       ];
 
       // Fix mobile viewport (remove CSS zoom)
@@ -506,16 +506,33 @@ define([
       );
 
       args.choosableCards.forEach((card) => {
-        this.onClick(`card-${card.id}`, () =>
-          this.clientState(
-            "recruitChoosePlace",
-            _("Where do you want to place that recruit?"),
-            {
-              cardId: card.id,
-              places: args.availablePlaces,
-            },
-          ),
-        );
+        this.onClick(`card-${card.id}`, () => {
+          // TITAN
+          if (
+            card.type == "Titan" ||
+            card.type == "Ouranos" ||
+            card.type == "Gaia"
+          ) {
+            this.clientState(
+              "recruitConfirmTitan",
+              _("Please confirm Titan recruitment"),
+              {
+                cardId: card.id,
+              },
+            );
+          }
+          // NORMAL
+          else {
+            this.clientState(
+              "recruitChoosePlace",
+              _("Where do you want to place that recruit?"),
+              {
+                cardId: card.id,
+                places: args.availablePlaces,
+              },
+            );
+          }
+        });
       });
     },
 
@@ -529,6 +546,17 @@ define([
             cardId: args.cardId,
             placeId: slot,
           });
+        });
+      });
+    },
+
+    onEnteringStateRecruitConfirmTitan(args) {
+      this.addCancelStateBtn();
+      $(`card-${args.cardId}`).classList.add("selected");
+
+      this.addPrimaryActionButton("btnConfirm", _("Confirm"), () => {
+        this.takeAction("actChooseCharacter", {
+          cardId: args.cardId,
         });
       });
     },
@@ -633,6 +661,7 @@ define([
             <div class='influence-realm realm-ursids'><div class="influence-counter" id='influence-ursids-${player.id}'></div></div>
             <div class='influence-realm realm-marines'><div class="influence-counter" id='influence-marines-${player.id}'></div></div>
           </div>
+          <div class='titans-area'></div>
         </div>
       </div>`;
     },
@@ -941,6 +970,9 @@ define([
       if (card.location == "influence") {
         return $(`influence-${card.influenceColumn}-${card.playerId}`)
           .parentNode;
+      }
+      if (card.location == "titans") {
+        return $(`board-${card.playerId}`).querySelector(".titans-area");
       }
 
       console.error("Trying to get container of a card", card);
