@@ -1,0 +1,53 @@
+@font-face {
+    font-family: "icomoon";
+    src: url("img/fonts/Icons/icomoon.eot");
+    src:
+        url("img/fonts/icomoon.eot#iefix") format("embedded-opentype"),
+        url("img/fonts/icomoon.ttf") format("truetype"),
+        url("img/fonts/icomoon.woff") format("woff"),
+        url("img/fonts/icomoon.svg#icomoon") format("svg");
+    font-weight: normal;
+    font-style: normal;
+    font-display: block;
+}
+
+[class^="svgicon-"],
+[class*=" svgicon-"] {
+    /* use !important to prevent issues with browser extensions that change fonts */
+    font-family: "icomoon" !important;
+    speak: never;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    text-transform: none;
+    line-height: 1;
+
+    /* Better Font Rendering =========== */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.svgicon-reptile:before {
+    content: "\e907";
+}
+.svgicon-castle:before {
+    content: "\e900";
+}
+.svgicon-feline:before {
+    content: "\e901";
+}
+.svgicon-imperial:before {
+    content: "\e902";
+}
+.svgicon-marine:before {
+    content: "\e903";
+}
+.svgicon-raptor:before {
+    content: "\e904";
+}
+.svgicon-religious:before {
+    content: "\e905";
+}
+.svgicon-ursid:before {
+    content: "\e906";
+}

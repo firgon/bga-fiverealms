@@ -42,6 +42,7 @@ define([
         ["passChooseCharacter", 1200],
         ["newAlkane", 2000],
         ["adjustAlkane", null],
+        ["newCastleCards", 10000],
       ];
 
       // Fix mobile viewport (remove CSS zoom)
@@ -660,42 +661,6 @@ define([
       `);
     },
 
-    gainPayMoney(pId, n, targetSource = null) {
-      if (this.isFastMode()) {
-        this._crystalCounters[pId].incValue(n);
-        return Promise.resolve();
-      }
-
-      let elem = `<div id='money-animation'>
-        ${Math.abs(n)}
-        <div class="icon-container icon-container-money">
-          <div class="fiverealms-icon icon-money"></div>
-        </div>
-      </div>`;
-      $("page-content").insertAdjacentHTML("beforeend", elem);
-
-      if (n > 0) {
-        return this.slide("money-animation", `counter-${pId}-money`, {
-          from: targetSource || this.getVisibleTitleContainer(),
-          destroy: true,
-          phantom: false,
-          duration: 1200,
-        }).then(() => this._counters[pId]["money"].incValue(n));
-      } else {
-        this._counters[pId]["money"].incValue(n);
-        return this.slide(
-          "money-animation",
-          targetSource || this.getVisibleTitleContainer(),
-          {
-            from: `counter-${pId}-money`,
-            destroy: true,
-            phantom: false,
-            duration: 1200,
-          },
-        );
-      }
-    },
-
     gainLoseScore(pId, n, targetSource = null) {
       if (this.isFastMode()) {
         this.scoreCtrl[pId].incValue(n);
@@ -704,7 +669,7 @@ define([
 
       let elem = `<div id='score-animation'>
         ${Math.abs(n)}
-        <i class="fa fa-star"></i>
+        <i class='svgicon-castle'></i>
       </div>`;
       $("page-content").insertAdjacentHTML("beforeend", elem);
 
@@ -731,14 +696,9 @@ define([
       }
     },
 
-    notif_spendMoney(n) {
-      debug("Notif: spending money", n);
-      this.gainPayMoney(n.args.player_id, -n.args.n);
-    },
-
-    notif_giveMoney(n) {
-      debug("Notif: gaining money", n);
-      this.gainPayMoney(n.args.player_id, n.args.n);
+    notif_newCastleCards(n) {
+      debug("Notif: gaining score", n);
+      this.gainLoseScore(n.args.player_id, n.args.deltaScore);
     },
 
     ////////////////////////////////////////////////////////
@@ -1031,20 +991,20 @@ define([
      */
     formatIcon(name, n = null, lowerCase = true) {
       let type = lowerCase ? name.toLowerCase() : name;
-      const NO_TEXT_ICONS = [];
-      let noText = NO_TEXT_ICONS.includes(name);
-      let text = n == null ? "" : `<span>${n}</span>`;
-      return `${
-        noText ? text : ""
-      }<div class="icon-container icon-container-${type}">
-            <div class="fiverealms-icon icon-${type}">${
-              noText ? "" : text
-            }</div>
-          </div>`;
+
+      return (n ? n + "&nbsp;" : "") + `<i class='svgicon-${type}'></i>`;
     },
 
     formatString(str) {
-      const ICONS = ["WORKER"];
+      const ICONS = [
+        "CASTLE",
+        "URSID",
+        "MARINE",
+        "FELINE",
+        "REPTILE",
+        "IMPERIAL",
+        "RELIGIOUS",
+      ];
 
       ICONS.forEach((name) => {
         // WITHOUT BONUS / WITH TEXT
@@ -1056,11 +1016,6 @@ define([
           this.formatIcon(name),
         );
       });
-      str = str.replace(
-        /__([^_]+)__/g,
-        '<span class="action-card-name-reference">$1</span>',
-      );
-      str = str.replace(/\*\*([^\*]+)\*\*/g, "<b>$1</b>");
 
       return str;
     },

@@ -145,11 +145,12 @@ class Notifications
       'player' => $player,
       'incScore' => abs($score),
       'card' => $card,
+      'deltaScore' => $score,
     ];
 
     $msg = $score > 0
-      ? clienttranslate('Thanks to ${cardName}, ${player_name} receives ${incScore} new castle card(s)')
-      : clienttranslate('Due to ${cardName}, ${player_name} looses ${incScore} new castle card(s)');
+      ? clienttranslate('Thanks to ${cardName}, ${player_name} receives ${incScore} <CASTLE>')
+      : clienttranslate('Due to ${cardName}, ${player_name} looses ${incScore} <CASTLE>');
 
     static::notifyAll("newCastleCards", $silent ? '' : $msg, $data);
   }
