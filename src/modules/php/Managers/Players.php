@@ -59,7 +59,7 @@ class Players extends \FRMS\Helpers\DB_Manager
     return Game::get()->getActivePlayerId();
   }
 
-  public function getCurrentId()
+  public static function getCurrentId()
   {
     return (int) Game::get()->getCurrentPId();
   }
@@ -103,7 +103,7 @@ class Players extends \FRMS\Helpers\DB_Manager
   /*
    * Return the number of players
    */
-  public function count()
+  public static function count()
   {
     return self::DB()->count();
   }
@@ -123,7 +123,7 @@ class Players extends \FRMS\Helpers\DB_Manager
   /**
    * Get current turn order according to first player variable
    */
-  public function getTurnOrder($firstPlayer = null)
+  public static function getTurnOrder($firstPlayer = null)
   {
     $firstPlayer = $firstPlayer ?? Globals::getFirstPlayer();
     $order = [];

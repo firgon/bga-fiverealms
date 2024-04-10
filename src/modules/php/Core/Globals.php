@@ -13,6 +13,7 @@ class Globals extends \FRMS\Helpers\DB_Manager
   protected static $variables = [
     'turn' => 'int',
     'firstPlayer' => 'int',
+    'cheatModule' => 'bool'
   ];
 
   protected static $table = 'global_variables';
@@ -27,6 +28,7 @@ class Globals extends \FRMS\Helpers\DB_Manager
   {
     static::setTurn(0);
     static::setFirstPlayer($activePlayerId);
+    static::setCheatModule(true); //TODO Remove at alpha phase
   }
 
   /*

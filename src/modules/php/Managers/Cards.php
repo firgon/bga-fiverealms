@@ -331,4 +331,26 @@ class Cards extends \FRMS\Helpers\Pieces
     {
         return explode('_', $spaceId);
     }
+
+    public static function placeInCouncil($cardId, $pId)
+    {
+
+        $card = static::get($cardId);
+        if ($card->isTitan()) {
+            $card->setLocation(TITANS);
+            $card->setPlayerId($pId);
+            $card->setFlipped(VISIBLE);
+        } else {
+            for ($i = 1; $i <= 4; $i++) {
+                if (!static::getInLocationPId(COUNCIL, $pId, $i)->first()) {
+                    $card->setState($i);
+                    $card->setLocation(COUNCIL);
+                    $card->setPlayerId($pId);
+                    $card->setFlipped(VISIBLE);
+                    break;
+                }
+            }
+        }
+        $card->recruitEffect();
+    }
 }

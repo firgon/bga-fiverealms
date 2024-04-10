@@ -19,12 +19,12 @@ use FRMS\Managers\Players;
 
 class Log extends \APP_DbObject
 {
-    public function enable()
+    public static function enable()
     {
         Game::get()->setGameStateValue('logging', 1);
     }
 
-    public function disable()
+    public static function disable()
     {
         Game::get()->setGameStateValue('logging', 0);
     }
@@ -32,7 +32,7 @@ class Log extends \APP_DbObject
     /**
      * Add an entry
      */
-    public function addEntry($entry)
+    public static function addEntry($entry)
     {
         $entry['affected'] = \json_encode($entry['affected']);
         $entry['move_id'] = self::getUniqueValueFromDB(
@@ -45,7 +45,7 @@ class Log extends \APP_DbObject
     /**
      * Clear the log table
      */
-    public function clearAll()
+    public static function clearAll()
     {
         $query = new QueryBuilder('log', null, 'id');
         $query->delete()->run();
@@ -54,7 +54,7 @@ class Log extends \APP_DbObject
     /**
      * Revert all the logged changes
      */
-    public function revertAll()
+    public static function revertAll()
     {
         $query = new QueryBuilder('log', null, 'id');
         $logs = $query
@@ -132,7 +132,7 @@ class Log extends \APP_DbObject
     /**
      * getCancelMoveIds : get all cancelled notifs IDs from BGA gamelog, used for styling the notifications on page reload
      */
-    protected function extractNotifIds($notifications)
+    protected static function extractNotifIds($notifications)
     {
         $notificationUIds = [];
         foreach ($notifications as $packet) {
@@ -144,7 +144,7 @@ class Log extends \APP_DbObject
         return $notificationUIds;
     }
 
-    public function getCanceledNotifIds()
+    public static function getCanceledNotifIds()
     {
         return self::extractNotifIds(
             self::getObjectListFromDb(

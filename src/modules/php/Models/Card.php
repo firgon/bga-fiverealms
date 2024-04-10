@@ -272,4 +272,9 @@ class Card extends \FRMS\Helpers\DB_Model
                 die("error with " . $this->getRealms());
         }
     }
+
+    public function getName()
+    {
+        return $this->getType() . "-" . $this->getRealm();
+    }
 }

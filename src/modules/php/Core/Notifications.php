@@ -74,9 +74,11 @@ class Notifications
       'player' => $currentPlayer,
       'realm' => $realm,
       'influence' => $influence,
+      'nb' => count($cards),
       'cards' => $cards,
     ];
-    $msg = clienttranslate('${player_name} add one card in his ${realm} influence');
+    $msg = count($cards) == 1 ? clienttranslate('${player_name} add one card in his ${realm} influence')
+      : clienttranslate('${player_name} add ${nb} cards in his ${realm} influence');
     static::notifyAll('influenceWitch', $msg, $data);
   }
 

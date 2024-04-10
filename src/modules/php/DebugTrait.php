@@ -11,9 +11,31 @@ use FRMS\Managers\Cards;
 
 trait DebugTrait
 {
+  function influence($realm, $nb = 1)
+  {
+    Game::goTo(ST_GENERIC_NEXT_PLAYER);
+    Players::changeActive(Players::getCurrentId());
+    Game::goTo(ST_PLAY);
+
+    if (!in_array($realm, ALL_BANNERS)) {
+      throw new \BgaVisibleSystemException("$realm ne fait pas partie des realms connus : " . implode(", ", ALL_BANNERS));
+    }
+    $influence = [];
+    for ($i = 0; $i < $nb; $i++) {
+      $card = Cards::singleCreate([
+        'location' => DISCARD,
+        'type' => REINE,
+        'realm' => $realm,
+      ]);
+      $influence[$realm][] = $card->getId();
+    }
+
+    // die(var_dump($influence));
+    $this->actInfluenceWitch($influence, true);
+  }
+
   function test()
   {
-    Cards::get(8)->setX('NULL');
   }
 
   // ████                         █████ ██████████            █████                        

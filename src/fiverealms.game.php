@@ -118,7 +118,8 @@ class FiveRealms extends Table
         return [
             'prefs' => Preferences::getUiData($pId),
             'players' => Players::getUiData($pId),
-            'cards' => Cards::getUiData()
+            'cards' => Cards::getUiData(),
+            'cheatModule' => Globals::isCheatModule() ? CheatModule::getUIData() : []
         ];
     }
 
@@ -266,13 +267,13 @@ class FiveRealms extends Table
     /////////////////////////////////////////////////////////////
 
     // Exposing protected method getCurrentPlayerId
-    public static function getCurrentPId()
+    public function getCurrentPId()
     {
         return self::getCurrentPlayerId();
     }
 
     // Exposing protected method translation
-    public static function translate($text)
+    public function translate($text)
     {
         return self::_($text);
     }

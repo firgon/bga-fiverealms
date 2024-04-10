@@ -12,7 +12,7 @@ class Warrior extends \FRMS\Models\Card
 {
 	public function anytimeEffect($influence)
 	{
-		$this->getRewards($influence, [4], 'steal');
+		$this->getRewards($influence, [4], 'stealOrDestroy');
 	}
 
 	//

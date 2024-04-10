@@ -67,6 +67,8 @@ const ST_RECRUIT = 4;
 const ST_STEAL_OR_DESTROY = 10;
 const ST_WITCH = 11;
 
+const ST_GENERIC_NEXT_PLAYER = 90;
+
 
 
 const ST_PRE_END_OF_GAME = 98;

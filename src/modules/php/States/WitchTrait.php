@@ -26,27 +26,33 @@ trait WitchTrait
 		];
 	}
 
-	public function actInfluenceWitch($influence)
+	public function actInfluenceWitch($influence, $bCheating = false)
 	{
 		// get infos
 		$pId = Game::get()->getCurrentPlayerId();
-		self::checkAction('actInfluenceWitch');
+		if (!$bCheating) self::checkAction('actInfluenceWitch');
 
 		$currentPlayer = Players::get($pId);
 
 		//for each space ids, place the matching card in the influence column
 
-		foreach ($influence as $playedRealm => $cardId) {
+		foreach ($influence as $playedRealm => $cardIds) {
+			if (!is_array($cardIds)) {
+				$cardIds = [$cardIds];
+			}
+
 			$cards = [];
-			$card = Cards::get($cardId);
-			if ($card->getLocation() != DISCARD) {
-				throw new \BgaVisibleSystemException("You can't influence this card. $cardId. Should not happen");
+			foreach ($cardIds as $cardId) {
+				$card = Cards::get($cardId);
+				if ($card->getLocation() != DISCARD) {
+					throw new \BgaVisibleSystemException("You can't influence this card. $cardId. Should not happen");
+				}
+				if (($card->getRealm() != $playedRealm && $card->getRealm() != IMPERIAL) || $card->getRealm() == RELIGIOUS) {
+					throw new \BgaVisibleSystemException("You can't place this card $card->id here.");
+				}
+				$cards[] = $card;
+				$currentPlayer->addCardInInfluence($card, $playedRealm);
 			}
-			if (($card->getRealm() != $playedRealm && $card->getRealm() != IMPERIAL) || $card->getRealm() == RELIGIOUS) {
-				throw new \BgaVisibleSystemException("You can't place this card $card->id here.");
-			}
-			$cards[] = $card;
-			$currentPlayer->addCardInInfluence($card, $playedRealm);
 
 			Notifications::influenceWitch($currentPlayer, $playedRealm, $influence, $cards);
 		}

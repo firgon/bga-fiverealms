@@ -143,5 +143,10 @@ $machinestates = [
         "action" => "stGameEnd",
         "args" => "argGameEnd"
 
-    ]
+    ],
+
+    ST_GENERIC_NEXT_PLAYER => [
+        'name' => 'genericNextPlayer',
+        'type' => 'game',
+    ],
 ];
