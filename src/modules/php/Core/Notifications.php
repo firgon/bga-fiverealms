@@ -79,7 +79,7 @@ class Notifications
     ];
     $msg = count($cards) == 1 ? clienttranslate('${player_name} add one card in his ${realm} influence')
       : clienttranslate('${player_name} add ${nb} cards in his ${realm} influence');
-    static::notifyAll('influenceWitch', $msg, $data);
+    static::notifyAll('influence', $msg, $data);
   }
 
   public static function recruit($currentPlayer, $spaceIds, $realm, $cards)
@@ -104,7 +104,7 @@ class Notifications
       'titanN' => $currentPlayer->countTitans(),
       'preserve' => ['placeId']
     ];
-    $msg = $card->isTitan() ? clienttranslate('${player_name} recruit a ${cardName} card from ${realm}, now he has ${titanN} Titans')
+    $msg = $card->isTitan() ? clienttranslate('${player_name} recruit a ${cardName} card from ${realm}, now he has ${titanN} Titan(s)')
       : clienttranslate('${player_name} recruit a ${cardName} card from ${realm} in his council');
     static::notifyAll('chooseCharacter', $msg, $data);
   }

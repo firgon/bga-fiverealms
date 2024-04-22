@@ -17,12 +17,14 @@ trait WitchTrait
 	public function argWitch()
 	{
 		[$cards, $choosableCards, $choosablePlaces] = Players::getActive()->getChoosableCardsAndPlaces(true);
+		$influencableCards = $cards->filter(fn ($card) => $card->getRealm() != RELIGIOUS);
 		return [
 			'cards' => $cards,
-			'choosableCards' => $choosableCards->ui(),
+			'influencableCards' => $influencableCards, //for influence
+			'choosableCards' => $choosableCards->ui(), //for recruit
 			'availablePlaces' => $choosablePlaces,
-			'canInfluence' => count($cards) > 0,
-			'suffix' => count($cards) > 0 ? "" : "impossible",
+			'canInfluence' => count($influencableCards) > 0,
+			'suffix' => count($influencableCards) > 0 || count($choosableCards) > 0 ? "" : "impossible",
 		];
 	}
 
@@ -35,11 +37,12 @@ trait WitchTrait
 		$currentPlayer = Players::get($pId);
 
 		//for each space ids, place the matching card in the influence column
-
+		$newInfluence = [];
 		foreach ($influence as $playedRealm => $cardIds) {
 			if (!is_array($cardIds)) {
 				$cardIds = [$cardIds];
 			}
+			$newInfluence[$playedRealm] = $cardIds;
 
 			$cards = [];
 			foreach ($cardIds as $cardId) {
@@ -58,7 +61,7 @@ trait WitchTrait
 		}
 
 		//for each realm column where player added cards, activate council.
-		$currentPlayer->activateCouncil($influence);
+		$currentPlayer->activateCouncil($newInfluence);
 
 		$this->gamestate->nextState('');
 	}

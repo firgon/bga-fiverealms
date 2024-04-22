@@ -19,9 +19,10 @@ trait StealTrait
 		$opp = Players::getActive()->getOpponent();
 
 		$canSteal = $opp->getScore() > 0;
-		$destroyableCardsIds = Cards::getInLocationPId(COUNCIL, $opp->getId())->getIds();
+		$destroyableCardsIds = Cards::getInLocationPId(COUNCIL, $opp->getId())
+			->merge(Cards::getInLocationPId(TITANS, $opp->getId()))
+			->getIds();
 
-		[$cards, $choosableCards, $choosablePlaces] = Players::getActive()->getChoosableCardsAndPlaces();
 		return [
 			'canSteal' => $canSteal,
 			'destroyableCardsIds' => $destroyableCardsIds,

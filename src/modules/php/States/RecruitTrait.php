@@ -44,12 +44,13 @@ trait RecruitTrait
 		}
 
 		//if discard a card is needed
-		$discardCard = Cards::getInLocationPId(COUNCIL, $pId, $placeId)->first();
-		if (!is_null($discardCard)) {
-			$discardCard->setLocation(DISCARD);
-			Notifications::discard($currentPlayer, $discardCard);
+		if (!$card->isTitan()) {
+			$discardCard = Cards::getInLocationPId(COUNCIL, $pId, $placeId)->first();
+			if (!is_null($discardCard)) {
+				$discardCard->setLocation(DISCARD);
+				Notifications::discard($currentPlayer, $discardCard);
+			}
 		}
-
 
 		$card->setLocation($card->isTitan() ? TITANS : COUNCIL);
 		$card->setPlayerId($pId);
