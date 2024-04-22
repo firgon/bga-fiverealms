@@ -25,7 +25,7 @@ trait StealTrait
 		return [
 			'canSteal' => $canSteal,
 			'destroyableCardsIds' => $destroyableCardsIds,
-			'suffix' => $canSteal || $destroyableCardsIds ? "" : "impossible"
+			'descSuffix' => $canSteal || $destroyableCardsIds ? "" : "impossible"
 		];
 	}
 

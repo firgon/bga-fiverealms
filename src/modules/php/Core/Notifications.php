@@ -136,7 +136,7 @@ class Notifications
       'player2' => $player->getOpponent()
     ];
 
-    $msg = clienttranslate('Thanks to Warrior Monk, ${player_name} steal ${incScore} castle card(s) to ${player_name2}');
+    $msg = clienttranslate('Thanks to Warrior Monk, ${player_name} steal ${incScore} <CASTLE> to ${player_name2}');
 
     static::notifyAll("steal", $msg, $data);
   }

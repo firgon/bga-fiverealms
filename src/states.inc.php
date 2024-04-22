@@ -101,10 +101,10 @@ $machinestates = [
 
     ST_STEAL_OR_DESTROY => [
         "name" => "steal",
-        "description" => clienttranslate('${actplayer} can steal a Castle Card or destroy one of your titans or characters'),
-        "descriptionmyturn" => clienttranslate('${you} can steal a Castle Card or destroy one of your titans or characters'),
-        "descriptionimpossible" => clienttranslate('${actplayer} can\'t steal a Castle Card or destroy one of your titans or characters'),
-        "descriptionmyturnimpossible" => clienttranslate('${you} cann\'t steal a Castle Card or destroy one of your titans or characters'),
+        "description" => clienttranslate('${actplayer} can steal a Castle Card or destroy one titan or character'),
+        "descriptionmyturn" => clienttranslate('${you} can steal a Castle Card or destroy one titan or character'),
+        "descriptionimpossible" => clienttranslate('${actplayer} can\'t steal a Castle Card or destroy one titan or character'),
+        "descriptionmyturnimpossible" => clienttranslate('${you} can\'t steal a Castle Card or destroy one titan or character'),
         "type" => ACTIVE_PLAYER,
         "args" => "argSteal",
         // "action" => "stPlay",
