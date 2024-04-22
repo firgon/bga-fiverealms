@@ -73,7 +73,7 @@
                 align-items: center;
 
                 #fiverealms-deck,
-                #fiverealms-discard {
+                #discard-cards-holder {
                     width: 160px;
                     height: 216px;
                     background: white;
@@ -89,9 +89,16 @@
                     }
                 }
 
-                #fiverealms-discard {
-                    .fiverealms-card {
-                        filter: grayscale(1);
+                #discard-cards-holder {
+                    #fiverealms-discard {
+                        .fiverealms-card {
+                            filter: grayscale(1);
+                        }
+
+                        .fiverealms-card.selected {
+                            filter: none;
+                            z-index: 1000;
+                        }
                     }
                 }
             }

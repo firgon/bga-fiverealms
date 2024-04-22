@@ -123,7 +123,7 @@ class Player extends \FRMS\Helpers\DB_Model
   }
 
 
-  public function countWarrior()
+  public function countWarriors()
   {
     return Cards::getInLocationQ(COUNCIL)
       ->where('player_id', $this->getId())

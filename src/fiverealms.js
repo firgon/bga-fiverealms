@@ -75,10 +75,39 @@ define([
         this.setupPlayers();
         this.setupInfoPanel();
         this.setupCards();
-
+        this.setupDiscardModal();
         this.cheatModuleSetup(gamedatas);
 
         this.inherited(arguments);
+      },
+
+      setupDiscardModal() {
+        this._discardModal = new customgame.modal("discardDisplay", {
+          class: "fiverealms_discard_popin",
+          autoShow: false,
+          closeIcon: "fa-times",
+          closeAction: "hide",
+          title: _("Discard"),
+          verticalAlign: "flex-start",
+          contentsTpl: `<div class='discard-modal' id='discard-cards-modal'></div><div id='discard-modal-footer'></div>`,
+          scale: 0.9,
+          breakpoint: 800,
+          onStartShow: () => {
+            this.closeCurrentTooltip();
+            $(`discard-cards-modal`).insertAdjacentElement(
+              "beforeend",
+              $(`fiverealms-discard`),
+            );
+          },
+          onStartHide: () => {
+            this.closeCurrentTooltip();
+            $(`discard-cards-holder`).insertAdjacentElement(
+              "beforeend",
+              $(`fiverealms-discard`),
+            );
+          },
+          onShow: () => this.closeCurrentTooltip(),
+        });
       },
 
       clearPossible() {
@@ -89,6 +118,10 @@ define([
             .querySelectorAll(`.influence-realm`)
             .forEach((e) => delete e.dataset.n);
         }
+        if (this._discardModal) {
+          this._discardModal.hide();
+        }
+
         this.inherited(arguments);
       },
 
@@ -636,6 +669,127 @@ define([
       notif_destroy(n) {
         debug("Notif: destroy character", n);
         this.slide(`card-${n.args.card.id}`, "fiverealms-discard");
+      },
+
+      onEnteringStateWitch(args) {
+        this.addPrimaryActionButton("btnOpenDiscard", _("Open discard"), () =>
+          this._discardModal.show(),
+        );
+        this._discardModal.show();
+
+        let selectedCardId = null;
+        args.choosableCards.forEach((card) => {
+          let cardId = card.id;
+          if (!$(`card-${cardId}`)) {
+            this.addCard(card);
+          }
+
+          this.onClick(`card-${cardId}`, () => {
+            // Highlight
+            if (selectedCardId) {
+              $(`card-${selectedCardId}`).classList.remove("selected");
+            }
+            selectedCardId = cardId;
+            $(`card-${selectedCardId}`).classList.add("selected");
+
+            // RECRUIT
+            this.addPrimaryActionButton(
+              "btnRecruit",
+              _("Recruit"),
+              () =>
+                this.clientState(
+                  "witchRecruit",
+                  _("Where do you want to recruit it?"),
+                  {
+                    cardId: selectedCardId,
+                    places: args.availablePlaces,
+                  },
+                ),
+              "discard-modal-footer",
+            );
+
+            // INFLUENCE
+            this.addPrimaryActionButton(
+              "btnInfluence",
+              _("Influence"),
+              () => {
+                let realm = card.realm;
+                // Imperial => choose column
+                if (realm == "imperial") {
+                  this.clientState(
+                    "witchChooseInfluenceColumn",
+                    _(
+                      "You must choose on which column to place the Imperial card",
+                    ),
+                    args,
+                  );
+                }
+                // Otherwise => auto
+                else {
+                  let influence = {};
+                  influence[realm] = selectedCardId;
+
+                  this.takeAction("actInfluenceWitch", {
+                    influence: JSON.stringify(influence),
+                  });
+                }
+              },
+              "discard-modal-footer",
+            );
+          });
+        });
+
+        this.addSecondaryActionButton("btnPass", _("Pass"), () =>
+          this.takeAction("actPass", {}),
+        );
+      },
+
+      onEnteringStateWitchRecruit(args) {
+        this.addCancelStateBtn();
+        $(`card-${args.cardId}`).classList.add("selected");
+
+        args.places.forEach((slot) => {
+          this.onClick(`throne-${this.player_id}-${slot}`, () => {
+            this.takeAction("actChooseCharacter", {
+              cardId: args.cardId,
+              placeId: slot,
+            });
+          });
+        });
+      },
+
+      onEnteringStateWitchChooseInfluenceColumn(args) {
+        this.addCancelStateBtn();
+        $(`card-${args.cardId}`).classList.add("selected");
+
+        let getRealm = (realm) =>
+          $(`board-${this.player_id}`).querySelector(
+            `.influence-realm.realm-${realm}`,
+          );
+        const REALMS = ["reptiles", "felines", "raptors", "ursids", "marines"];
+        let selectedRealm = null;
+
+        REALMS.forEach((realm) => {
+          // Cant place on empty col
+          if (this._counters[this.player_id][realm].getValue() == 0) return;
+
+          let influence = getRealm(realm);
+          this.onClick(influence, () => {
+            if (selectedRealm) {
+              delete getRealm(selectedRealm).dataset.n;
+            }
+            selectedRealm = realm;
+            getRealm(selectedRealm).dataset.n = 1;
+
+            this.addPrimaryActionButton("btnConfirm", _("Confirm"), () => {
+              let influence = {};
+              influence[selectedRealm] = args.cardId;
+              this.takeAction("actInfluenceWitch", {
+                influence: JSON.stringify(influence),
+              });
+            });
+          });
+        });
       },
 
       ////////////////////////////////////////

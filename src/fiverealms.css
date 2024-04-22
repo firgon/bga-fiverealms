@@ -252,7 +252,7 @@
         flex-flow: column;
         align-items: center; }
         #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-deck,
-        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-discard {
+        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #discard-cards-holder {
           width: 160px;
           height: 216px;
           background: white;
@@ -261,12 +261,15 @@
           margin-bottom: 10px;
           position: relative; }
           #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-deck .fiverealms-card,
-          #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-discard .fiverealms-card {
+          #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #discard-cards-holder .fiverealms-card {
             position: absolute;
             top: 7px;
             left: 7px; }
-        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-discard .fiverealms-card {
+        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #discard-cards-holder #fiverealms-discard .fiverealms-card {
           filter: grayscale(1); }
+        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #discard-cards-holder #fiverealms-discard .fiverealms-card.selected {
+          filter: none;
+          z-index: 1000; }
       #fiverealms-main-container #resizable-central-board #central-board #alkane-container {
         width: 600px;
         height: 824px;
@@ -896,16 +899,14 @@
   .flip-container.flipped .flip-inner {
     transform: rotateY(180deg); }
 
-#popin_showScoresheet_underlay {
-  background-color: black !important;
-  opacity: 0.6; }
-
-#popin_showScoresheet {
+#popin_showSettings,
+.fiverealms_discard_popin {
   background-color: #ebd5bd;
   border-radius: 8px;
   box-shadow: 0 3px 8px black;
   position: relative; }
-  #popin_showScoresheet .fiverealms_popin_closeicon {
+  #popin_showSettings .fiverealms_discard_popin_closeicon,
+  .fiverealms_discard_popin .fiverealms_discard_popin_closeicon {
     background-color: #a47a77;
     border-radius: 50%;
     width: 40px;
@@ -918,151 +919,45 @@
     right: -18px;
     font-size: 90%;
     color: white !important;
-    border: 1px solid #dfbda8; }
-    #popin_showScoresheet .fiverealms_popin_closeicon:hover {
+    border: 1px solid #35302d;
+    z-index: 2; }
+    #popin_showSettings .fiverealms_discard_popin_closeicon:hover,
+    .fiverealms_discard_popin .fiverealms_discard_popin_closeicon:hover {
       text-decoration: none;
       color: #ccc !important;
       transform: scale(1.1); }
-    #popin_showScoresheet .fiverealms_popin_closeicon i {
+    #popin_showSettings .fiverealms_discard_popin_closeicon i,
+    .fiverealms_discard_popin .fiverealms_discard_popin_closeicon i {
       margin-top: -2px; }
-  #popin_showScoresheet h2 {
+  #popin_showSettings h2,
+  .fiverealms_discard_popin h2 {
+    font-family: MyriadPro-Semibold;
     text-align: center;
-    font-size: 23px;
+    font-size: 25px;
     margin: 0px;
     background: #b79570;
     border-radius: 8px 8px 0px 0px;
-    padding: 7px 0px;
+    padding: 11px 0px 3px;
     border-bottom: 1px solid #734f2a; }
-  #popin_showScoresheet #scoring-board {
-    width: 905px;
-    height: 400px;
-    background: url("img/scoring-board.jpg");
-    background-size: 100% auto;
-    border-radius: 0px 0px 8px 8px;
-    box-shadow: 2px 3px 5px 1px black;
-    position: relative; }
-    #popin_showScoresheet #scoring-board #scoring-board-first,
-    #popin_showScoresheet #scoring-board #scoring-board-second {
-      position: absolute;
-      width: 770px;
-      height: 39px;
-      opacity: 0.5;
-      top: 58px;
-      left: 110px;
-      display: flex; }
-      #popin_showScoresheet #scoring-board #scoring-board-first > div,
-      #popin_showScoresheet #scoring-board #scoring-board-second > div {
-        width: 45px;
-        height: 39px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(1),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(1) {
-          margin-right: 15px;
-          margin-left: 4px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(2),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(2) {
-          margin-right: 19px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(3),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(3) {
-          margin-right: 13px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(4),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(4) {
-          margin-right: 43px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(5),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(5) {
-          margin-right: 13px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(6),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(6) {
-          margin-right: 18px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(7),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(7) {
-          margin-right: 16px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(8),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(8) {
-          margin-right: 39px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(9),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(9) {
-          margin-right: 15px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(10),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(10) {
-          margin-right: 19px; }
-        #popin_showScoresheet #scoring-board #scoring-board-first > div:nth-child(11),
-        #popin_showScoresheet #scoring-board #scoring-board-second > div:nth-child(11) {
-          margin-right: 13px; }
-    #popin_showScoresheet #scoring-board #scoring-board-second {
-      top: 99px;
-      height: 32px; }
-      #popin_showScoresheet #scoring-board #scoring-board-second > div {
-        height: 32px; }
-    #popin_showScoresheet #scoring-board .scoring-shift {
-      position: absolute;
-      left: 20px;
-      height: 59px;
-      display: flex;
-      transition: background-color 0.4s; }
-      #popin_showScoresheet #scoring-board .scoring-shift.active {
-        background-color: #ffffff70; }
-      #popin_showScoresheet #scoring-board .scoring-shift#scoring-shift-1 {
-        top: 131px;
-        width: 322px; }
-        #popin_showScoresheet #scoring-board .scoring-shift#scoring-shift-1 > div:nth-child(5) {
-          margin-right: 0px; }
-      #popin_showScoresheet #scoring-board .scoring-shift#scoring-shift-2 {
-        top: 190px;
-        width: 590px; }
-        #popin_showScoresheet #scoring-board .scoring-shift#scoring-shift-2 > div:nth-child(9) {
-          margin-right: 0px; }
-      #popin_showScoresheet #scoring-board .scoring-shift#scoring-shift-3 {
-        top: 250px;
-        width: 860px; }
-      #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell {
-        width: 50px;
-        height: 59px;
-        box-sizing: border-box;
-        transition: border 0.5s, box-shadow 0.5s;
-        border: 2px solid transparent; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell.active {
-          border: 2px solid red;
-          box-shadow: 0px 0px 5px red; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell .scoring-cell-first,
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell .scoring-cell-second {
-          height: 29px;
-          display: flex;
-          justify-content: center;
-          align-items: center; }
-          #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell .scoring-cell-first .marker,
-          #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell .scoring-cell-second .marker {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            border: 1px solid black;
-            margin: 1px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell .scoring-cell-top {
-          margin-bottom: 1px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(2) {
-          margin-right: 13px;
-          margin-left: 4px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(3) {
-          margin-right: 9px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(4) {
-          margin-right: 7px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(5) {
-          margin-right: 40px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(6) {
-          margin-right: 6px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(7) {
-          margin-right: 13px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(8) {
-          margin-right: 8px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(9) {
-          margin-right: 46px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(10) {
-          margin-right: 9px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(11) {
-          margin-right: 6px; }
-        #popin_showScoresheet #scoring-board .scoring-shift .scoring-cell:nth-child(12) {
-          margin-right: 5px; }
-      #popin_showScoresheet #scoring-board .scoring-shift .scoring-shift-header {
-        width: 90px; }
+
+.fiverealms_discard_popin {
+  width: 700px; }
+  .fiverealms_discard_popin #fiverealms-discard {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    padding: 20px; }
+    .fiverealms_discard_popin #fiverealms-discard .goldncrash-card {
+      margin: 5px; }
+  .fiverealms_discard_popin #discard-modal-footer {
+    background: #bbb;
+    border-top: 1px solid #797979;
+    border-bottom-left-radius: 7px;
+    border-bottom-right-radius: 7px;
+    display: flex;
+    justify-content: end;
+    padding: 2px 15px; }
 
 :root {
   --boardScale: 1;

@@ -15,18 +15,18 @@ define([
     autoShow: false,
 
     modalTpl: `
-      <div id='popin_\${id}_container' class="\${class}_container">
-        <div id='popin_\${id}_underlay' class="\${class}_underlay"></div>
-        <div id='popin_\${id}_wrapper' class="\${class}_wrapper">
-          <div id="popin_\${id}" class="\${class}">
-            \${titleTpl}
-            \${closeIconTpl}
-            \${helpIconTpl}
-            \${contentsTpl}
-          </div>
-        </div>
-      </div>
-    `,
+		<div id='popin_\${id}_container' class="\${class}_container">
+		  <div id='popin_\${id}_underlay' class="\${class}_underlay"></div>
+		  <div id='popin_\${id}_wrapper' class="\${class}_wrapper">
+			<div id="popin_\${id}" class="\${class}">
+			  \${titleTpl}
+			  \${closeIconTpl}
+			  \${helpIconTpl}
+			  \${contentsTpl}
+			</div>
+		  </div>
+		</div>
+	  `,
 
     closeIcon: "fa-times-circle", // Set to null if you don't want an icon
     closeIconTpl:
@@ -43,9 +43,9 @@ define([
     titleTpl: '<h2 id="popin_${id}_title" class="${class}_title">${title}</h2>',
 
     contentsTpl: `
-        <div id="popin_\${id}_contents" class="\${class}_contents">
-          \${contents}
-        </div>`,
+		  <div id="popin_\${id}_contents" class="\${class}_contents">
+			\${contents}
+		  </div>`,
     contents: "",
 
     verticalAlign: "center",
@@ -61,6 +61,8 @@ define([
 
     onShow: null,
     onHide: null,
+    onStartShow: null,
+    onStartHide: null,
 
     statusElt: null, // If specified, will add/remove "opened" class on this element
 
@@ -141,9 +143,9 @@ define([
         top: "0px",
         width: "100%",
         height: "100%",
-        zIndex: 947,
+        zIndex: 1049,
         opacity: 0,
-        backgroundColor: "white",
+        backgroundColor: "black",
       });
 
       dojo.style("popin_" + this.id + "_wrapper", {
@@ -152,7 +154,7 @@ define([
         top: "0px",
         width: "min(100%,100vw)",
         height: "100vh",
-        zIndex: 950,
+        zIndex: 1050,
         opacity: 0,
         display: "flex",
         justifyContent: "center",
@@ -294,6 +296,10 @@ define([
       this.adjustSize();
       this._isOpening = true;
       this._isClosing = false;
+      if (this.onStartShow !== null) {
+        this.onStartShow();
+      }
+
       this.fadeInAnimation().then(() => {
         if (!this._isOpening) return;
 
@@ -367,6 +373,10 @@ define([
 
       this._isClosing = true;
       this._isOpening = false;
+      if (this.onStartHide !== null) {
+        this.onStartHide();
+      }
+
       this.fadeOutAnimation().then(() => {
         if (!this._isClosing || this._isOpening) return;
         this._isClosing = false;
@@ -420,45 +430,45 @@ define([
 });
 
 /*
-
-.custom_popin {
-  position:relative;
-  max-width: 1000px;
-  min-width: 300px;
-//  width: auto;
-  width:70%;
-  box-sizing: border-box;
-  background: linear-gradient(to bottom, #f8f8f8, #e7e9e8);
-  border: 2px black solid;
-  border-radius: 8px;
-  padding: 1%;
-}
-.mobile_version .custom_popin {
- padding: 10px;
-}
-
-.custom_popin_title {
- font-size: 150%;
- padding-right: 90px;
-}
-.mobile_version .custom_popin_title {
- font-size: 120%;
-}
-
-
-.custom_popin_closeicon,
-.custom_popin_helpicon {
- position: absolute;
- top: 5px;
- color: black !important;
- right: 8px;
- font-size: 134%;
-}
-.custom_popin_helpicon {
- right: 47px;
-}
-.notouch-device .custom_popin_closeicon:hover,
-.notouch-device .custom_popin_helpicon:hover {
- color: #555555 !important;
-}
-*/
+  
+  .custom_popin {
+	position:relative;
+	max-width: 1000px;
+	min-width: 300px;
+  //  width: auto;
+	width:70%;
+	box-sizing: border-box;
+	background: linear-gradient(to bottom, #f8f8f8, #e7e9e8);
+	border: 2px black solid;
+	border-radius: 8px;
+	padding: 1%;
+  }
+  .mobile_version .custom_popin {
+   padding: 10px;
+  }
+  
+  .custom_popin_title {
+   font-size: 150%;
+   padding-right: 90px;
+  }
+  .mobile_version .custom_popin_title {
+   font-size: 120%;
+  }
+  
+  
+  .custom_popin_closeicon,
+  .custom_popin_helpicon {
+   position: absolute;
+   top: 5px;
+   color: black !important;
+   right: 8px;
+   font-size: 134%;
+  }
+  .custom_popin_helpicon {
+   right: 47px;
+  }
+  .notouch-device .custom_popin_closeicon:hover,
+  .notouch-device .custom_popin_helpicon:hover {
+   color: #555555 !important;
+  }
+  */

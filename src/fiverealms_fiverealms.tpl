@@ -6,7 +6,9 @@
         <div id="central-board">
             <div id="central-board-left-column">
                 <div id="fiverealms-deck"></div>
-                <div id="fiverealms-discard"></div>
+                <div id='discard-cards-holder'>
+                    <div id="fiverealms-discard"></div>
+                </div>
             </div>
             <div id="alkane-container">
                 <div class='alkane-slot' id='alkane-0-0'></div>
