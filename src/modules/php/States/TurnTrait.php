@@ -16,14 +16,15 @@ trait TurnTrait
 {
 	public function stNextPlayer()
 	{
-		Cards::adjustAlkane();
 		$activePlayer = Players::getActive();
 		$nextState = $activePlayer->getNextPendingAction();
 
 		if ($nextState) {
 			Game::goTo($nextState);
 		} else {
-			if (Cards::countInLocation(DECK)) {
+			Cards::adjustAlkane();
+
+			if (Cards::countInLocation(DECK) && $activePlayer->countTitans() != 5) {
 				$this->activeNextPlayer();
 				$this->giveExtraTime(Players::getActiveId());
 				Game::transition(END_TURN);
@@ -137,6 +138,15 @@ trait TurnTrait
 
 	public function stPreEndOfGame()
 	{
+		foreach (Players::getAll() as $pId => $player) {
+			if ($player->countTitans() >= 5) {
+				Notifications::message(clienttranslate('${player_name} has 5 titans and wins'), ['player' => $player]);
+				$player->getOpponent()->setScore(0);
+				$player->setScore(1);
+				Game::transition();
+				return;
+			}
+		}
 		foreach (Players::getAll() as $pId => $player) {
 			$player->activateCouncil([], true);
 		}
