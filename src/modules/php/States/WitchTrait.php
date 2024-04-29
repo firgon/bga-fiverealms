@@ -16,7 +16,7 @@ trait WitchTrait
 {
 	public function argWitch()
 	{
-		[$cards, $choosableCards, $choosablePlaces] = Players::getActive()->getChoosableCardsAndPlaces(true);
+		[$cards, $choosableCards, $choosablePlaces, $fullCouncil] = Players::getActive()->getChoosableCardsAndPlaces(true);
 		$influencableCards = $cards->filter(fn ($card) => $card->getRealm() != RELIGIOUS);
 		return [
 			'cards' => $cards,
@@ -24,6 +24,7 @@ trait WitchTrait
 			'choosableCards' => $choosableCards->ui(), //for recruit
 			'availablePlaces' => $choosablePlaces,
 			'canInfluence' => count($influencableCards) > 0,
+			'fullCouncil' => $fullCouncil,
 			'suffix' => count($influencableCards) > 0 || count($choosableCards) > 0 ? "" : "impossible",
 		];
 	}

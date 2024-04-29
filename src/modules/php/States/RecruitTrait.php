@@ -16,11 +16,12 @@ trait RecruitTrait
 {
 	public function argRecruit()
 	{
-		[$cards, $choosableCards, $choosablePlaces] = Players::getActive()->getChoosableCardsAndPlaces();
+		[$cards, $choosableCards, $choosablePlaces, $fullCouncil] = Players::getActive()->getChoosableCardsAndPlaces();
 		return [
 			'cards' => $cards,
 			'choosableCards' => $choosableCards->ui(),
 			'availablePlaces' => $choosablePlaces,
+			'fullCouncil' => $fullCouncil,
 			'suffix' => count($choosableCards) ? '' : 'impossible'
 		];
 	}

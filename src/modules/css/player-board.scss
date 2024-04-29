@@ -33,6 +33,10 @@
                         &:hover {
                             background: green;
                         }
+
+                        .fiverealms-card {
+                            opacity: 0.8;
+                        }
                     }
                 }
             }
@@ -52,6 +56,8 @@
                     align-items: end;
                     position: relative;
                     padding-bottom: 11px;
+                    border-radius: 7px;
+                    box-shadow: 1px 1px 3px black;
 
                     &.selectable {
                         cursor: pointer;
@@ -116,6 +122,9 @@
 
             .titans-area {
                 display: flex;
+                .fiverealms-card {
+                    margin: 0px 5px;
+                }
             }
         }
     }

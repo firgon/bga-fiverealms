@@ -44,6 +44,7 @@ define([
           ["influence", null],
           ["chooseCharacter", 2400],
           ["passChooseCharacter", 1200],
+          ["discardCharacter", 1000],
           ["newAlkane", 2000],
           ["adjustAlkane", null],
           ["newCastleCards", 1000],
@@ -492,6 +493,7 @@ define([
         this.clearPossible();
         this.slide(`card-${card.id}`, this.getCardContainer(card));
         if (n.args.deck) this.addCard(n.args.deck);
+        this.decDeckCount();
       },
 
       notif_influence(n) {
@@ -575,6 +577,7 @@ define([
                 {
                   cardId: card.id,
                   places: args.availablePlaces,
+                  fullCouncil: args.fullCouncil,
                 },
               );
             }
@@ -585,6 +588,15 @@ define([
       onEnteringStateRecruitChoosePlace(args) {
         this.addCancelStateBtn();
         $(`card-${args.cardId}`).classList.add("selected");
+
+        if (!args.fullCouncil) {
+          let slot = args.places[0];
+          this.takeAction("actChooseCharacter", {
+            cardId: args.cardId,
+            placeId: slot,
+          });
+          return;
+        }
 
         args.places.forEach((slot) => {
           this.onClick(`throne-${this.player_id}-${slot}`, () => {
@@ -671,6 +683,11 @@ define([
         this.slide(`card-${n.args.card.id}`, "fiverealms-discard");
       },
 
+      notif_discardCharacter(n) {
+        debug("Notif: discard character", n);
+        this.slide(`card-${n.args.card.id}`, "fiverealms-discard");
+      },
+
       onEnteringStateWitch(args) {
         this.addPrimaryActionButton("btnOpenDiscard", _("Open discard"), () =>
           this._discardModal.show(),
@@ -678,11 +695,19 @@ define([
         this._discardModal.show();
 
         let selectedCardId = null;
-        args.choosableCards.forEach((card) => {
+        let choosableCardIds = args.choosableCards.map((card) => card.id);
+        let influencableCardIds = Object.keys(args.influencableCards).map((t) =>
+          parseInt(t),
+        );
+        Object.values(args.cards).forEach((card) => {
           let cardId = card.id;
           if (!$(`card-${cardId}`)) {
             this.addCard(card);
           }
+          let canBeRecruited = choosableCardIds.includes(cardId);
+          let canBeInfluenced = influencableCardIds.includes(cardId);
+
+          if (!canBeInfluenced && !canBeRecruited) return;
 
           this.onClick(`card-${cardId}`, () => {
             // Highlight
@@ -703,10 +728,12 @@ define([
                   {
                     cardId: selectedCardId,
                     places: args.availablePlaces,
+                    fullCouncil: args.fullCouncil,
                   },
                 ),
               "discard-modal-footer",
             );
+            $("btnRecruit").classList.toggle("disabled", !canBeRecruited);
 
             // INFLUENCE
             this.addPrimaryActionButton(
@@ -736,6 +763,7 @@ define([
               },
               "discard-modal-footer",
             );
+            $("btnInfluence").classList.toggle("disabled", !canBeInfluenced);
           });
         });
 
@@ -747,6 +775,14 @@ define([
       onEnteringStateWitchRecruit(args) {
         this.addCancelStateBtn();
         $(`card-${args.cardId}`).classList.add("selected");
+        if (!args.fullCouncil) {
+          let slot = args.places[0];
+          this.takeAction("actChooseCharacter", {
+            cardId: args.cardId,
+            placeId: slot,
+          });
+          return;
+        }
 
         args.places.forEach((slot) => {
           this.onClick(`throne-${this.player_id}-${slot}`, () => {
@@ -981,6 +1017,11 @@ define([
               this.destroy(oCard);
             }
           });
+
+        $("fiverealms-deck").dataset.n = cards.deckN;
+      },
+      decDeckCount(n = 1) {
+        $("fiverealms-deck").dataset.n = $("fiverealms-deck").dataset.n - n;
       },
 
       addCard(card, location = null) {
@@ -1021,7 +1062,7 @@ define([
           desc += `<h4>${_("King")}</h4>
           <p>
             ${_(
-              "At the end of the game, if you strictly have more influence in the Realm of this King: earn 3 castles.",
+              "At the end of the game, if you strictly have more influence in the Realm of this King: earn 3 <CASTLE>.",
             )}
           </p>`;
         }
@@ -1029,7 +1070,7 @@ define([
           desc += `<h4>${_("Queen")}</h4>
           <p>
             ${_(
-              "Throughout the game, when you influence the 3rd , 4th and 5th Banner of the Realm of this Queen: earn 1 castle.",
+              "Throughout the game, when you influence the 3rd , 4th and 5th Banner of the Realm of this Queen: earn 1 <CASTLE>.",
             )}
           </p>`;
         }
@@ -1037,7 +1078,7 @@ define([
           desc += `<h4>${_("Witch")}</h4>
           <p>
             ${_(
-              "Throughout the game, when you influence the 3rd and 5th Banner of the Realm of this Witch: look at all the cards in the discard pile, and pick 1 card that you mayRECRUIT or INFLUENCE.",
+              "Throughout the game, when you influence the 3rd and 5th Banner of the Realm of this Witch: look at all the cards in the discard pile, and pick 1 card that you may RECRUIT or INFLUENCE.",
             )}
           </p>`;
         }
@@ -1052,7 +1093,7 @@ define([
         if (card.type == "Titan") {
           desc += `<h4>${_("Titan")}</h4>
           <p>
-          ${_("When recruited, earn 1 castle.")}
+          ${_("When recruited, earn 1 <CASTLE>.")}
           <br />
           ${_(
             "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
@@ -1064,7 +1105,7 @@ define([
           desc += `<h4>${_("Popess")}</h4>
           <p>
           ${_(
-            "Throughout the game, when you influence the 4th banner of any Realm: earn 2 castles.",
+            "Throughout the game, when you influence the 4th banner of any Realm: earn 2 <CASTLE>.",
           )}
           </p>`;
         }
@@ -1076,28 +1117,28 @@ define([
           )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more Warriors and Warrior Monk, steal 2 castles from your opponent.",
+            "At the end of the game, if you strictly have more Warriors and Warrior Monk, steal 2 <CASTLE> from your opponent.",
           )}
           </p>`;
         }
         if (card.type == "Gaia") {
           desc += `<h4>${_("Gaia (Titan)")}</h4>
           <p>
-          ${_("When recruited, earn 1 castle.")}
+          ${_("When recruited, earn 1 <CASTLE>.")}
           <br />
           ${_(
             "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
           )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more Titans, Gaia included, earn 1 castle.",
+            "At the end of the game, if you strictly have more Titans, Gaia included, earn 1 <CASTLE>.",
           )}
           </p>`;
         }
         if (card.type == "Ouranos") {
           desc += `<h4>${_("Ouranos (Titan)")}</h4>
           <p>
-          ${_("When recruited, earn 1 castle.")}
+          ${_("When recruited, earn 1 <CASTLE>.")}
           <br />
           ${_(
             "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
@@ -1109,11 +1150,11 @@ define([
           desc += `<h4>${_("Colonel")}</h4>
           <p>
           ${_(
-            "Throughout the game, when you create 1 line of 5 influences: earn 1 castle.",
+            "Throughout the game, when you create 1 line of 5 influences: earn 1 <CASTLE>.",
           )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more lines of influence: earn 2 castles.",
+            "At the end of the game, if you strictly have more lines of influence: earn 2 <CASTLE>.",
           )}
           </p>`;
         }
@@ -1129,11 +1170,11 @@ define([
           desc += `<h4>${_("Captain")}</h4>
           <p>
           ${_(
-            "When recruited, earn 1 castle by Realm for which you have strictly more influence.",
+            "When recruited, earn 1 <CASTLE> by Realm for which you have strictly more influence.",
           )}
           <br />
           ${_(
-            "At the end of the game, earn 1 castle by Realm for which you have strictly more influence.",
+            "At the end of the game, earn 1 <CASTLE> by Realm for which you have strictly more influence.",
           )}
           </p>`;
         }
@@ -1141,7 +1182,7 @@ define([
           desc += `<h4>${_("Marshal")}</h4>
           <p>
           ${_(
-            "At the end of the game, if you strictly have more Characters from the Imperial Order: earn 3 castles.",
+            "At the end of the game, if you strictly have more Characters from the Imperial Order: earn 3 <CASTLE>.",
           )}
           </p>`;
         }
@@ -1150,7 +1191,7 @@ define([
         ${this.tplCard(card)}
         <div class='card-desc'>
           <h4 class='card-id'>Id: ${card.id}</h4>
-          ${desc}
+          ${this.formatString(desc)}
         </div>
       </div>  
       `;
@@ -1196,11 +1237,18 @@ define([
           this.addCard(n.args.deck);
         }
 
+        // First card of deck already exist
+        this.decDeckCount();
+
         n.args.alkane.forEach((card, i) => {
-          this.addCard(card, "fiverealms-deck");
-          this.wait(100 * i).then(() =>
-            this.slide(`card-${card.id}`, this.getCardContainer(card)),
-          );
+          if (!$(`card-${card.id}`)) {
+            this.addCard(card, "fiverealms-deck");
+            this.decDeckCount();
+          }
+
+          this.wait(100 * i).then(() => {
+            this.slide(`card-${card.id}`, this.getCardContainer(card));
+          });
         });
       },
 

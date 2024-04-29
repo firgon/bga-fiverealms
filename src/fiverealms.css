@@ -148,6 +148,8 @@
         cursor: pointer; }
         #fiverealms-main-container .fiverealms-board .player-board-fixed-size .throne-row .throne-slot.selectable:hover {
           background: green; }
+        #fiverealms-main-container .fiverealms-board .player-board-fixed-size .throne-row .throne-slot.selectable .fiverealms-card {
+          opacity: 0.8; }
     #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area {
       display: grid;
       height: 200px;
@@ -161,7 +163,9 @@
         justify-content: center;
         align-items: end;
         position: relative;
-        padding-bottom: 11px; }
+        padding-bottom: 11px;
+        border-radius: 7px;
+        box-shadow: 1px 1px 3px black; }
         #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm.selectable {
           cursor: pointer; }
         #fiverealms-main-container .fiverealms-board .player-board-fixed-size .influence-area .influence-realm[data-n]::before {
@@ -209,11 +213,12 @@
           box-shadow: 0px 0px 5px 1px black; }
     #fiverealms-main-container .fiverealms-board .player-board-fixed-size .titans-area {
       display: flex; }
+      #fiverealms-main-container .fiverealms-board .player-board-fixed-size .titans-area .fiverealms-card {
+        margin: 0px 5px; }
 
 #pending-recruit {
   display: flex;
   justify-content: center;
-  align-items: center;
   height: 0px;
   transition: height 0.4s; }
   #pending-recruit .fiverealms-card {
@@ -265,6 +270,24 @@
             position: absolute;
             top: 7px;
             left: 7px; }
+        #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #fiverealms-deck::before {
+          content: attr(data-n);
+          position: absolute;
+          background: white;
+          width: 50px;
+          height: 50px;
+          border-radius: 50%;
+          top: 7%;
+          left: calc(50% - 25px);
+          z-index: 20;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          font-size: 18px;
+          opacity: 0.9;
+          font-weight: bold;
+          border: 1px solid black;
+          box-shadow: 1px 1px 2px black; }
         #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #discard-cards-holder #fiverealms-discard .fiverealms-card {
           filter: grayscale(1); }
         #fiverealms-main-container #resizable-central-board #central-board #central-board-left-column #discard-cards-holder #fiverealms-discard .fiverealms-card.selected {
@@ -948,8 +971,8 @@
     justify-content: center;
     align-items: center;
     padding: 20px; }
-    .fiverealms_discard_popin #fiverealms-discard .goldncrash-card {
-      margin: 5px; }
+    .fiverealms_discard_popin #fiverealms-discard .fiverealms-card {
+      margin: 10px; }
   .fiverealms_discard_popin #discard-modal-footer {
     background: #bbb;
     border-top: 1px solid #797979;

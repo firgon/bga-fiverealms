@@ -53,7 +53,7 @@ class Player extends \FRMS\Helpers\DB_Model
     $choosablePlaces = count(array_keys($council)) != 4
       ? array_values(array_diff([1, 2, 3, 4], array_keys($council)))
       : [1, 2, 3, 4];
-    return [$cards, $choosableCards, $choosablePlaces];
+    return [$cards, $choosableCards, $choosablePlaces, count($council) ==  4];
   }
 
   public function getCharactersInCouncil()
