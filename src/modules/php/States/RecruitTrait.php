@@ -20,7 +20,8 @@ trait RecruitTrait
 		return [
 			'cards' => $cards,
 			'choosableCards' => $choosableCards->ui(),
-			'availablePlaces' => $choosablePlaces
+			'availablePlaces' => $choosablePlaces,
+			'suffix' => count($choosableCards) ? '' : 'impossible'
 		];
 	}
 

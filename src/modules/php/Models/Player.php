@@ -116,9 +116,13 @@ class Player extends \FRMS\Helpers\DB_Model
       ->where('player_id', $this->getId())
       ->where('influence_column', $realm)
       ->count();
-    return Cards::getInLocationQ(INFLUENCE)
+  }
+
+  public function countInCouncil($realm)
+  {
+    return Cards::getInLocationQ(COUNCIL)
       ->where('player_id', $this->getId())
-      ->where('influence_column', $realm)
+      ->where('realm', $realm)
       ->count();
   }
 
@@ -132,7 +136,7 @@ class Player extends \FRMS\Helpers\DB_Model
 
   public function countLines()
   {
-    return max(array_map(fn ($realm) => $this->countSpecificBanner($realm), NORMAL_BANNERS));
+    return min(array_map(fn ($realm) => $this->countSpecificBanner($realm), NORMAL_BANNERS));
   }
 
   public function activateCouncil($influence, $bEndOfGame = false)
@@ -163,7 +167,7 @@ class Player extends \FRMS\Helpers\DB_Model
   public function increaseScore($score, $card)
   {
     $this->incScore($score);
-    Notifications::getNewCastleCards($score, $card, $this);
+    if ($score) Notifications::getNewCastleCards($score, $card, $this);
   }
 
   public function getOpponent()

@@ -77,8 +77,10 @@ trait StealTrait
 
 		Notifications::steal($player, 1);
 
-		$player->incScore(1);
-		$player->getOpponent()->incScore(-1);
+		$opponent = $player->getOpponent();
+		$loss = min(1, $opponent->getScore());
+		$player->increaseScore($loss);
+		$opponent->increaseScore(-$loss);
 
 		Game::transition(END_TURN);
 	}

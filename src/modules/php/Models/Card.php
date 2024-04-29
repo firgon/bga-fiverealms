@@ -61,13 +61,24 @@ class Card extends \FRMS\Helpers\DB_Model
         return 0;
     }
 
-    protected function getPlayer()
+    protected function getPlayer(): Player
     {
         return Players::get($this->getPlayerId());
     }
 
-    protected function countNewLines($nthOfCards)
+    protected function countNewLines($influence)
     {
+
+        $range = [];
+        foreach ($influence as $realm => $data) {
+            $tmpRange = $this->getRangePlayedCards(count($data), $realm);
+            foreach ($tmpRange as $rank) {
+                $range[$rank] = true;
+            }
+        }
+
+        $nthOfCards = array_keys($range);
+
         $linesNb = $this->getPlayer()->countLines();
 
         //determine how many new lines have been created
@@ -117,13 +128,23 @@ class Card extends \FRMS\Helpers\DB_Model
         }
     }
 
+    protected function majorityOfThisRealmInCouncil()
+    {
+        $player = $this->getPlayer();
+        $opponent = $player->getOpponent();
+        if ($player->countInCouncil($this->getRealm()) > $opponent->countInCouncil($this->getRealm())) {
+            $player->increaseScore(3, $this);
+        }
+    }
+
     protected function majorityOfWarriors()
     {
         $player = $this->getPlayer();
         $opponent = $player->getOpponent();
         if ($player->countWarriors() > $opponent->countWarriors()) {
-            $player->increaseScore(2, $this);
-            $opponent->increaseScore(-2, $this);
+            $loss = min(2, $opponent->getScore());
+            $player->increaseScore($loss, $this);
+            $opponent->increaseScore(-$loss, $this);
         }
     }
     protected function majorityOfTitans()
@@ -138,7 +159,7 @@ class Card extends \FRMS\Helpers\DB_Model
     {
         $player = $this->getPlayer();
         if ($player->countLines() > $player->getOpponent()->countLines()) {
-            $player->increaseScore(3, $this);
+            $player->increaseScore(2, $this);
         };
     }
 
@@ -153,8 +174,7 @@ class Card extends \FRMS\Helpers\DB_Model
                 $majorities++;
             }
         }
-
-        $player->increaseScore($majorities, $this);
+        if ($majorities) $player->increaseScore($majorities, $this);
     }
 
     public function stealOrDestroy()
@@ -164,8 +184,11 @@ class Card extends \FRMS\Helpers\DB_Model
 
     public function steal()
     {
-        //TODO
-        throw new Exception('Unimplemented method');
+        $player = $this->getPlayer();
+        $opponent = $player->getOpponent();
+        $loss = min(1, $opponent->getScore());
+        $player->increaseScore($loss, $this);
+        $opponent->increaseScore(-$loss, $this);
     }
 
     //

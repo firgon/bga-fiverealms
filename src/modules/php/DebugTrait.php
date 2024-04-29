@@ -36,6 +36,9 @@ trait DebugTrait
 
   function test()
   {
+    foreach (Players::getAll() as $pId => $player) {
+      $player->activateCouncil([], true);
+    }
   }
 
   // ████                         █████ ██████████            █████                        

@@ -13,7 +13,7 @@ class Marshal extends \FRMS\Models\Card
 
 	public function endEffect()
 	{
-		return $this->majorityOfThisRealm();
+		return $this->majorityOfThisRealmInCouncil();
 	}
 
 	public function isTitan()

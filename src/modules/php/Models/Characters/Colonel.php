@@ -12,7 +12,7 @@ class Colonel extends \FRMS\Models\Card
 {
 	public function anytimeEffect($influence)
 	{
-		return $this->getRewards($influence, 'countNewLines', 1);
+		$this->getPlayer()->increaseScore($this->countNewLines($influence), $this);
 	}
 
 	public function endEffect()
