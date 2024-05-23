@@ -77,7 +77,6 @@ define([
         this.setupInfoPanel();
         this.setupCards();
         this.setupDiscardModal();
-        this.cheatModuleSetup(gamedatas);
 
         this.inherited(arguments);
       },
@@ -97,14 +96,14 @@ define([
             this.closeCurrentTooltip();
             $(`discard-cards-modal`).insertAdjacentElement(
               "beforeend",
-              $(`fiverealms-discard`),
+              $(`fiverealms-discard`)
             );
           },
           onStartHide: () => {
             this.closeCurrentTooltip();
             $(`discard-cards-holder`).insertAdjacentElement(
               "beforeend",
-              $(`fiverealms-discard`),
+              $(`fiverealms-discard`)
             );
           },
           onShow: () => this.closeCurrentTooltip(),
@@ -149,12 +148,12 @@ define([
         if (args.args && args.args.previousSteps) {
           args.args.previousSteps.forEach((stepId) => {
             let logEntry = $("logs").querySelector(
-              `.log.notif_newUndoableStep[data-step="${stepId}"]`,
+              `.log.notif_newUndoableStep[data-step="${stepId}"]`
             );
             if (logEntry) this.onClick(logEntry, () => this.undoToStep(stepId));
 
             logEntry = document.querySelector(
-              `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`,
+              `.chatwindowlogs_zone .log.notif_newUndoableStep[data-step="${stepId}"]`
             );
             if (logEntry) this.onClick(logEntry, () => this.undoToStep(stepId));
           });
@@ -174,7 +173,7 @@ define([
                 "btnUndoLastStep",
                 _("Undo last step"),
                 () => this.undoToStep(lastStep),
-                "restartAction",
+                "restartAction"
               );
           }
 
@@ -186,7 +185,7 @@ define([
               this.stopActionTimer();
               this.takeAction("actRestart");
             },
-            "restartAction",
+            "restartAction"
           );
         }
 
@@ -216,7 +215,7 @@ define([
 
           if ($(`dockedlog_${notif.mobileLogId}`))
             this.onClick($(`dockedlog_${notif.mobileLogId}`), () =>
-              this.undoToStep(stepId),
+              this.undoToStep(stepId)
             );
         }
       },
@@ -233,7 +232,7 @@ define([
         this.startActionTimer(
           "btnConfirmTurn",
           timer,
-          this.prefs[OPTION_CONFIRM].value,
+          this.prefs[OPTION_CONFIRM].value
         );
       },
 
@@ -322,7 +321,7 @@ define([
                 spaceId: args.spaceId,
                 realm,
                 spaceIds: args.realms[realm],
-              },
+              }
             );
           };
         };
@@ -350,20 +349,20 @@ define([
           this.addPrimaryActionButton(
             `btn${realm}`,
             REALMS[realm],
-            selectRealm(realm),
+            selectRealm(realm)
           );
           this.connect($(`btn${realm}`), "mouseover", () =>
-            this.highlightSpaces(spaceIds),
+            this.highlightSpaces(spaceIds)
           );
           this.connect($(`btn${realm}`), "mouseout", () =>
-            this.clearHighlights(),
+            this.clearHighlights()
           );
 
           spaceIds.forEach((spaceId) => {
             let cell = this.getCell(spaceId);
             this.onClick(cell, selectRealm(realm));
             this.connect(cell, "mouseover", () =>
-              this.highlightSpaces(spaceIds),
+              this.highlightSpaces(spaceIds)
             );
             this.connect(cell, "mouseout", () => this.clearHighlights());
           });
@@ -387,16 +386,16 @@ define([
           this.takeAction("actRecruit", {
             spaceId: args.spaceId,
             realm: args.realm,
-          }),
+          })
         );
         this.addPrimaryActionButton("btnInfluence", _("Influence"), () => {
           if (args.realm == "imperial") {
             this.clientState(
               "chooseInfluenceColumns",
               _(
-                "You must choose on which column(s) to place the Imperial cards",
+                "You must choose on which column(s) to place the Imperial cards"
               ),
-              args,
+              args
             );
           } else {
             let influence = {};
@@ -435,7 +434,7 @@ define([
           totalSelected = 0;
           REALMS.forEach((realm) => {
             $(`board-${this.player_id}`).querySelector(
-              `.influence-realm.realm-${realm}`,
+              `.influence-realm.realm-${realm}`
             ).dataset.n = selection[realm];
             totalSelected += selection[realm];
           });
@@ -458,7 +457,7 @@ define([
           if (this._counters[this.player_id][realm].getValue() == 0) return;
 
           let influence = $(`board-${this.player_id}`).querySelector(
-            `.influence-realm.realm-${realm}`,
+            `.influence-realm.realm-${realm}`
           );
           this.onClick(influence, () => {
             if (totalSelected >= args.spaceIds.length) return;
@@ -506,7 +505,7 @@ define([
             return this.slide(`card-${card.id}`, this.getCardContainer(card), {
               delay: 100 * i,
             });
-          }),
+          })
         ).then(() => {
           Object.entries(increases).forEach(([realm, inc]) => {
             this._counters[n.args.player_id][realm].incValue(inc);
@@ -523,8 +522,8 @@ define([
           n.args.cards.map((card, i) =>
             this.slide(`card-${card.id}`, "pending-recruit", {
               delay: 100 * i,
-            }),
-          ),
+            })
+          )
         ).then(() => {
           Promise.all(
             n.args.cards.map((card, i) => {
@@ -535,10 +534,10 @@ define([
                 this.addCustomTooltip(
                   `card-${card.id}`,
                   this.getCardTooltip(card),
-                  { forceRecreate: true },
+                  { forceRecreate: true }
                 );
               });
-            }),
+            })
           ).then(() => {
             this.notifqueue.setSynchronousDuration(100);
           });
@@ -550,7 +549,7 @@ define([
         if (!this.isCurrentPlayerActive()) return;
 
         this.addDangerActionButton("btnPass", _("Pass"), () =>
-          this.takeAction("actPassChooseCharacter", {}),
+          this.takeAction("actPassChooseCharacter", {})
         );
 
         args.choosableCards.forEach((card) => {
@@ -566,7 +565,7 @@ define([
                 _("Please confirm Titan recruitment"),
                 {
                   cardId: card.id,
-                },
+                }
               );
             }
             // NORMAL
@@ -578,7 +577,7 @@ define([
                   cardId: card.id,
                   places: args.availablePlaces,
                   fullCouncil: args.fullCouncil,
-                },
+                }
               );
             }
           });
@@ -630,10 +629,10 @@ define([
               (elt, i) =>
                 this.slide(elt, "fiverealms-discard", {
                   delay: 100 * i,
-                }),
-            ),
+                })
+            )
           ).then(() =>
-            $("resizable-central-board").classList.remove("recruiting"),
+            $("resizable-central-board").classList.remove("recruiting")
           );
         });
       },
@@ -646,10 +645,10 @@ define([
             (elt, i) =>
               this.slide(elt, "fiverealms-discard", {
                 delay: 100 * i,
-              }),
-          ),
+              })
+          )
         ).then(() =>
-          $("resizable-central-board").classList.remove("recruiting"),
+          $("resizable-central-board").classList.remove("recruiting")
         );
       },
 
@@ -657,7 +656,7 @@ define([
         // NOTHING TO STEAL/DESTROY
         if (!args.descSuffix == "impossible") {
           this.addSecondaryActionButton("btnPass", _("Pass"), () =>
-            this.takeAction("actPass", {}),
+            this.takeAction("actPass", {})
           );
         }
         // STEAL/DESTROY
@@ -666,13 +665,13 @@ define([
             this.addPrimaryActionButton(
               "btnSteal",
               this.formatString(_("Steal one <CASTLE>")),
-              () => this.takeAction("actSteal", {}),
+              () => this.takeAction("actSteal", {})
             );
           }
 
           args.destroyableCardsIds.forEach((cardId) => {
             this.onClick(`card-${cardId}`, () =>
-              this.takeAction("actDestroy", { cardId }),
+              this.takeAction("actDestroy", { cardId })
             );
           });
         }
@@ -690,14 +689,14 @@ define([
 
       onEnteringStateWitch(args) {
         this.addPrimaryActionButton("btnOpenDiscard", _("Open discard"), () =>
-          this._discardModal.show(),
+          this._discardModal.show()
         );
         this._discardModal.show();
 
         let selectedCardId = null;
         let choosableCardIds = args.choosableCards.map((card) => card.id);
         let influencableCardIds = Object.keys(args.influencableCards).map((t) =>
-          parseInt(t),
+          parseInt(t)
         );
         Object.values(args.cards).forEach((card) => {
           let cardId = card.id;
@@ -729,9 +728,9 @@ define([
                     cardId: selectedCardId,
                     places: args.availablePlaces,
                     fullCouncil: args.fullCouncil,
-                  },
+                  }
                 ),
-              "discard-modal-footer",
+              "discard-modal-footer"
             );
             $("btnRecruit").classList.toggle("disabled", !canBeRecruited);
 
@@ -746,9 +745,9 @@ define([
                   this.clientState(
                     "witchChooseInfluenceColumn",
                     _(
-                      "You must choose on which column to place the Imperial card",
+                      "You must choose on which column to place the Imperial card"
                     ),
-                    args,
+                    args
                   );
                 }
                 // Otherwise => auto
@@ -761,14 +760,14 @@ define([
                   });
                 }
               },
-              "discard-modal-footer",
+              "discard-modal-footer"
             );
             $("btnInfluence").classList.toggle("disabled", !canBeInfluenced);
           });
         });
 
         this.addSecondaryActionButton("btnPass", _("Pass"), () =>
-          this.takeAction("actPass", {}),
+          this.takeAction("actPass", {})
         );
       },
 
@@ -800,7 +799,7 @@ define([
 
         let getRealm = (realm) =>
           $(`board-${this.player_id}`).querySelector(
-            `.influence-realm.realm-${realm}`,
+            `.influence-realm.realm-${realm}`
           );
         const REALMS = ["reptiles", "felines", "raptors", "ursids", "marines"];
         let selectedRealm = null;
@@ -847,7 +846,7 @@ define([
             "tplPlayerPanel",
             player,
             `player_panel_content_${player.color}`,
-            "after",
+            "after"
           );
           this.place("tplPlayerBoard", player, "fiverealms-main-container");
 
@@ -857,9 +856,9 @@ define([
             (realm) => {
               this._counters[pId][realm] = this.createCounter(
                 `influence-${realm}-${pId}`,
-                player.influence[realm],
+                player.influence[realm]
               );
-            },
+            }
           );
 
           // Useful to order boards
@@ -955,7 +954,7 @@ define([
               destroy: true,
               phantom: false,
               duration: 1100,
-            },
+            }
           );
         }
       },
@@ -972,7 +971,7 @@ define([
         this.gainLoseScore(
           n.args.player_id,
           n.args.incScore,
-          `player_score_${victimId}`,
+          `player_score_${victimId}`
         );
       },
 
@@ -1030,7 +1029,7 @@ define([
         let o = this.place(
           "tplCard",
           card,
-          location == null ? this.getCardContainer(card) : location,
+          location == null ? this.getCardContainer(card) : location
         );
         let tooltipDesc = this.getCardTooltip(card);
         if (tooltipDesc != null) {
@@ -1062,7 +1061,7 @@ define([
           desc += `<h4>${_("King")}</h4>
           <p>
             ${_(
-              "At the end of the game, if you strictly have more influence in the Realm of this King: earn 3 <CASTLE>.",
+              "At the end of the game, if you strictly have more influence in the Realm of this King: earn 3 <CASTLE>."
             )}
           </p>`;
         }
@@ -1070,7 +1069,7 @@ define([
           desc += `<h4>${_("Queen")}</h4>
           <p>
             ${_(
-              "Throughout the game, when you influence the 3rd , 4th and 5th Banner of the Realm of this Queen: earn 1 <CASTLE>.",
+              "Throughout the game, when you influence the 3rd , 4th and 5th Banner of the Realm of this Queen: earn 1 <CASTLE>."
             )}
           </p>`;
         }
@@ -1078,7 +1077,7 @@ define([
           desc += `<h4>${_("Witch")}</h4>
           <p>
             ${_(
-              "Throughout the game, when you influence the 3rd and 5th Banner of the Realm of this Witch: look at all the cards in the discard pile, and pick 1 card that you may RECRUIT or INFLUENCE.",
+              "Throughout the game, when you influence the 3rd and 5th Banner of the Realm of this Witch: look at all the cards in the discard pile, and pick 1 card that you may RECRUIT or INFLUENCE."
             )}
           </p>`;
         }
@@ -1086,7 +1085,7 @@ define([
           desc += `<h4>${_("Warrior")}</h4>
           <p>
             ${_(
-              "Throughout the game, when you influence the 4th Banner of the Realm of this Warrior: steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile.",
+              "Throughout the game, when you influence the 4th Banner of the Realm of this Warrior: steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile."
             )}
           </p>`;
         }
@@ -1096,7 +1095,7 @@ define([
           ${_("When recruited, earn 1 <CASTLE>.")}
           <br />
           ${_(
-            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game."
           )}
           </p>`;
         }
@@ -1105,7 +1104,7 @@ define([
           desc += `<h4>${_("Popess")}</h4>
           <p>
           ${_(
-            "Throughout the game, when you influence the 4th banner of any Realm: earn 2 <CASTLE>.",
+            "Throughout the game, when you influence the 4th banner of any Realm: earn 2 <CASTLE>."
           )}
           </p>`;
         }
@@ -1113,11 +1112,11 @@ define([
           desc += `<h4>${_("Warrior Monk")}</h4>
           <p>
           ${_(
-            "When recruited, steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile.",
+            "When recruited, steal from your opponent or destroy an opposing Character or Titan. If destroyed, put it in the discard pile."
           )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more Warriors and Warrior Monk, steal 2 <CASTLE> from your opponent.",
+            "At the end of the game, if you strictly have more Warriors and Warrior Monk, steal 2 <CASTLE> from your opponent."
           )}
           </p>`;
         }
@@ -1127,11 +1126,11 @@ define([
           ${_("When recruited, earn 1 <CASTLE>.")}
           <br />
           ${_(
-            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game."
           )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more Titans, Gaia included, earn 1 <CASTLE>.",
+            "At the end of the game, if you strictly have more Titans, Gaia included, earn 1 <CASTLE>."
           )}
           </p>`;
         }
@@ -1141,7 +1140,7 @@ define([
           ${_("When recruited, earn 1 <CASTLE>.")}
           <br />
           ${_(
-            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game.",
+            "Throughout the game, if you recruit a 5th different Titan: you immediately win the game."
           )}
           </p>`;
         }
@@ -1150,11 +1149,11 @@ define([
           desc += `<h4>${_("Colonel")}</h4>
           <p>
           ${_(
-            "Throughout the game, when you create 1 line of 5 influences: earn 1 <CASTLE>.",
+            "Throughout the game, when you create 1 line of 5 influences: earn 1 <CASTLE>."
           )}
           <br />
           ${_(
-            "At the end of the game, if you strictly have more lines of influence: earn 2 <CASTLE>.",
+            "At the end of the game, if you strictly have more lines of influence: earn 2 <CASTLE>."
           )}
           </p>`;
         }
@@ -1162,7 +1161,7 @@ define([
           desc += `<h4>${_("General")}</h4>
           <p>
           ${_(
-            "Throughout the game, when you create 1 line of 5 influences: Immediately play a new turn.",
+            "Throughout the game, when you create 1 line of 5 influences: Immediately play a new turn."
           )}
           </p>`;
         }
@@ -1170,11 +1169,11 @@ define([
           desc += `<h4>${_("Captain")}</h4>
           <p>
           ${_(
-            "When recruited, earn 1 <CASTLE> by Realm for which you have strictly more influence.",
+            "When recruited, earn 1 <CASTLE> by Realm for which you have strictly more influence."
           )}
           <br />
           ${_(
-            "At the end of the game, earn 1 <CASTLE> by Realm for which you have strictly more influence.",
+            "At the end of the game, earn 1 <CASTLE> by Realm for which you have strictly more influence."
           )}
           </p>`;
         }
@@ -1182,7 +1181,7 @@ define([
           desc += `<h4>${_("Marshal")}</h4>
           <p>
           ${_(
-            "At the end of the game, if you strictly have more Characters from the Imperial Order: earn 3 <CASTLE>.",
+            "At the end of the game, if you strictly have more Characters from the Imperial Order: earn 3 <CASTLE>."
           )}
           </p>`;
         }
@@ -1303,7 +1302,7 @@ define([
           // WITHOUT TEXT
           str = str.replaceAll(
             new RegExp("<" + name + ">", "g"),
-            this.formatIcon(name),
+            this.formatIcon(name)
           );
         });
 
@@ -1441,6 +1440,6 @@ define([
         scale = Math.min(widthScale, heightScale);
         ROOT.style.setProperty("--playerBoardScale", scale);
       },
-    },
+    }
   );
 });
