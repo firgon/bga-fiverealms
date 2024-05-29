@@ -15,12 +15,6 @@ $gameinfos = array(
     // Name of the game in English (will serve as the basis for translation) 
     'game_name' => "FiveRealms",
 
-    // Game designer (or game designers, separated by commas)
-    'designer' => ' ',
-
-    // Game artist (or game artists, separated by commas)
-    'artist' => ' ',
-
     // Year of FIRST publication of this game. Can be negative.
     'year' => 2024,
 
@@ -34,7 +28,7 @@ $gameinfos = array(
     'publisher_bgg_id' => 40652,
 
     // Board game geek ID of the game
-    'bgg_id' => 0,
+    'bgg_id' => 419259,
 
 
     // Players configuration that can be played (ex: 2 to 4 players)
@@ -125,18 +119,6 @@ $gameinfos = array(
         //  maximum possible value: unlimited
         //  minimum possible value: 740
         'max' => null
-    ),
-
-    // Game presentation
-    // Short game presentation text that will appear on the game description page, structured as an array of paragraphs.
-    // Each paragraph must be wrapped with totranslate() for translation and should not contain html (plain text without formatting).
-    // A good length for this text is between 100 and 150 words (about 6 to 9 lines on a standard display)
-    'presentation' => array(
-        totranslate('Explore the American West with a pen and cards as your equipment. To succeed in
-        your expeditions, call the right cards and give the ones you like to trigger the most
-        advantageous effects.'),
-        totranslate('You’ll also need to match characters with their favorite tools and transportation to
-        open doors to new regions. Can you become the best explorer?')
     ),
 
     //////// BGA SANDBOX ONLY PARAMETERS (DO NOT MODIFY)
