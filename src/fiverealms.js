@@ -645,7 +645,7 @@ define([
 
     onEnteringStateSteal(args) {
       // NOTHING TO STEAL/DESTROY
-      if (!args.descSuffix == "impossible") {
+      if (args.descSuffix == "impossible") {
         this.addSecondaryActionButton("btnPass", _("Pass"), () =>
           this.takeAction("actPass", {})
         );
