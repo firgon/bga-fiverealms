@@ -164,10 +164,10 @@ class Player extends \FRMS\Helpers\DB_Model
     $throne->anytimeEffect($influence);
   }
 
-  public function increaseScore($score, $card)
+  public function increaseScore($score, $card = null)
   {
     $this->incScore($score);
-    if ($score) Notifications::getNewCastleCards($score, $card, $this);
+    if ($score && $card) Notifications::getNewCastleCards($score, $card, $this);
   }
 
   public function getOpponent()
