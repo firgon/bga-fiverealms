@@ -88,8 +88,8 @@ $machinestates = [
 
     ST_RECRUIT => [
         "name" => "recruit",
-        "description" => clienttranslate('${actplayer} may choose one character to place in this council'),
-        "descriptionmyturn" => clienttranslate('${you} may choose one character to place in this council'),
+        "description" => clienttranslate('${actplayer} may choose one character to place in his council'),
+        "descriptionmyturn" => clienttranslate('${you} may choose one character to place in his council'),
         "descriptionimpossible" => clienttranslate('${actplayer} can\'t recruit any character and must pass'),
         "descriptionmyturnimpossible" => clienttranslate('${you} can\'t recruit any character and must pass'),
         "type" => ACTIVE_PLAYER,
