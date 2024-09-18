@@ -49,11 +49,11 @@ class Player extends \FRMS\Helpers\DB_Model
   {
     $cards = $bFromDiscard ? Cards::getInLocation(DISCARD) : $this->getCardsInHand(true);
     $council = $this->getCharactersInCouncil();
-    $choosableCards = $cards->filter(fn ($card) => !in_array($card->getType(), array_values($council)));
+    $choosableCards = $cards->filter(fn($card) => !in_array($card->getType() . $card->getRealm(), array_values($council)));
     $choosablePlaces = count(array_keys($council)) != 4
       ? array_values(array_diff([1, 2, 3, 4], array_keys($council)))
       : [1, 2, 3, 4];
-    return [$cards, $choosableCards, $choosablePlaces, count($council) ==  4];
+    return [$cards, $choosableCards, $choosablePlaces, count($council) == 4];
   }
 
   public function getCharactersInCouncil()
@@ -62,7 +62,7 @@ class Player extends \FRMS\Helpers\DB_Model
     $cardsInCouncil = Cards::getInLocationPId(COUNCIL, $this->getId());
 
     foreach ($cardsInCouncil as $cardId => $card) {
-      $result[$card->getState()] = $card->getType();
+      $result[$card->getState()] = $card->getType() . $card->getRealm();
     }
     return $result;
   }
@@ -131,12 +131,12 @@ class Player extends \FRMS\Helpers\DB_Model
   {
     return Cards::getInLocationQ(COUNCIL)
       ->where('player_id', $this->getId())
-      ->get()->filter(fn ($card) => $card->isWarrior())->count();
+      ->get()->filter(fn($card) => $card->isWarrior())->count();
   }
 
   public function countLines()
   {
-    return min(array_map(fn ($realm) => $this->countSpecificBanner($realm), NORMAL_BANNERS));
+    return min(array_map(fn($realm) => $this->countSpecificBanner($realm), NORMAL_BANNERS));
   }
 
   public function activateCouncil($influence, $bEndOfGame = false)
