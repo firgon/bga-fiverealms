@@ -36,7 +36,13 @@ trait TurnTrait
 
 	public function argPlay()
 	{
-		$nextCard = Cards::getTopOf(DECK);
+		$nextCards = Cards::getTopOf(DECK, 2, false);
+
+		$nextCard = $nextCards->first();
+
+		$nextCards = $nextCards->toArray();
+
+		$nextCard2 = (count($nextCards) == 2) ? $nextCards[1]->getUiData(false) : null;
 
 		//safe but probably useless
 		if (!$nextCard) {
@@ -48,7 +54,8 @@ trait TurnTrait
 
 		return [
 			'possibleSpaceIds' => Cards::getPlayablePlaces($nextCard->getRealm()),
-			'deck' => $nextCard->getUiData(false)
+			'deck' => $nextCard->getUiData(false),
+			'secondCardOnDeck' => $nextCard2
 		];
 	}
 

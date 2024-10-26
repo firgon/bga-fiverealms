@@ -49,7 +49,12 @@ class Player extends \FRMS\Helpers\DB_Model
   {
     $cards = $bFromDiscard ? Cards::getInLocation(DISCARD) : $this->getCardsInHand(true);
     $council = $this->getCharactersInCouncil();
-    $choosableCards = $cards->filter(fn($card) => !in_array($card->getType() . $card->getRealm(), array_values($council)));
+    $titans = Cards::getInLocationPId(TITANS, $this->getId())->map(fn($card) => $card->getType() . $card->getRealm())->toArray();
+    //a card is choosable only if there is not same card in titans or in council.
+    $choosableCards = $cards->filter(
+      fn($card) =>
+      !in_array($card->getType() . $card->getRealm(), $titans) && !in_array($card->getType() . $card->getRealm(), array_values($council))
+    );
     $choosablePlaces = count(array_keys($council)) != 4
       ? array_values(array_diff([1, 2, 3, 4], array_keys($council)))
       : [1, 2, 3, 4];

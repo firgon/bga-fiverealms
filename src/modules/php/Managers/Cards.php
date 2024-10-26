@@ -49,8 +49,8 @@ class Cards extends \FRMS\Helpers\Pieces
 
     public static function getVisibleCards()
     {
-        $toExclude = [DECK, DECK . THRONE, DISCARD, ALKANE];
-        return static::getAll()->filter(fn ($card) => !in_array($card->getLocation(), $toExclude))->ui();
+        $toExclude = [DECK, DECK . THRONE, ALKANE];
+        return static::getAll()->filter(fn($card) => !in_array($card->getLocation(), $toExclude))->ui();
     }
 
     /* Creation of the Cards */
@@ -228,7 +228,7 @@ class Cards extends \FRMS\Helpers\Pieces
                             }
                         }
                     }
-                    $currentSpaceIds = array_map(fn ($c) => $c->getSpaceId(), $currentZone);
+                    $currentSpaceIds = array_map(fn($c) => $c->getSpaceId(), $currentZone);
                     foreach ($currentZone as $validatedCard) {
                         $adjacentRealms[$validatedCard->getSpaceId()] = $currentSpaceIds;
                     }
