@@ -8,3 +8,4 @@ composer.json
 composer.lock
 phpunit.xml
 .phpunit.result.cache
+src/.sass-cache/

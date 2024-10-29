@@ -5,6 +5,7 @@
         <div id="pending-recruit"></div>
         <div id="central-board">
             <div id="central-board-left-column">
+                <div id="fiverealms-top-deck"></div>
                 <div id="fiverealms-deck"></div>
                 <div id='discard-cards-holder'>
                     <div id="fiverealms-discard"></div>
